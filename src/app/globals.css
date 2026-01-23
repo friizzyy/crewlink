@@ -109,17 +109,25 @@
   ::-webkit-scrollbar {
     @apply w-2 h-2;
   }
-  
+
   ::-webkit-scrollbar-track {
     @apply bg-transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
     @apply bg-slate-300 rounded-full;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-slate-400;
+  }
+
+  /* GPU-accelerated scroll reveal optimization */
+  .transition-all {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 }
 

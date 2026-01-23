@@ -18,28 +18,32 @@ import { MarketingFooter } from '@/components/MarketingFooter'
 function useScrollReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
-
-  // Wait for mount to ensure CSS hidden state is applied before observing
-  useEffect(() => {
-    const timer = requestAnimationFrame(() => {
-      setIsMounted(true)
-    })
-    return () => cancelAnimationFrame(timer)
-  }, [])
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    if (!isMounted) return
+    const element = ref.current
+    if (!element) return
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true)
-      },
-      { threshold, rootMargin: '0px 0px -50px 0px' }
-    )
-    if (ref.current) observer.observe(ref.current)
-    return () => observer.disconnect()
-  }, [threshold, isMounted])
+    // Small delay to ensure CSS is painted before observing
+    const initTimer = setTimeout(() => {
+      observerRef.current = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            requestAnimationFrame(() => {
+              setIsVisible(true)
+            })
+          }
+        },
+        { threshold, rootMargin: '0px 0px -50px 0px' }
+      )
+      observerRef.current.observe(element)
+    }, 100)
+
+    return () => {
+      clearTimeout(initTimer)
+      observerRef.current?.disconnect()
+    }
+  }, [threshold])
 
   return { ref, isVisible }
 }
