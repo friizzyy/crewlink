@@ -28,7 +28,7 @@ const PRIORITY_CITY_IDS = ['san-francisco', 'los-angeles', 'grass-valley', 'san-
 // Stats data
 const stats = [
   { label: 'Cities Live', value: '35+', icon: MapPin, color: 'cyan' },
-  { label: 'Coming Soon', value: '15+', icon: TrendingUp, color: 'purple' },
+  { label: 'Launching Next', value: '15+', icon: TrendingUp, color: 'purple' },
   { label: 'Active Workers', value: '50K+', icon: Users, color: 'emerald' },
   { label: 'Jobs Completed', value: '120K+', icon: Briefcase, color: 'amber' },
 ]
@@ -468,9 +468,9 @@ function CitiesPageContent() {
               category={selectedCategory}
             />
 
-            {/* Coming Soon */}
+            {/* Expanding To */}
             <CityListSection
-              title="Coming Soon"
+              title="Expanding To"
               badge="Expansion"
               badgeColor="purple"
               cities={filteredExpansion}

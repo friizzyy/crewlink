@@ -50,7 +50,7 @@ const values = [
   {
     icon: Lightbulb,
     title: 'Innovation',
-    description: 'We continuously improve our platform with cutting-edge technology to make hiring and working seamless.',
+    description: 'We continuously improve our platform with modern technology to make hiring and working seamless.',
     color: 'amber',
   },
 ]
@@ -404,7 +404,7 @@ function InvestorsSection() {
               <span className="text-sm font-medium text-amber-400">Backed By</span>
             </div>
             <h3 className="text-xl font-semibold text-white">
-              World-Class Investors
+              Leading Investors
             </h3>
           </div>
           <div className="flex flex-wrap justify-center gap-4">

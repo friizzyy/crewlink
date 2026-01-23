@@ -140,19 +140,19 @@ export default function WorkMessagesPage() {
   }
 
   const handleCall = () => {
-    toast.info('Voice calls coming soon')
+    toast.info('Voice calls available in a future update')
   }
 
   const handleVideoCall = () => {
-    toast.info('Video calls coming soon')
+    toast.info('Video calls available in a future update')
   }
 
   const handleAttachment = () => {
-    toast.info('File attachments coming soon')
+    toast.info('File attachments available in a future update')
   }
 
   const handleImageUpload = () => {
-    toast.info('Image sharing coming soon')
+    toast.info('Image sharing available in a future update')
   }
 
   const getJobStatusColor = (status: string) => {
