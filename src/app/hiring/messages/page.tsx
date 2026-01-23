@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
   MessageCircle, Search, Phone, Video, MoreHorizontal,
   Send, Paperclip, Image as ImageIcon, Smile, Check, CheckCheck,
-  ArrowLeft, Star, Clock, MapPin
+  ArrowLeft, Star, Clock, MapPin, Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
@@ -126,6 +126,10 @@ export default function HiringMessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>('1')
   const [messageText, setMessageText] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [messages, setMessages] = useState(mockMessages)
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const filteredConversations = mockConversations.filter((conv) =>
     conv.worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -136,11 +140,66 @@ export default function HiringMessagesPage() {
 
   const toast = useToast()
 
-  const handleSendMessage = () => {
-    if (!messageText.trim()) return
-    // In real app, send message via API
-    toast.success('Message sent')
-    setMessageText('')
+  // Auto-resize textarea
+  const adjustTextareaHeight = useCallback(() => {
+    const textarea = textareaRef.current
+    if (textarea) {
+      textarea.style.height = 'auto'
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 120)}px`
+    }
+  }, [])
+
+  // Focus input when conversation changes
+  useEffect(() => {
+    if (selectedConversation && textareaRef.current) {
+      // Small delay to ensure the DOM is updated
+      setTimeout(() => {
+        textareaRef.current?.focus()
+      }, 100)
+    }
+  }, [selectedConversation])
+
+  // Handle input change with auto-resize
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setMessageText(e.target.value)
+    adjustTextareaHeight()
+  }
+
+  const handleSendMessage = async () => {
+    const trimmedText = messageText.trim()
+    if (!trimmedText || isSending) return
+
+    setIsSending(true)
+
+    try {
+      // Simulate API call (in real app, send via API)
+      await new Promise(resolve => setTimeout(resolve, 300))
+
+      // Add message to local state
+      const newMessage = {
+        id: `msg-${Date.now()}`,
+        text: trimmedText,
+        time: 'Just now',
+        isFromMe: true,
+        read: false,
+      }
+      setMessages(prev => [...prev, newMessage])
+
+      // Clear input and reset height
+      setMessageText('')
+      if (textareaRef.current) {
+        textareaRef.current.style.height = 'auto'
+      }
+
+      toast.success('Message sent')
+    } catch (error) {
+      console.error('Error sending message:', error)
+      toast.error('Failed to send message. Please try again.')
+    } finally {
+      setIsSending(false)
+      // Re-focus the input after sending
+      textareaRef.current?.focus()
+    }
   }
 
   const handleCall = () => {
@@ -309,7 +368,7 @@ export default function HiringMessagesPage() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {mockMessages.map((message) => (
+            {messages.map((message) => (
               <div
                 key={message.id}
                 className={cn('flex', message.isFromMe ? 'justify-end' : 'justify-start')}
@@ -349,14 +408,16 @@ export default function HiringMessagesPage() {
               <div className="flex gap-2">
                 <button
                   onClick={handleAttachment}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  disabled={isSending}
+                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
                   title="Attach file"
                 >
                   <Paperclip className="w-5 h-5" />
                 </button>
                 <button
                   onClick={handleImageUpload}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                  disabled={isSending}
+                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
                   title="Send image"
                 >
                   <ImageIcon className="w-5 h-5" />
@@ -364,8 +425,9 @@ export default function HiringMessagesPage() {
               </div>
               <div className="flex-1 relative">
                 <textarea
+                  ref={textareaRef}
                   value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
                       e.preventDefault()
@@ -374,23 +436,32 @@ export default function HiringMessagesPage() {
                   }}
                   placeholder="Type a message..."
                   rows={1}
-                  className="w-full px-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none"
+                  disabled={isSending}
+                  className="w-full px-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none min-h-[42px] max-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{ overflow: 'hidden' }}
                 />
               </div>
-              <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <button
+                disabled={isSending}
+                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
+              >
                 <Smile className="w-5 h-5" />
               </button>
               <button
                 onClick={handleSendMessage}
-                disabled={!messageText.trim()}
+                disabled={!messageText.trim() || isSending}
                 className={cn(
-                  'p-2.5 rounded-xl transition-colors',
-                  messageText.trim()
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
+                  'p-2.5 rounded-xl transition-colors disabled:cursor-not-allowed',
+                  messageText.trim() && !isSending
+                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:opacity-90'
                     : 'bg-slate-800 text-slate-500'
                 )}
               >
-                <Send className="w-5 h-5" />
+                {isSending ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5" />
+                )}
               </button>
             </div>
           </div>
