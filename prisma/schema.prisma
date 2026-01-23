@@ -1,0 +1,414 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER & PROFILES
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  phone         String    @unique
+  email         String?   @unique
+  name          String?
+  avatarUrl     String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Auth
+  otpCode       String?
+  otpExpiresAt  DateTime?
+
+  // Profiles
+  workerProfile WorkerProfile?
+  hirerProfile  HirerProfile?
+
+  // Relations
+  jobs          Job[]           @relation("JobPoster")
+  bids          Bid[]
+  bookingsAsHirer    Booking[]  @relation("BookingHirer")
+  bookingsAsWorker   Booking[]  @relation("BookingWorker")
+  reviewsGiven       Review[]   @relation("ReviewAuthor")
+  reviewsReceived    Review[]   @relation("ReviewSubject")
+  messagesSent       Message[]  @relation("MessageSender")
+  messageThreads     ThreadParticipant[]
+  notifications      Notification[]
+  paymentRecords     PaymentRecord[]
+}
+
+model WorkerProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Professional info
+  headline        String?
+  bio             String?
+  hourlyRate      Float?
+  skills          String    @default("[]") // JSON array of skill IDs
+  
+  // Verification
+  isVerified      Boolean   @default(false)
+  verificationStatus String @default("pending") // pending, submitted, approved, rejected
+  idDocumentUrl   String?
+  backgroundCheckStatus String @default("none") // none, pending, passed, failed
+  
+  // Service area
+  serviceRadius   Float     @default(25) // miles
+  baseLat         Float?
+  baseLng         Float?
+  baseAddress     String?
+  
+  // Stats
+  completedJobs   Int       @default(0)
+  totalEarnings   Float     @default(0)
+  averageRating   Float     @default(0)
+  responseRate    Float     @default(0)
+  
+  // Settings
+  isActive        Boolean   @default(true)
+  instantBook     Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  availability    AvailabilityWindow[]
+}
+
+model HirerProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Info
+  companyName     String?
+  bio             String?
+  
+  // Location
+  defaultLat      Float?
+  defaultLng      Float?
+  defaultAddress  String?
+  
+  // Stats
+  totalJobsPosted Int       @default(0)
+  totalSpent      Float     @default(0)
+  averageRating   Float     @default(0)
+  
+  // Verification
+  isVerified      Boolean   @default(false)
+  paymentVerified Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// ============================================
+// AVAILABILITY
+// ============================================
+
+model AvailabilityWindow {
+  id              String    @id @default(cuid())
+  workerProfileId String
+  workerProfile   WorkerProfile @relation(fields: [workerProfileId], references: [id], onDelete: Cascade)
+  
+  dayOfWeek       Int       // 0-6 (Sunday-Saturday)
+  startTime       String    // HH:MM format
+  endTime         String    // HH:MM format
+  isAvailable     Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([workerProfileId, dayOfWeek])
+}
+
+// ============================================
+// JOBS
+// ============================================
+
+model Job {
+  id              String    @id @default(cuid())
+  posterId        String
+  poster          User      @relation("JobPoster", fields: [posterId], references: [id], onDelete: Cascade)
+  
+  // Basic info
+  title           String
+  description     String
+  category        String
+  skills          String    @default("[]") // JSON array of required skill IDs
+  
+  // Scope (AI-enhanced)
+  scopeRaw        String?   // Original user input
+  scopeCleaned    String?   // AI-cleaned scope
+  
+  // Location
+  lat             Float
+  lng             Float
+  address         String
+  isRemote        Boolean   @default(false)
+  
+  // Schedule
+  scheduleType    String    @default("flexible") // flexible, specific, asap
+  startDate       DateTime?
+  endDate         DateTime?
+  estimatedHours  Float?
+  
+  // Budget
+  budgetType      String    @default("hourly") // hourly, fixed, bidding
+  budgetMin       Float?
+  budgetMax       Float?
+  
+  // Status
+  status          String    @default("draft") // draft, posted, in_progress, completed, cancelled
+  
+  // Matching
+  viewCount       Int       @default(0)
+  bidCount        Int       @default(0)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  bids            Bid[]
+  bookings        Booking[]
+  
+  @@index([status])
+  @@index([category])
+  @@index([lat, lng])
+}
+
+// ============================================
+// BIDS
+// ============================================
+
+model Bid {
+  id              String    @id @default(cuid())
+  jobId           String
+  job             Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  workerId        String
+  worker          User      @relation(fields: [workerId], references: [id], onDelete: Cascade)
+  
+  // Offer
+  amount          Float
+  message         String?
+  estimatedHours  Float?
+  
+  // Status
+  status          String    @default("pending") // pending, accepted, rejected, withdrawn
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([jobId, workerId])
+}
+
+// ============================================
+// BOOKINGS
+// ============================================
+
+model Booking {
+  id              String    @id @default(cuid())
+  jobId           String
+  job             Job       @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  hirerId         String
+  hirer           User      @relation("BookingHirer", fields: [hirerId], references: [id], onDelete: Cascade)
+  workerId        String
+  worker          User      @relation("BookingWorker", fields: [workerId], references: [id], onDelete: Cascade)
+  
+  // Schedule
+  scheduledStart  DateTime
+  scheduledEnd    DateTime?
+  actualStart     DateTime?
+  actualEnd       DateTime?
+  
+  // Payment
+  agreedAmount    Float
+  finalAmount     Float?
+  paymentStatus   String    @default("pending") // pending, held, released, refunded
+  
+  // Status
+  status          String    @default("confirmed") // confirmed, in_progress, completed, cancelled, disputed
+  
+  // Completion
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  payments        PaymentRecord[]
+  reviews         Review[]
+}
+
+// ============================================
+// REVIEWS
+// ============================================
+
+model Review {
+  id              String    @id @default(cuid())
+  bookingId       String
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  authorId        String
+  author          User      @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  subjectId       String
+  subject         User      @relation("ReviewSubject", fields: [subjectId], references: [id], onDelete: Cascade)
+  
+  // Review content
+  rating          Int       // 1-5
+  title           String?
+  content         String?
+  
+  // Specific ratings
+  communicationRating  Int?
+  qualityRating        Int?
+  timelinessRating     Int?
+  valueRating          Int?
+  
+  // Flags
+  isPublic        Boolean   @default(true)
+  response        String?   // Subject's response
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@unique([bookingId, authorId])
+}
+
+// ============================================
+// MESSAGING
+// ============================================
+
+model MessageThread {
+  id              String    @id @default(cuid())
+  jobId           String?
+  
+  // Metadata
+  lastMessageAt   DateTime  @default(now())
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  participants    ThreadParticipant[]
+  messages        Message[]
+}
+
+model ThreadParticipant {
+  id              String    @id @default(cuid())
+  threadId        String
+  thread          MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Read status
+  lastReadAt      DateTime?
+  isMuted         Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([threadId, userId])
+}
+
+model Message {
+  id              String    @id @default(cuid())
+  threadId        String
+  thread          MessageThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  senderId        String
+  sender          User      @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  
+  // Content
+  content         String
+  messageType     String    @default("text") // text, image, system, offer
+  metadata        String?   // JSON for offers, etc.
+  
+  // Status
+  isEdited        Boolean   @default(false)
+  isDeleted       Boolean   @default(false)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// ============================================
+// PAYMENTS
+// ============================================
+
+model PaymentRecord {
+  id              String    @id @default(cuid())
+  bookingId       String
+  booking         Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Payment details
+  amount          Float
+  type            String    // charge, payout, refund, fee
+  status          String    @default("pending") // pending, processing, completed, failed
+  
+  // External reference
+  externalId      String?
+  provider        String?   // stripe, paypal, etc.
+  
+  // Metadata
+  description     String?
+  metadata        String?   // JSON
+  
+  processedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+// ============================================
+// NOTIFICATIONS
+// ============================================
+
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Content
+  type            String    // new_bid, booking_confirmed, message, review, payment, etc.
+  title           String
+  body            String
+  data            String?   // JSON with action data
+  
+  // Status
+  isRead          Boolean   @default(false)
+  readAt          DateTime?
+  
+  createdAt       DateTime  @default(now())
+}
+
+// ============================================
+// SKILLS (Reference data)
+// ============================================
+
+model Skill {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  category        String
+  iconName        String?
+  isActive        Boolean   @default(true)
+  
+  createdAt       DateTime  @default(now())
+}
+
+model Category {
+  id              String    @id @default(cuid())
+  name            String    @unique
+  slug            String    @unique
+  iconName        String?
+  description     String?
+  isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0)
+  
+  createdAt       DateTime  @default(now())
+}

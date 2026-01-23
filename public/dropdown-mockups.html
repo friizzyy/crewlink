@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropdown Design Options</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .glass { backdrop-filter: blur(20px); }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+  </style>
+</head>
+<body class="p-8">
+  <h1 class="text-3xl font-bold text-white mb-2 text-center">Dropdown Design Options</h1>
+  <p class="text-slate-400 text-center mb-12">Choose your preferred style for Messages & Notifications</p>
+
+  <!-- MESSAGES SECTION -->
+  <h2 class="text-2xl font-semibold text-cyan-400 mb-6 border-b border-cyan-500/20 pb-2">Messages Dropdown</h2>
+
+  <div class="grid grid-cols-3 gap-8 mb-16">
+
+    <!-- Option 1: Minimal Card -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 1: Minimal Cards</h3>
+      <p class="text-sm text-slate-500 mb-4">Clean, spacious, card-based layout</p>
+      <div class="w-80 bg-slate-900/95 glass rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-white">Messages</span>
+            <span class="text-xs text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">2 new</span>
+          </div>
+        </div>
+        <div class="p-2 space-y-1 max-h-80 overflow-y-auto">
+          <!-- Message 1 -->
+          <div class="p-3 rounded-xl bg-cyan-500/5 hover:bg-cyan-500/10 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">SM</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="font-medium text-sm text-white">Sarah M.</span>
+                  <span class="text-[10px] text-slate-500">2m</span>
+                </div>
+                <p class="text-xs text-slate-400 truncate">Thanks for the quick response!</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-cyan-400 mt-2 shrink-0"></div>
+            </div>
+          </div>
+          <!-- Message 2 -->
+          <div class="p-3 rounded-xl bg-cyan-500/5 hover:bg-cyan-500/10 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-semibold shrink-0">MJ</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="font-medium text-sm text-white">Marcus J.</span>
+                  <span class="text-[10px] text-slate-500">15m</span>
+                </div>
+                <p class="text-xs text-slate-400 truncate">I can start tomorrow at 9am</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-cyan-400 mt-2 shrink-0"></div>
+            </div>
+          </div>
+          <!-- Message 3 -->
+          <div class="p-3 rounded-xl hover:bg-white/5 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center text-slate-300 text-sm font-semibold shrink-0">DT</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-0.5">
+                  <span class="font-medium text-sm text-slate-300">David T.</span>
+                  <span class="text-[10px] text-slate-500">1h</span>
+                </div>
+                <p class="text-xs text-slate-500 truncate">Is the job still available?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 border-t border-white/5">
+          <button class="w-full py-2 text-sm font-medium text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 rounded-lg transition-all">
+            View all messages
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option 2: Compact List with Status Bar -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 2: Status Indicator</h3>
+      <p class="text-sm text-slate-500 mb-4">Left accent bar shows unread status</p>
+      <div class="w-80 bg-slate-900/95 glass rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
+        <div class="px-4 py-3 bg-gradient-to-r from-cyan-500/10 to-transparent border-b border-white/5">
+          <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-cyan-400 pulse-dot"></div>
+            <span class="text-sm font-semibold text-white">Messages</span>
+            <span class="ml-auto text-xs text-cyan-400">2 unread</span>
+          </div>
+        </div>
+        <div class="max-h-80 overflow-y-auto">
+          <!-- Message 1 - Unread -->
+          <div class="flex hover:bg-white/5 cursor-pointer transition-all border-l-2 border-cyan-400">
+            <div class="flex-1 p-3 flex gap-3">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">SM</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-semibold text-sm text-white">Sarah M.</span>
+                  <span class="text-[10px] text-cyan-400">2m ago</span>
+                </div>
+                <p class="text-xs text-slate-300 truncate mt-0.5">Thanks for the quick response!</p>
+              </div>
+            </div>
+          </div>
+          <!-- Message 2 - Unread -->
+          <div class="flex hover:bg-white/5 cursor-pointer transition-all border-l-2 border-cyan-400">
+            <div class="flex-1 p-3 flex gap-3">
+              <div class="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-xs font-bold shrink-0">MJ</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-semibold text-sm text-white">Marcus J.</span>
+                  <span class="text-[10px] text-cyan-400">15m ago</span>
+                </div>
+                <p class="text-xs text-slate-300 truncate mt-0.5">I can start tomorrow at 9am</p>
+              </div>
+            </div>
+          </div>
+          <!-- Message 3 - Read -->
+          <div class="flex hover:bg-white/5 cursor-pointer transition-all border-l-2 border-transparent">
+            <div class="flex-1 p-3 flex gap-3">
+              <div class="w-9 h-9 rounded-full bg-slate-700 flex items-center justify-center text-slate-400 text-xs font-bold shrink-0">DT</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-baseline gap-2">
+                  <span class="font-medium text-sm text-slate-400">David T.</span>
+                  <span class="text-[10px] text-slate-500">1h ago</span>
+                </div>
+                <p class="text-xs text-slate-500 truncate mt-0.5">Is the job still available?</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-2 border-t border-white/5 bg-slate-950/50">
+          <button class="w-full py-2.5 text-sm font-medium text-white bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 rounded-xl transition-all">
+            Open Messages
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option 3: Modern Floating -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 3: Floating Bubbles</h3>
+      <p class="text-sm text-slate-500 mb-4">Chat-style with message preview bubbles</p>
+      <div class="w-80 bg-slate-950/95 glass rounded-3xl shadow-2xl shadow-cyan-500/10 border border-cyan-500/20 overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-white">Messages</span>
+            </div>
+            <div class="flex items-center gap-1 px-2 py-1 rounded-full bg-cyan-500/20">
+              <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 pulse-dot"></div>
+              <span class="text-xs font-medium text-cyan-400">2</span>
+            </div>
+          </div>
+          <div class="space-y-3">
+            <!-- Message 1 -->
+            <div class="group cursor-pointer">
+              <div class="flex items-start gap-3">
+                <div class="relative">
+                  <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-white text-sm font-bold">SM</div>
+                  <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-semibold text-sm text-white">Sarah M.</span>
+                    <span class="text-[10px] text-slate-500">2m</span>
+                  </div>
+                  <div class="bg-slate-800/80 rounded-2xl rounded-tl-sm px-3 py-2 group-hover:bg-slate-700/80 transition-all">
+                    <p class="text-xs text-slate-200">Thanks for the quick response!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Message 2 -->
+            <div class="group cursor-pointer">
+              <div class="flex items-start gap-3">
+                <div class="relative">
+                  <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-sm font-bold">MJ</div>
+                  <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-slate-950"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-semibold text-sm text-white">Marcus J.</span>
+                    <span class="text-[10px] text-slate-500">15m</span>
+                  </div>
+                  <div class="bg-slate-800/80 rounded-2xl rounded-tl-sm px-3 py-2 group-hover:bg-slate-700/80 transition-all">
+                    <p class="text-xs text-slate-200">I can start tomorrow at 9am</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Message 3 -->
+            <div class="group cursor-pointer opacity-60">
+              <div class="flex items-start gap-3">
+                <div class="relative">
+                  <div class="w-11 h-11 rounded-2xl bg-slate-700 flex items-center justify-center text-slate-400 text-sm font-bold">DT</div>
+                  <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-slate-500 border-2 border-slate-950"></div>
+                </div>
+                <div class="flex-1">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="font-medium text-sm text-slate-400">David T.</span>
+                    <span class="text-[10px] text-slate-600">1h</span>
+                  </div>
+                  <div class="bg-slate-800/50 rounded-2xl rounded-tl-sm px-3 py-2 group-hover:bg-slate-700/50 transition-all">
+                    <p class="text-xs text-slate-400">Is the job still available?</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 pb-4">
+          <button class="w-full py-3 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-2xl transition-all shadow-lg shadow-cyan-500/25">
+            View All Messages
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTIFICATIONS SECTION -->
+  <h2 class="text-2xl font-semibold text-cyan-400 mb-6 border-b border-cyan-500/20 pb-2">Notifications Dropdown</h2>
+
+  <div class="grid grid-cols-3 gap-8">
+
+    <!-- Option 1: Icon-based Categories -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 1: Category Icons</h3>
+      <p class="text-sm text-slate-500 mb-4">Color-coded icons by notification type</p>
+      <div class="w-80 bg-slate-900/95 glass rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between">
+            <span class="text-sm font-semibold text-white">Notifications</span>
+            <span class="text-xs text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded-full">3 new</span>
+          </div>
+        </div>
+        <div class="p-2 space-y-1 max-h-80 overflow-y-auto">
+          <!-- Notification 1 - Bid -->
+          <div class="p-3 rounded-xl bg-emerald-500/5 hover:bg-emerald-500/10 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-white font-medium">New bid received</p>
+                <p class="text-xs text-slate-400 mt-0.5">Marcus J. bid $85 on your cleaning job</p>
+                <p class="text-[10px] text-emerald-400 mt-1">5m ago</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-emerald-400 mt-1 shrink-0"></div>
+            </div>
+          </div>
+          <!-- Notification 2 - Completed -->
+          <div class="p-3 rounded-xl bg-cyan-500/5 hover:bg-cyan-500/10 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-white font-medium">Job completed</p>
+                <p class="text-xs text-slate-400 mt-0.5">Sarah M. marked "Deep Clean" as complete</p>
+                <p class="text-[10px] text-cyan-400 mt-1">1h ago</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-cyan-400 mt-1 shrink-0"></div>
+            </div>
+          </div>
+          <!-- Notification 3 - Message -->
+          <div class="p-3 rounded-xl bg-purple-500/5 hover:bg-purple-500/10 cursor-pointer transition-all">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-white font-medium">New message</p>
+                <p class="text-xs text-slate-400 mt-0.5">You have a new message from David T.</p>
+                <p class="text-[10px] text-purple-400 mt-1">2h ago</p>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-purple-400 mt-1 shrink-0"></div>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 border-t border-white/5 flex items-center justify-between">
+          <button class="text-xs text-slate-400 hover:text-white transition-colors">Mark all read</button>
+          <button class="text-sm font-medium text-cyan-400 hover:text-cyan-300 transition-colors">View all</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option 2: Timeline Style -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 2: Timeline</h3>
+      <p class="text-sm text-slate-500 mb-4">Connected timeline with dots</p>
+      <div class="w-80 bg-slate-900/95 glass rounded-2xl shadow-2xl shadow-black/50 border border-white/10 overflow-hidden">
+        <div class="px-4 py-3 bg-gradient-to-r from-cyan-500/10 to-transparent border-b border-white/5">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+              </svg>
+              <span class="text-sm font-semibold text-white">Notifications</span>
+            </div>
+            <span class="text-xs text-cyan-400">3 new</span>
+          </div>
+        </div>
+        <div class="relative max-h-80 overflow-y-auto">
+          <!-- Timeline line -->
+          <div class="absolute left-6 top-4 bottom-4 w-px bg-gradient-to-b from-cyan-500/50 via-purple-500/50 to-transparent"></div>
+
+          <div class="p-4 space-y-4">
+            <!-- Item 1 -->
+            <div class="flex gap-4 relative">
+              <div class="w-3 h-3 rounded-full bg-emerald-400 ring-4 ring-emerald-400/20 shrink-0 mt-1 z-10"></div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-baseline justify-between mb-1">
+                  <span class="text-sm font-medium text-white">New bid received</span>
+                  <span class="text-[10px] text-slate-500">5m</span>
+                </div>
+                <p class="text-xs text-slate-400">Marcus J. bid $85 on your cleaning job</p>
+              </div>
+            </div>
+            <!-- Item 2 -->
+            <div class="flex gap-4 relative">
+              <div class="w-3 h-3 rounded-full bg-cyan-400 ring-4 ring-cyan-400/20 shrink-0 mt-1 z-10"></div>
+              <div class="flex-1 pb-4">
+                <div class="flex items-baseline justify-between mb-1">
+                  <span class="text-sm font-medium text-white">Job completed</span>
+                  <span class="text-[10px] text-slate-500">1h</span>
+                </div>
+                <p class="text-xs text-slate-400">Sarah M. marked "Deep Clean" as complete</p>
+              </div>
+            </div>
+            <!-- Item 3 -->
+            <div class="flex gap-4 relative">
+              <div class="w-3 h-3 rounded-full bg-purple-400 ring-4 ring-purple-400/20 shrink-0 mt-1 z-10"></div>
+              <div class="flex-1">
+                <div class="flex items-baseline justify-between mb-1">
+                  <span class="text-sm font-medium text-white">New message</span>
+                  <span class="text-[10px] text-slate-500">2h</span>
+                </div>
+                <p class="text-xs text-slate-400">You have a new message from David T.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-3 border-t border-white/5 bg-slate-950/50 flex gap-2">
+          <button class="flex-1 py-2 text-xs text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all">Mark all read</button>
+          <button class="flex-1 py-2 text-xs font-medium text-white bg-cyan-500/20 hover:bg-cyan-500/30 rounded-lg transition-all">View all</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Option 3: Stacked Cards -->
+    <div>
+      <h3 class="text-lg font-medium text-white mb-3">Option 3: Stacked Cards</h3>
+      <p class="text-sm text-slate-500 mb-4">Elevated cards with depth effect</p>
+      <div class="w-80 bg-slate-950/95 glass rounded-3xl shadow-2xl shadow-cyan-500/10 border border-cyan-500/20 overflow-hidden">
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                </svg>
+              </div>
+              <span class="font-semibold text-white">Notifications</span>
+            </div>
+            <button class="text-xs text-slate-500 hover:text-cyan-400 transition-colors">Clear all</button>
+          </div>
+          <div class="space-y-2">
+            <!-- Card 1 -->
+            <div class="bg-gradient-to-r from-emerald-500/10 to-emerald-500/5 rounded-2xl p-3 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer transition-all hover:translate-x-1">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center shrink-0">
+                  <span class="text-lg">💰</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-white">New Bid!</span>
+                    <span class="text-[10px] text-emerald-400 bg-emerald-500/20 px-1.5 py-0.5 rounded">5m</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Marcus J. bid $85 on cleaning job</p>
+                </div>
+              </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="bg-gradient-to-r from-cyan-500/10 to-cyan-500/5 rounded-2xl p-3 border border-cyan-500/20 hover:border-cyan-500/40 cursor-pointer transition-all hover:translate-x-1">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center shrink-0">
+                  <span class="text-lg">✅</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-white">Completed</span>
+                    <span class="text-[10px] text-cyan-400 bg-cyan-500/20 px-1.5 py-0.5 rounded">1h</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">Sarah M. finished "Deep Clean"</p>
+                </div>
+              </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="bg-gradient-to-r from-purple-500/10 to-purple-500/5 rounded-2xl p-3 border border-purple-500/20 hover:border-purple-500/40 cursor-pointer transition-all hover:translate-x-1">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/20 flex items-center justify-center shrink-0">
+                  <span class="text-lg">💬</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm font-semibold text-white">Message</span>
+                    <span class="text-[10px] text-purple-400 bg-purple-500/20 px-1.5 py-0.5 rounded">2h</span>
+                  </div>
+                  <p class="text-xs text-slate-400 mt-1">New message from David T.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="px-4 pb-4">
+          <button class="w-full py-3 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-2xl transition-all shadow-lg shadow-cyan-500/25">
+            View All Notifications
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-12 text-center">
+    <p class="text-slate-400">Pick your favorite combination (e.g., "Messages 2, Notifications 3")</p>
+  </div>
+</body>
+</html>

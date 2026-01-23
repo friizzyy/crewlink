@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal Nav Mockups - CrewLink</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(6, 182, 212, 0.5); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    .float-animation { animation: float 6s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+    .glass-morphism {
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    .glass-morphism-strong {
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .gradient-border {
+      position: relative;
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(59, 130, 246, 0.3), rgba(168, 85, 247, 0.2));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+
+    .nav-item-glow:hover {
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white min-h-screen">
+
+  <!-- Header -->
+  <div class="text-center py-12 px-6 border-b border-white/5">
+    <h1 class="text-4xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
+      Universal Nav Redesign Mockups
+    </h1>
+    <p class="text-slate-400 max-w-2xl mx-auto">
+      3 different floating nav concepts - all premium, all matching the site's immersive ambient style
+    </p>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- OPTION 1: Floating Pill Nav -->
+  <!-- ============================================ -->
+  <section class="py-16 px-6 border-b border-white/5">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-8">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-400 text-sm font-medium mb-3">
+          Option 1
+        </span>
+        <h2 class="text-2xl font-bold text-white mb-2">Floating Pill Nav</h2>
+        <p class="text-slate-400">Centered floating pill with glassmorphism. Clean, modern, Apple-inspired.</p>
+      </div>
+
+      <!-- Demo Container -->
+      <div class="relative h-[500px] rounded-2xl border border-white/10 overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950">
+
+        <!-- Ambient background effects -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px]"></div>
+
+        <!-- THE NAV -->
+        <nav class="absolute top-6 left-1/2 -translate-x-1/2 z-50">
+          <div class="glass-morphism-strong gradient-border rounded-full px-2 py-2 flex items-center gap-1 shadow-2xl shadow-black/40">
+
+            <!-- Logo -->
+            <a href="#" class="flex items-center gap-2 pl-3 pr-4">
+              <div class="relative">
+                <div class="absolute inset-0 bg-cyan-500 rounded-lg blur-md opacity-50"></div>
+                <div class="relative w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                  <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+              </div>
+              <span class="font-bold text-lg hidden sm:block">CrewLink</span>
+            </a>
+
+            <!-- Divider -->
+            <div class="w-px h-8 bg-white/10"></div>
+
+            <!-- Nav Links -->
+            <div class="flex items-center gap-1 px-2">
+              <a href="#" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                How It Works
+              </a>
+              <a href="#" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                Safety
+              </a>
+              <a href="#" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                Pricing
+              </a>
+              <a href="#" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-full transition-all">
+                Cities
+              </a>
+            </div>
+
+            <!-- Divider -->
+            <div class="w-px h-8 bg-white/10"></div>
+
+            <!-- CTAs -->
+            <div class="flex items-center gap-2 pr-1 pl-2">
+              <a href="#" class="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                Sign In
+              </a>
+              <a href="#" class="relative group">
+                <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur-lg opacity-50 group-hover:opacity-80 transition-opacity"></div>
+                <span class="relative block px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full">
+                  Get Started
+                </span>
+              </a>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Content placeholder -->
+        <div class="absolute inset-0 flex items-center justify-center pt-20">
+          <div class="text-center max-w-2xl px-6">
+            <h2 class="text-4xl font-bold mb-4">
+              <span class="text-white">Get help</span>
+              <span class="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent"> today.</span>
+            </h2>
+            <p class="text-slate-400">Centered pill floats above content, maximum visual impact.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pros/Cons -->
+      <div class="mt-6 grid sm:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+          <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+            <span>+</span> Strengths
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• Ultra-modern, Apple/Linear inspired</li>
+            <li>• Draws attention to navigation</li>
+            <li>• Very premium feel</li>
+            <li>• Content breathes underneath</li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+          <h4 class="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+            <span>~</span> Considerations
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• Horizontal space limited on mobile</li>
+            <li>• May need to collapse items</li>
+            <li>• CTA less prominent vs full-width</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- OPTION 2: Split Floating Islands -->
+  <!-- ============================================ -->
+  <section class="py-16 px-6 border-b border-white/5">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-8">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 text-purple-400 text-sm font-medium mb-3">
+          Option 2
+        </span>
+        <h2 class="text-2xl font-bold text-white mb-2">Split Floating Islands</h2>
+        <p class="text-slate-400">Logo on left island, nav links and CTAs on right island. Asymmetric, unique.</p>
+      </div>
+
+      <!-- Demo Container -->
+      <div class="relative h-[500px] rounded-2xl border border-white/10 overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950">
+
+        <!-- Ambient background effects -->
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-cyan-600/10 rounded-full blur-[100px]"></div>
+
+        <!-- THE NAV -->
+        <nav class="absolute top-6 left-0 right-0 px-6 z-50">
+          <div class="flex items-center justify-between gap-4">
+
+            <!-- Left Island - Logo -->
+            <div class="glass-morphism-strong gradient-border rounded-2xl px-4 py-3 flex items-center gap-3 shadow-xl shadow-black/30">
+              <div class="relative">
+                <div class="absolute inset-0 bg-cyan-500 rounded-xl blur-md opacity-50"></div>
+                <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center border border-cyan-400/30">
+                  <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                  </svg>
+                </div>
+              </div>
+              <span class="font-bold text-xl tracking-tight">CrewLink</span>
+            </div>
+
+            <!-- Right Island - Nav + CTAs -->
+            <div class="glass-morphism-strong gradient-border rounded-2xl px-2 py-2 flex items-center gap-1 shadow-xl shadow-black/30">
+
+              <!-- Nav Links -->
+              <div class="hidden md:flex items-center">
+                <a href="#" class="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                  How It Works
+                </a>
+                <a href="#" class="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                  Safety
+                </a>
+                <a href="#" class="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                  Pricing
+                </a>
+                <a href="#" class="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/5 rounded-xl transition-all">
+                  Cities
+                </a>
+              </div>
+
+              <!-- Vertical Divider -->
+              <div class="hidden md:block w-px h-8 bg-white/10 mx-2"></div>
+
+              <!-- CTAs -->
+              <div class="flex items-center gap-2">
+                <a href="#" class="px-4 py-2.5 text-sm font-medium text-slate-300 hover:text-white transition-colors hidden sm:block">
+                  Sign In
+                </a>
+                <a href="#" class="relative group">
+                  <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur-lg opacity-40 group-hover:opacity-70 transition-opacity"></div>
+                  <span class="relative flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl group-hover:from-cyan-400 group-hover:to-blue-500 transition-all">
+                    Get Started
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Content placeholder -->
+        <div class="absolute inset-0 flex items-center justify-center pt-20">
+          <div class="text-center max-w-2xl px-6">
+            <h2 class="text-4xl font-bold mb-4">
+              <span class="text-white">Get help</span>
+              <span class="bg-gradient-to-r from-purple-400 to-cyan-500 bg-clip-text text-transparent"> today.</span>
+            </h2>
+            <p class="text-slate-400">Split islands create visual balance and clear hierarchy.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pros/Cons -->
+      <div class="mt-6 grid sm:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+          <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+            <span>+</span> Strengths
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• Logo gets dedicated space</li>
+            <li>• CTAs highly visible on right</li>
+            <li>• Unique, memorable design</li>
+            <li>• Easy mobile adaptation</li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+          <h4 class="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+            <span>~</span> Considerations
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• More complex visual structure</li>
+            <li>• May feel disconnected</li>
+            <li>• Extra visual weight on screen</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- OPTION 3: Floating Bar with Glow Border -->
+  <!-- ============================================ -->
+  <section class="py-16 px-6 border-b border-white/5">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-8">
+        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-sm font-medium mb-3">
+          Option 3
+        </span>
+        <h2 class="text-2xl font-bold text-white mb-2">Floating Bar with Animated Glow</h2>
+        <p class="text-slate-400">Full-width floating bar with subtle pulsing glow border. Premium and immersive.</p>
+      </div>
+
+      <!-- Demo Container -->
+      <div class="relative h-[500px] rounded-2xl border border-white/10 overflow-hidden bg-gradient-to-br from-slate-900 to-slate-950">
+
+        <!-- Ambient background effects -->
+        <div class="absolute top-1/3 left-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/3 right-1/3 w-80 h-80 bg-emerald-600/10 rounded-full blur-[100px]"></div>
+
+        <!-- THE NAV -->
+        <nav class="absolute top-5 left-5 right-5 z-50">
+          <div class="relative">
+            <!-- Animated glow border -->
+            <div class="absolute -inset-[1px] bg-gradient-to-r from-cyan-500/50 via-blue-500/30 to-purple-500/50 rounded-2xl blur-sm pulse-glow"></div>
+
+            <!-- Nav content -->
+            <div class="relative glass-morphism-strong rounded-2xl px-6 py-4 flex items-center justify-between border border-white/[0.08]">
+
+              <!-- Left - Logo + Nav Links -->
+              <div class="flex items-center gap-8">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-3 group">
+                  <div class="relative">
+                    <div class="absolute inset-0 bg-cyan-500 rounded-xl blur-md opacity-40 group-hover:opacity-70 transition-opacity"></div>
+                    <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center border border-cyan-400/30">
+                      <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                      </svg>
+                    </div>
+                  </div>
+                  <span class="font-bold text-xl tracking-tight">CrewLink</span>
+                </a>
+
+                <!-- Nav Links - with underline indicators -->
+                <div class="hidden md:flex items-center gap-1">
+                  <a href="#" class="relative px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors group">
+                    How It Works
+                    <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full group-hover:w-3/4 transition-all duration-300"></span>
+                  </a>
+                  <a href="#" class="relative px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors group">
+                    Safety
+                    <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full group-hover:w-3/4 transition-all duration-300"></span>
+                  </a>
+                  <a href="#" class="relative px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors group">
+                    Pricing
+                    <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full group-hover:w-3/4 transition-all duration-300"></span>
+                  </a>
+                  <a href="#" class="relative px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors group">
+                    Cities
+                    <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full group-hover:w-3/4 transition-all duration-300"></span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- Right - CTAs -->
+              <div class="flex items-center gap-4">
+                <a href="#" class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                  Sign In
+                </a>
+
+                <!-- Premium CTA with double border effect -->
+                <a href="#" class="relative group">
+                  <!-- Outer glow -->
+                  <div class="absolute -inset-1 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur-lg opacity-30 group-hover:opacity-60 transition-opacity"></div>
+                  <!-- Gradient border -->
+                  <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl"></div>
+                  <!-- Inner bg -->
+                  <span class="relative flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-slate-950 rounded-[10px] m-[1px] group-hover:bg-transparent transition-colors">
+                    <span>Get Started</span>
+                    <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                    </svg>
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        <!-- Content placeholder -->
+        <div class="absolute inset-0 flex items-center justify-center pt-20">
+          <div class="text-center max-w-2xl px-6">
+            <h2 class="text-4xl font-bold mb-4">
+              <span class="text-white">Get help</span>
+              <span class="bg-gradient-to-r from-cyan-400 to-emerald-500 bg-clip-text text-transparent"> today.</span>
+            </h2>
+            <p class="text-slate-400">Floating bar with animated glow creates an immersive, premium feel.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pros/Cons -->
+      <div class="mt-6 grid sm:grid-cols-2 gap-4">
+        <div class="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
+          <h4 class="text-emerald-400 font-semibold mb-2 flex items-center gap-2">
+            <span>+</span> Strengths
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• Familiar layout, easy to use</li>
+            <li>• Animated glow adds premium feel</li>
+            <li>• Maximum space for content</li>
+            <li>• Hover underlines are satisfying</li>
+          </ul>
+        </div>
+        <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20">
+          <h4 class="text-amber-400 font-semibold mb-2 flex items-center gap-2">
+            <span>~</span> Considerations
+          </h4>
+          <ul class="text-sm text-slate-400 space-y-1">
+            <li>• Less unique than pill/island</li>
+            <li>• Glow animation adds visual load</li>
+            <li>• Wider bar = more dominant</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================ -->
+  <!-- COMPARISON SUMMARY -->
+  <!-- ============================================ -->
+  <section class="py-16 px-6">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="text-2xl font-bold text-white mb-8 text-center">Quick Comparison</h2>
+
+      <div class="grid gap-4">
+        <!-- Option 1 -->
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-900/50 border border-white/5">
+          <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 font-bold text-lg shrink-0">
+            1
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-white">Floating Pill</h3>
+            <p class="text-sm text-slate-400">Centered, compact, Apple-inspired</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-500">Best for:</span>
+            <p class="text-sm text-cyan-400">Minimal, modern feel</p>
+          </div>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-900/50 border border-white/5">
+          <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 font-bold text-lg shrink-0">
+            2
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-white">Split Islands</h3>
+            <p class="text-sm text-slate-400">Asymmetric, unique, branded</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-500">Best for:</span>
+            <p class="text-sm text-purple-400">Standing out, brand identity</p>
+          </div>
+        </div>
+
+        <!-- Option 3 -->
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-slate-900/50 border border-white/5">
+          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 font-bold text-lg shrink-0">
+            3
+          </div>
+          <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-white">Floating Bar + Glow</h3>
+            <p class="text-sm text-slate-400">Familiar layout, premium glow effect</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-500">Best for:</span>
+            <p class="text-sm text-emerald-400">Familiar but elevated</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 p-6 rounded-2xl bg-gradient-to-r from-cyan-500/10 to-blue-600/10 border border-cyan-500/20 text-center">
+        <p class="text-slate-300">
+          <span class="text-cyan-400 font-semibold">Recommendation:</span> Option 3 (Floating Bar + Glow) balances familiarity with premium feel,
+          or Option 1 (Floating Pill) for a bolder, more modern statement.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 border-t border-white/5 text-center">
+    <p class="text-sm text-slate-500">CrewLink Universal Nav Mockups · All options use glassmorphism + gradient borders</p>
+  </footer>
+
+</body>
+</html>

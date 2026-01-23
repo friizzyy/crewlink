@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrewLink - Choose Your Landing Page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Space+Grotesk:wght@300..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7ff',
+              100: '#d9edff',
+              200: '#bce0ff',
+              300: '#8ecdff',
+              400: '#59b0ff',
+              500: '#338bff',
+              600: '#1a6af5',
+              700: '#1355e1',
+              800: '#1646b6',
+              900: '#183f8f',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .font-dm { font-family: 'DM Sans', sans-serif; }
+    .font-space { font-family: 'Space Grotesk', sans-serif; }
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    
+    .preview-frame {
+      transform: scale(0.25);
+      transform-origin: top left;
+      width: 400%;
+      height: 400%;
+    }
+    
+    .option-card {
+      transition: all 0.3s ease;
+    }
+    
+    .option-card:hover {
+      transform: translateY(-4px);
+    }
+    
+    .gradient-a {
+      background: linear-gradient(135deg, #eef7ff 0%, #d9edff 50%, #bce0ff 100%);
+    }
+    
+    .gradient-b {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    }
+    
+    .gradient-c {
+      background: linear-gradient(135deg, #fef3c7 0%, #fde68a 50%, #fcd34d 100%);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-dm">
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-b border-slate-200 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <span class="text-xl font-bold text-slate-900">CrewLink</span>
+      </div>
+      <div class="text-sm text-slate-600">Landing Page Selector</div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="pt-24 pb-16 px-6">
+    <div class="max-w-7xl mx-auto">
+      <!-- Hero -->
+      <div class="text-center mb-16">
+        <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+          Choose Your Landing Page
+        </h1>
+        <p class="text-xl text-slate-600 max-w-2xl mx-auto">
+          Pick the design that best represents CrewLink's brand. Each option has a distinct personality and aesthetic.
+        </p>
+      </div>
+
+      <!-- Options Grid -->
+      <div class="grid lg:grid-cols-3 gap-8 mb-16">
+        
+        <!-- Option A -->
+        <div class="option-card bg-white rounded-2xl shadow-lg shadow-slate-200/50 overflow-hidden border border-slate-200">
+          <div class="gradient-a h-48 relative overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-3 mx-auto float-animation">
+                  <svg class="w-8 h-8 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"/>
+                  </svg>
+                </div>
+                <div class="font-bold text-brand-700">Bold & Bright</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">Light Theme</span>
+              <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">Energetic</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Option A</h3>
+            <p class="text-slate-600 text-sm mb-4">
+              Vibrant, playful design with animated elements. Light background with blue/brand gradients. Floating job cards and live worker counter. Best for attracting younger, dynamic audience.
+            </p>
+            <ul class="text-sm text-slate-500 space-y-1 mb-6">
+              <li>✓ Animated floating cards</li>
+              <li>✓ Live activity counter</li>
+              <li>✓ Gradient hero section</li>
+              <li>✓ Playful illustrations</li>
+            </ul>
+            <a href="#option-a" class="block w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl text-center transition-colors">
+              View Full Preview ↓
+            </a>
+          </div>
+        </div>
+
+        <!-- Option B -->
+        <div class="option-card bg-white rounded-2xl shadow-lg shadow-slate-200/50 overflow-hidden border border-slate-200">
+          <div class="gradient-b h-48 relative overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-slate-800 rounded-2xl shadow-lg shadow-cyan-500/20 border border-cyan-500/30 flex items-center justify-center mb-3 mx-auto float-animation" style="animation-delay: 0.5s;">
+                  <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                  </svg>
+                </div>
+                <div class="font-bold text-cyan-400">Dark Premium</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-1 bg-slate-800 text-cyan-400 text-xs font-medium rounded-full">Dark Theme</span>
+              <span class="px-2 py-1 bg-slate-800 text-purple-400 text-xs font-medium rounded-full">Premium</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Option B</h3>
+            <p class="text-slate-600 text-sm mb-4">
+              Sophisticated dark design with neon cyan/blue accents. Glowing effects and blur overlays. Tech-forward aesthetic. Best for premium positioning and professional appeal.
+            </p>
+            <ul class="text-sm text-slate-500 space-y-1 mb-6">
+              <li>✓ Neon glow effects</li>
+              <li>✓ Dramatic typography</li>
+              <li>✓ Glass morphism cards</li>
+              <li>✓ Tech-forward feel</li>
+            </ul>
+            <a href="#option-b" class="block w-full py-3 bg-slate-800 hover:bg-slate-900 text-cyan-400 font-semibold rounded-xl text-center transition-colors">
+              View Full Preview ↓
+            </a>
+          </div>
+        </div>
+
+        <!-- Option C -->
+        <div class="option-card bg-white rounded-2xl shadow-lg shadow-slate-200/50 overflow-hidden border border-slate-200">
+          <div class="gradient-c h-48 relative overflow-hidden">
+            <div class="absolute inset-0 flex items-center justify-center">
+              <div class="text-center">
+                <div class="w-16 h-16 bg-white rounded-2xl shadow-lg flex items-center justify-center mb-3 mx-auto float-animation" style="animation-delay: 1s;">
+                  <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <div class="font-bold text-amber-800">Warm & Grounded</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs font-medium rounded-full">Warm Theme</span>
+              <span class="px-2 py-1 bg-stone-100 text-stone-700 text-xs font-medium rounded-full">Trustworthy</span>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-2">Option C</h3>
+            <p class="text-slate-600 text-sm mb-4">
+              Earth tones with map-first hero design. Stone/amber palette. Interactive worker cards with ratings. Human-centered, approachable design. Best for building trust and local feel.
+            </p>
+            <ul class="text-sm text-slate-500 space-y-1 mb-6">
+              <li>✓ Map-focused hero</li>
+              <li>✓ Worker profile cards</li>
+              <li>✓ Warm color palette</li>
+              <li>✓ Community-focused</li>
+            </ul>
+            <a href="#option-c" class="block w-full py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-xl text-center transition-colors">
+              View Full Preview ↓
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full Previews -->
+      <div class="space-y-24">
+        
+        <!-- Option A Full Preview -->
+        <section id="option-a" class="scroll-mt-24">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Option A: Bold & Bright</h2>
+            <span class="px-4 py-2 bg-brand-100 text-brand-700 font-semibold rounded-full">Light Theme</span>
+          </div>
+          <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+            <!-- Landing A Preview -->
+            <div class="bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-8 md:p-16">
+              <!-- Nav -->
+              <nav class="flex items-center justify-between mb-16">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                  </div>
+                  <span class="text-xl font-bold text-slate-900">CrewLink</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+                  <a href="#" class="hover:text-brand-600">How It Works</a>
+                  <a href="#" class="hover:text-brand-600">Pricing</a>
+                  <a href="#" class="hover:text-brand-600">Safety</a>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button class="px-4 py-2 text-slate-700 font-medium hover:text-brand-600">Sign In</button>
+                  <button class="px-5 py-2 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/25">Get Started</button>
+                </div>
+              </nav>
+              
+              <!-- Hero -->
+              <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-6">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    2,847 workers online now
+                  </div>
+                  <h1 class="text-5xl md:text-6xl font-bold text-slate-900 leading-tight mb-6">
+                    Get help with
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-500 to-indigo-500">anything</span>
+                    in minutes
+                  </h1>
+                  <p class="text-xl text-slate-600 mb-8">
+                    Connect with skilled locals for moving, cleaning, repairs, deliveries & more. Instant quotes, verified workers, secure payments.
+                  </p>
+                  <div class="flex flex-col sm:flex-row gap-4">
+                    <button class="px-8 py-4 bg-brand-600 text-white font-semibold rounded-xl hover:bg-brand-700 shadow-lg shadow-brand-600/25 text-lg">
+                      Find Help Now →
+                    </button>
+                    <button class="px-8 py-4 border-2 border-slate-300 text-slate-700 font-semibold rounded-xl hover:border-brand-600 hover:text-brand-600 text-lg">
+                      Become a Worker
+                    </button>
+                  </div>
+                </div>
+                <div class="relative">
+                  <!-- Floating Cards -->
+                  <div class="relative h-96">
+                    <div class="absolute top-0 right-0 bg-white rounded-2xl shadow-xl p-4 transform rotate-3 float-animation">
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-slate-900">Moving Help</div>
+                          <div class="text-sm text-slate-500">$45/hr • 2 workers</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="absolute top-24 left-0 bg-white rounded-2xl shadow-xl p-4 transform -rotate-2 float-animation" style="animation-delay: 0.5s;">
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-slate-900">Home Cleaning</div>
+                          <div class="text-sm text-slate-500">$35/hr • 1 worker</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="absolute bottom-12 right-8 bg-white rounded-2xl shadow-xl p-4 transform rotate-1 float-animation" style="animation-delay: 1s;">
+                      <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <div class="font-semibold text-slate-900">Job Completed!</div>
+                          <div class="text-sm text-green-600">+$127.50 earned</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Categories -->
+              <div class="mt-20">
+                <h2 class="text-2xl font-bold text-slate-900 text-center mb-8">Popular Services</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div class="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-shadow border border-slate-100">
+                    <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-7 h-7 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                      </svg>
+                    </div>
+                    <div class="font-semibold text-slate-900">Moving</div>
+                    <div class="text-sm text-slate-500">847 workers</div>
+                  </div>
+                  <div class="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-shadow border border-slate-100">
+                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                      </svg>
+                    </div>
+                    <div class="font-semibold text-slate-900">Cleaning</div>
+                    <div class="text-sm text-slate-500">1,234 workers</div>
+                  </div>
+                  <div class="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-shadow border border-slate-100">
+                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"/>
+                      </svg>
+                    </div>
+                    <div class="font-semibold text-slate-900">Assembly</div>
+                    <div class="text-sm text-slate-500">562 workers</div>
+                  </div>
+                  <div class="bg-white rounded-2xl p-6 text-center hover:shadow-lg transition-shadow border border-slate-100">
+                    <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                      <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                      </svg>
+                    </div>
+                    <div class="font-semibold text-slate-900">Delivery</div>
+                    <div class="text-sm text-slate-500">923 workers</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Option B Full Preview -->
+        <section id="option-b" class="scroll-mt-24">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Option B: Dark Premium</h2>
+            <span class="px-4 py-2 bg-slate-800 text-cyan-400 font-semibold rounded-full">Dark Theme</span>
+          </div>
+          <div class="bg-slate-950 rounded-2xl shadow-xl overflow-hidden border border-slate-800">
+            <!-- Landing B Preview -->
+            <div class="p-8 md:p-16 relative overflow-hidden">
+              <!-- Background Effects -->
+              <div class="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+              <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
+              
+              <!-- Nav -->
+              <nav class="flex items-center justify-between mb-16 relative z-10">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                  </div>
+                  <span class="text-xl font-bold text-white font-space">CrewLink</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-400">
+                  <a href="#" class="hover:text-cyan-400 transition-colors">How It Works</a>
+                  <a href="#" class="hover:text-cyan-400 transition-colors">Pricing</a>
+                  <a href="#" class="hover:text-cyan-400 transition-colors">Safety</a>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button class="px-4 py-2 text-slate-300 font-medium hover:text-white transition-colors">Sign In</button>
+                  <button class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-cyan-500/25 transition-all">Get Started</button>
+                </div>
+              </nav>
+              
+              <!-- Hero -->
+              <div class="relative z-10 text-center mb-16">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800/80 border border-slate-700 text-cyan-400 rounded-full text-sm font-medium mb-8 backdrop-blur">
+                  <span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span>
+                  Trusted by 50,000+ users
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold text-white leading-tight mb-6 font-space">
+                  The Future of<br>
+                  <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400">Local Services</span>
+                </h1>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+                  AI-powered matching. Instant connections. Verified professionals. Experience the next generation of on-demand help.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button class="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-semibold rounded-xl hover:shadow-xl hover:shadow-cyan-500/25 transition-all text-lg">
+                    Start Free →
+                  </button>
+                  <button class="px-8 py-4 border border-slate-700 text-slate-300 font-semibold rounded-xl hover:border-cyan-500 hover:text-cyan-400 transition-all text-lg backdrop-blur bg-slate-900/50">
+                    Watch Demo
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Stats -->
+              <div class="grid grid-cols-3 gap-8 max-w-3xl mx-auto relative z-10">
+                <div class="text-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur">
+                  <div class="text-4xl font-bold text-white font-space mb-2">50K+</div>
+                  <div class="text-slate-400">Active Users</div>
+                </div>
+                <div class="text-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur">
+                  <div class="text-4xl font-bold text-white font-space mb-2">$2M+</div>
+                  <div class="text-slate-400">Paid to Workers</div>
+                </div>
+                <div class="text-center p-6 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur">
+                  <div class="text-4xl font-bold text-white font-space mb-2">4.9★</div>
+                  <div class="text-slate-400">Avg Rating</div>
+                </div>
+              </div>
+              
+              <!-- Feature Cards -->
+              <div class="grid md:grid-cols-3 gap-6 mt-16 relative z-10">
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-slate-700 hover:border-cyan-500/50 transition-colors group">
+                  <div class="w-12 h-12 bg-cyan-500/10 border border-cyan-500/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-cyan-500/20 transition-colors">
+                    <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white mb-2">AI Matching</h3>
+                  <p class="text-slate-400 text-sm">Smart algorithms find the perfect worker for your specific needs in seconds.</p>
+                </div>
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-slate-700 hover:border-blue-500/50 transition-colors group">
+                  <div class="w-12 h-12 bg-blue-500/10 border border-blue-500/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/20 transition-colors">
+                    <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white mb-2">Verified Pros</h3>
+                  <p class="text-slate-400 text-sm">Background-checked workers with verified IDs and skills certifications.</p>
+                </div>
+                <div class="p-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-slate-700 hover:border-purple-500/50 transition-colors group">
+                  <div class="w-12 h-12 bg-purple-500/10 border border-purple-500/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500/20 transition-colors">
+                    <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-lg font-semibold text-white mb-2">Instant Connect</h3>
+                  <p class="text-slate-400 text-sm">Real-time messaging and live location tracking for seamless coordination.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Option C Full Preview -->
+        <section id="option-c" class="scroll-mt-24">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-slate-900">Option C: Warm & Grounded</h2>
+            <span class="px-4 py-2 bg-amber-100 text-amber-700 font-semibold rounded-full">Warm Theme</span>
+          </div>
+          <div class="bg-stone-50 rounded-2xl shadow-xl overflow-hidden border border-stone-200">
+            <!-- Landing C Preview -->
+            <div class="p-8 md:p-16">
+              <!-- Nav -->
+              <nav class="flex items-center justify-between mb-12">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 bg-amber-500 rounded-xl flex items-center justify-center">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                  </div>
+                  <span class="text-xl font-bold text-stone-800 font-outfit">CrewLink</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8 text-sm font-medium text-stone-600">
+                  <a href="#" class="hover:text-amber-600 transition-colors">How It Works</a>
+                  <a href="#" class="hover:text-amber-600 transition-colors">Pricing</a>
+                  <a href="#" class="hover:text-amber-600 transition-colors">Cities</a>
+                </div>
+                <div class="flex items-center gap-3">
+                  <button class="px-4 py-2 text-stone-600 font-medium hover:text-amber-600 transition-colors">Sign In</button>
+                  <button class="px-5 py-2 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 shadow-lg shadow-amber-500/25 transition-all">Get Started</button>
+                </div>
+              </nav>
+              
+              <!-- Hero with Map -->
+              <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div>
+                  <h1 class="text-4xl md:text-5xl font-bold text-stone-800 leading-tight mb-6 font-outfit">
+                    Find trusted help
+                    <span class="text-amber-600">near you</span>
+                  </h1>
+                  <p class="text-lg text-stone-600 mb-8">
+                    Connect with verified local workers for moving, cleaning, repairs, and more. Your neighbors are ready to help.
+                  </p>
+                  
+                  <!-- Search Box -->
+                  <div class="bg-white rounded-2xl p-4 shadow-lg border border-stone-200 mb-8">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                      <div class="flex-1 relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" placeholder="What do you need help with?" class="w-full pl-10 pr-4 py-3 bg-stone-50 rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                      </div>
+                      <button class="px-6 py-3 bg-amber-500 text-white font-semibold rounded-xl hover:bg-amber-600 transition-colors whitespace-nowrap">
+                        Find Help
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <!-- Category Pills -->
+                  <div class="flex flex-wrap gap-2">
+                    <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm font-medium hover:bg-amber-100 hover:text-amber-700 cursor-pointer transition-colors">📦 Moving</span>
+                    <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm font-medium hover:bg-amber-100 hover:text-amber-700 cursor-pointer transition-colors">🧹 Cleaning</span>
+                    <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm font-medium hover:bg-amber-100 hover:text-amber-700 cursor-pointer transition-colors">🔧 Repairs</span>
+                    <span class="px-4 py-2 bg-stone-100 text-stone-700 rounded-full text-sm font-medium hover:bg-amber-100 hover:text-amber-700 cursor-pointer transition-colors">🚗 Delivery</span>
+                  </div>
+                </div>
+                
+                <!-- Map Preview -->
+                <div class="relative">
+                  <div class="bg-gradient-to-br from-amber-100 to-stone-200 rounded-3xl p-4 shadow-xl">
+                    <!-- Fake Map -->
+                    <div class="bg-stone-100 rounded-2xl h-80 relative overflow-hidden">
+                      <!-- Map Pattern -->
+                      <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23d6d3d1\" fill-opacity=\"0.4\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+                      
+                      <!-- Worker Cards on Map -->
+                      <div class="absolute top-6 left-6 bg-white rounded-xl p-3 shadow-lg transform -rotate-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center text-lg">👨</div>
+                          <div>
+                            <div class="font-semibold text-stone-800 text-sm">Marcus T.</div>
+                            <div class="text-xs text-stone-500">⭐ 4.9 • 0.3 mi</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="absolute top-16 right-8 bg-white rounded-xl p-3 shadow-lg transform rotate-2">
+                        <div class="flex items-center gap-2">
+                          <div class="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-lg">👩</div>
+                          <div>
+                            <div class="font-semibold text-stone-800 text-sm">Sarah K.</div>
+                            <div class="text-xs text-stone-500">⭐ 5.0 • 0.5 mi</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="absolute bottom-16 left-12 bg-white rounded-xl p-3 shadow-lg">
+                        <div class="flex items-center gap-2">
+                          <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center text-lg">👨</div>
+                          <div>
+                            <div class="font-semibold text-stone-800 text-sm">James R.</div>
+                            <div class="text-xs text-stone-500">⭐ 4.8 • 0.7 mi</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- You Are Here -->
+                      <div class="absolute bottom-8 right-12">
+                        <div class="w-4 h-4 bg-amber-500 rounded-full animate-ping"></div>
+                        <div class="w-4 h-4 bg-amber-500 rounded-full absolute inset-0"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Trust Indicators -->
+              <div class="mt-16 grid grid-cols-3 gap-8">
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                  </div>
+                  <div class="font-semibold text-stone-800 mb-1">Background Checked</div>
+                  <div class="text-sm text-stone-500">Every worker is verified</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                  </div>
+                  <div class="font-semibold text-stone-800 mb-1">Secure Payments</div>
+                  <div class="text-sm text-stone-500">Pay safely through app</div>
+                </div>
+                <div class="text-center">
+                  <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+                    </svg>
+                  </div>
+                  <div class="font-semibold text-stone-800 mb-1">24/7 Support</div>
+                  <div class="text-sm text-stone-500">Help when you need it</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Selection CTA -->
+      <div class="mt-24 bg-gradient-to-br from-brand-600 to-indigo-600 rounded-3xl p-12 text-center">
+        <h2 class="text-3xl font-bold text-white mb-4">Ready to choose?</h2>
+        <p class="text-blue-100 mb-8 max-w-xl mx-auto">
+          Tell me which landing page you prefer (A, B, or C) and I'll set it as the homepage and continue building the rest of the app!
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <div class="px-6 py-3 bg-white/20 text-white font-semibold rounded-xl backdrop-blur">
+            Option A: Bold & Bright
+          </div>
+          <div class="px-6 py-3 bg-white/20 text-white font-semibold rounded-xl backdrop-blur">
+            Option B: Dark Premium
+          </div>
+          <div class="px-6 py-3 bg-white/20 text-white font-semibold rounded-xl backdrop-blur">
+            Option C: Warm & Grounded
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-slate-400 py-8 px-6">
+    <div class="max-w-7xl mx-auto text-center text-sm">
+      CrewLink Landing Page Preview • Built with Next.js, TypeScript & Tailwind
+    </div>
+  </footer>
+</body>
+</html>

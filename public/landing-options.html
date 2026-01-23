@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrewLink Landing Page Options</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); }
+    .gradient-text { background: linear-gradient(135deg, #06b6d4, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .glow { box-shadow: 0 0 60px rgba(6, 182, 212, 0.3); }
+    .option-divider {
+      background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+      height: 2px;
+    }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    @keyframes pulse-glow { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+    .float { animation: float 3s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    .fade-in { opacity: 0; animation: fadeIn 0.8s ease forwards; }
+    @keyframes fadeIn { to { opacity: 1; } }
+    .slide-up { opacity: 0; transform: translateY(30px); animation: slideUp 0.8s ease forwards; }
+    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-slate-950 text-white">
+
+  <!-- Navigation Header -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-lg border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold">Landing Page Options</h1>
+      <div class="flex gap-4 text-sm">
+        <a href="#option1" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">Option 1</a>
+        <a href="#option2" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">Option 2</a>
+        <a href="#option3" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">Option 3</a>
+        <a href="#option4" class="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition">Option 4</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 1: SUBTLE LUXURY SCROLL -->
+  <!-- ================================================================ -->
+  <section id="option1" class="pt-24">
+    <div class="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 py-6 text-center border-b border-cyan-500/30">
+      <h2 class="text-3xl font-bold">Option 1: Subtle Luxury Scroll</h2>
+      <p class="text-slate-400 mt-2">Elegant animations, premium feel, keeps current structure</p>
+    </div>
+
+    <!-- Hero -->
+    <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-950">
+      <!-- Animated background elements -->
+      <div class="absolute inset-0">
+        <div class="absolute top-20 left-20 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl float"></div>
+        <div class="absolute bottom-20 right-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl float" style="animation-delay: 1s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-cyan-500/5 to-blue-500/5 rounded-full blur-3xl pulse-glow"></div>
+      </div>
+
+      <!-- Grid overlay -->
+      <div class="absolute inset-0 opacity-[0.02]" style="background-image: linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+      <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <div class="fade-in" style="animation-delay: 0.2s;">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/50 border border-slate-700/50 mb-8">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+            </span>
+            <span class="text-sm text-slate-300">2,400+ workers active in your area</span>
+          </div>
+        </div>
+
+        <h1 class="text-6xl md:text-7xl font-black tracking-tight mb-6 slide-up" style="animation-delay: 0.4s;">
+          <span class="text-white">Local help,</span><br>
+          <span class="gradient-text">delivered fast.</span>
+        </h1>
+
+        <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10 fade-in" style="animation-delay: 0.6s;">
+          Connect with trusted workers in your neighborhood. From home repairs to moving help, find skilled people ready to work today.
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center fade-in" style="animation-delay: 0.8s;">
+          <button class="group relative px-8 py-4 rounded-xl font-semibold text-lg overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 transition-transform group-hover:scale-105"></div>
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span class="relative text-white">Find Workers Near Me</span>
+          </button>
+          <button class="px-8 py-4 rounded-xl font-semibold text-lg border border-slate-700 text-slate-300 hover:bg-slate-800/50 hover:border-slate-600 transition-all">
+            I Want to Work
+          </button>
+        </div>
+
+        <!-- Trust indicators -->
+        <div class="mt-16 flex items-center justify-center gap-8 text-slate-500 text-sm fade-in" style="animation-delay: 1s;">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Background Verified</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Instant Booking</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <span>Secure Payments</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500">
+        <span class="text-xs tracking-wider uppercase">Scroll to explore</span>
+        <div class="w-6 h-10 rounded-full border-2 border-slate-700 flex justify-center pt-2">
+          <div class="w-1 h-2 bg-slate-500 rounded-full animate-bounce"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Preview -->
+    <div class="py-24 bg-slate-900/50">
+      <div class="max-w-6xl mx-auto px-6">
+        <h3 class="text-3xl font-bold text-center mb-4">Popular Services</h3>
+        <p class="text-slate-400 text-center mb-12">Browse by category or search for specific skills</p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="glass rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
+            <div class="text-4xl mb-3">🔧</div>
+            <h4 class="font-semibold text-white group-hover:text-cyan-400 transition">Handyman</h4>
+            <p class="text-sm text-slate-500">1,240 available</p>
+          </div>
+          <div class="glass rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
+            <div class="text-4xl mb-3">🧹</div>
+            <h4 class="font-semibold text-white group-hover:text-cyan-400 transition">Cleaning</h4>
+            <p class="text-sm text-slate-500">890 available</p>
+          </div>
+          <div class="glass rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
+            <div class="text-4xl mb-3">📦</div>
+            <h4 class="font-semibold text-white group-hover:text-cyan-400 transition">Moving</h4>
+            <p class="text-sm text-slate-500">560 available</p>
+          </div>
+          <div class="glass rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/50 transition-all cursor-pointer group">
+            <div class="text-4xl mb-3">🌱</div>
+            <h4 class="font-semibold text-white group-hover:text-cyan-400 transition">Yard Work</h4>
+            <p class="text-sm text-slate-500">720 available</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="option-divider my-0"></div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 2: SCROLL-STORY SPLIT LAYOUT -->
+  <!-- ================================================================ -->
+  <section id="option2" class="pt-8">
+    <div class="bg-gradient-to-r from-purple-500/20 to-pink-500/20 py-6 text-center border-b border-purple-500/30">
+      <h2 class="text-3xl font-bold">Option 2: Scroll-Story Split Layout</h2>
+      <p class="text-slate-400 mt-2">Two-column narrative, sticky left side, scrolling features</p>
+    </div>
+
+    <!-- Split Hero -->
+    <div class="min-h-screen flex">
+      <!-- Left side - Sticky -->
+      <div class="w-1/2 bg-slate-950 sticky top-0 h-screen flex items-center justify-center p-12">
+        <div class="max-w-lg">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/10 border border-purple-500/30 mb-6">
+            <span class="text-purple-400 text-sm font-medium">The future of local work</span>
+          </div>
+
+          <h1 class="text-5xl font-black mb-6 leading-tight">
+            <span class="text-white">Your neighborhood.</span><br>
+            <span class="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">Your workforce.</span>
+          </h1>
+
+          <p class="text-lg text-slate-400 mb-8">
+            CrewLink connects you with skilled, verified workers who live and work in your community.
+          </p>
+
+          <button class="px-8 py-4 rounded-xl font-semibold bg-gradient-to-r from-purple-500 to-pink-600 text-white hover:from-purple-400 hover:to-pink-500 transition-all">
+            Start Exploring
+          </button>
+        </div>
+      </div>
+
+      <!-- Right side - Scrolling content -->
+      <div class="w-1/2 bg-slate-900/50">
+        <!-- Feature 1 -->
+        <div class="min-h-screen flex items-center p-12 border-b border-slate-800">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-3xl mb-6">
+              📍
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Hyperlocal Discovery</h3>
+            <p class="text-slate-400 text-lg leading-relaxed">
+              See workers within walking distance. Our map-first approach means you're always connected to help that's minutes away, not miles.
+            </p>
+            <div class="mt-8 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                  <span class="text-cyan-400 text-sm font-bold">5</span>
+                </div>
+                <div>
+                  <p class="font-medium text-white">Workers nearby</p>
+                  <p class="text-sm text-slate-500">Within 0.5 miles of you</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="min-h-screen flex items-center p-12 border-b border-slate-800">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-3xl mb-6">
+              ✓
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Trust Built In</h3>
+            <p class="text-slate-400 text-lg leading-relaxed">
+              Every worker is background-checked and reviewed by real customers. See ratings, read reviews, and hire with confidence.
+            </p>
+            <div class="mt-8 space-y-3">
+              <div class="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Identity verified</span>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Background checked</span>
+              </div>
+              <div class="flex items-center gap-3 p-3 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Reviews from real customers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="min-h-screen flex items-center p-12">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-3xl mb-6">
+              ⚡
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Same-Day Service</h3>
+            <p class="text-slate-400 text-lg leading-relaxed">
+              Need help today? Post a job and get responses within minutes. Our real-time matching means you're never waiting long.
+            </p>
+            <div class="mt-8 p-6 bg-slate-800/50 rounded-xl border border-slate-700/50">
+              <div class="text-center">
+                <p class="text-5xl font-black text-amber-400">8 min</p>
+                <p class="text-slate-500 mt-2">Average response time</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="option-divider my-0"></div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 3: CINEMATIC CITY GRAVITY -->
+  <!-- ================================================================ -->
+  <section id="option3" class="pt-8">
+    <div class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 py-6 text-center border-b border-emerald-500/30">
+      <h2 class="text-3xl font-bold">Option 3: Cinematic City Gravity</h2>
+      <p class="text-slate-400 mt-2">Location-first, map-centric, immersive city feel</p>
+    </div>
+
+    <!-- Full-bleed hero with map background -->
+    <div class="relative min-h-screen overflow-hidden">
+      <!-- Fake map background -->
+      <div class="absolute inset-0 bg-slate-900">
+        <div class="absolute inset-0 opacity-30" style="background-image: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Cpath d=%22M0 50 L100 50 M50 0 L50 100%22 stroke=%22%23334155%22 stroke-width=%220.5%22/%3E%3C/svg%3E'); background-size: 40px 40px;"></div>
+
+        <!-- Simulated map dots -->
+        <div class="absolute top-1/4 left-1/4 w-3 h-3 bg-cyan-500 rounded-full animate-ping"></div>
+        <div class="absolute top-1/3 left-1/2 w-3 h-3 bg-cyan-500 rounded-full animate-ping" style="animation-delay: 0.5s;"></div>
+        <div class="absolute top-1/2 left-1/3 w-3 h-3 bg-cyan-500 rounded-full animate-ping" style="animation-delay: 1s;"></div>
+        <div class="absolute top-2/3 right-1/3 w-3 h-3 bg-emerald-500 rounded-full animate-ping" style="animation-delay: 0.3s;"></div>
+        <div class="absolute bottom-1/4 left-1/2 w-3 h-3 bg-emerald-500 rounded-full animate-ping" style="animation-delay: 0.7s;"></div>
+      </div>
+
+      <!-- Gradient overlays -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-transparent to-slate-950"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
+
+      <!-- Content -->
+      <div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <div class="mb-6">
+          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            Live in your city
+          </span>
+        </div>
+
+        <h1 class="text-6xl md:text-8xl font-black tracking-tight mb-4">
+          <span class="text-white">Your city.</span>
+        </h1>
+        <h1 class="text-6xl md:text-8xl font-black tracking-tight mb-8">
+          <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Your crew.</span>
+        </h1>
+
+        <p class="text-xl text-slate-400 max-w-xl mb-10">
+          Real people. Real skills. Right around the corner. Discover the workforce that already exists in your neighborhood.
+        </p>
+
+        <!-- Location search -->
+        <div class="w-full max-w-lg">
+          <div class="relative">
+            <input
+              type="text"
+              placeholder="Enter your address or zip code"
+              class="w-full px-6 py-4 pr-32 rounded-2xl bg-slate-800/80 backdrop-blur-sm border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20"
+            >
+            <button class="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold hover:from-emerald-400 hover:to-teal-500 transition-all">
+              Search
+            </button>
+          </div>
+          <p class="text-slate-500 text-sm mt-3">Or use your current location</p>
+        </div>
+
+        <!-- City stats -->
+        <div class="mt-16 grid grid-cols-3 gap-12">
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">2.4k</p>
+            <p class="text-slate-500 text-sm">Active workers</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">156</p>
+            <p class="text-slate-500 text-sm">Jobs posted today</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">4.9</p>
+            <p class="text-slate-500 text-sm">Avg. rating</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it works - cinematic cards -->
+    <div class="py-24 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-16">How it works</h2>
+
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900 border border-slate-800 group-hover:border-emerald-500/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl mb-6">1</div>
+              <h3 class="text-xl font-bold mb-3">Drop a pin</h3>
+              <p class="text-slate-400">Tell us where you need help. We'll show you everyone available nearby.</p>
+            </div>
+          </div>
+
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900 border border-slate-800 group-hover:border-cyan-500/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl mb-6">2</div>
+              <h3 class="text-xl font-bold mb-3">Pick your person</h3>
+              <p class="text-slate-400">Browse profiles, read reviews, and choose who fits your needs.</p>
+            </div>
+          </div>
+
+          <div class="relative group">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900 border border-slate-800 group-hover:border-purple-500/30 transition-all">
+              <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl mb-6">3</div>
+              <h3 class="text-xl font-bold mb-3">Get it done</h3>
+              <p class="text-slate-400">They come to you. Pay securely when the job's complete.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="option-divider my-0"></div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 4: PREMIUM LAYOUT REBUILD -->
+  <!-- ================================================================ -->
+  <section id="option4" class="pt-8">
+    <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 py-6 text-center border-b border-amber-500/30">
+      <h2 class="text-3xl font-bold">Option 4: Premium Layout Rebuild</h2>
+      <p class="text-slate-400 mt-2">Complete overhaul, strong typography, luxurious whitespace</p>
+    </div>
+
+    <!-- Ultra-minimal hero -->
+    <div class="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden">
+      <!-- Subtle gradient orb -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-amber-500/5 to-orange-500/5 rounded-full blur-3xl"></div>
+
+      <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+        <!-- Minimal badge -->
+        <p class="text-amber-400/80 text-sm tracking-[0.3em] uppercase font-medium mb-12">The local work marketplace</p>
+
+        <!-- Massive headline -->
+        <h1 class="text-7xl md:text-9xl font-black tracking-tight leading-[0.85] mb-8">
+          <span class="block text-white">Find</span>
+          <span class="block bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 bg-clip-text text-transparent">trusted</span>
+          <span class="block text-white">help.</span>
+        </h1>
+
+        <!-- Simple subtext -->
+        <p class="text-xl text-slate-500 max-w-lg mx-auto mb-16">
+          Verified workers in your neighborhood. Ready when you are.
+        </p>
+
+        <!-- Two clear CTAs -->
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+          <button class="group px-10 py-5 rounded-2xl font-semibold text-lg bg-white text-slate-900 hover:bg-slate-100 transition-all">
+            <span class="flex items-center gap-3">
+              Hire Someone
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </span>
+          </button>
+          <button class="group px-10 py-5 rounded-2xl font-semibold text-lg border-2 border-slate-700 text-white hover:border-slate-500 hover:bg-slate-900/50 transition-all">
+            <span class="flex items-center gap-3">
+              Find Work
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path></svg>
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats section - clean and bold -->
+    <div class="py-32 bg-slate-900/30">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div class="text-center p-8">
+            <p class="text-6xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">50k+</p>
+            <p class="text-slate-500 mt-3">Verified workers</p>
+          </div>
+          <div class="text-center p-8">
+            <p class="text-6xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">12</p>
+            <p class="text-slate-500 mt-3">Major cities</p>
+          </div>
+          <div class="text-center p-8">
+            <p class="text-6xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">4.9</p>
+            <p class="text-slate-500 mt-3">Average rating</p>
+          </div>
+          <div class="text-center p-8">
+            <p class="text-6xl font-black bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">$2M+</p>
+            <p class="text-slate-500 mt-3">Paid to workers</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories - large cards -->
+    <div class="py-32 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-16">
+          <h2 class="text-5xl font-black mb-4">What do you need?</h2>
+          <p class="text-slate-500 text-lg">Browse popular categories or search for anything</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <div class="group p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 hover:border-amber-500/30 transition-all cursor-pointer">
+            <div class="flex items-center gap-6">
+              <div class="w-20 h-20 rounded-2xl bg-amber-500/10 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                🔧
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-white group-hover:text-amber-400 transition">Home Repairs</h3>
+                <p class="text-slate-500 mt-1">Plumbing, electrical, general fixes</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 hover:border-amber-500/30 transition-all cursor-pointer">
+            <div class="flex items-center gap-6">
+              <div class="w-20 h-20 rounded-2xl bg-amber-500/10 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                🧹
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-white group-hover:text-amber-400 transition">Cleaning</h3>
+                <p class="text-slate-500 mt-1">Deep clean, regular, move-out</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 hover:border-amber-500/30 transition-all cursor-pointer">
+            <div class="flex items-center gap-6">
+              <div class="w-20 h-20 rounded-2xl bg-amber-500/10 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                📦
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-white group-hover:text-amber-400 transition">Moving & Hauling</h3>
+                <p class="text-slate-500 mt-1">Local moves, furniture, junk removal</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="group p-8 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-800 hover:border-amber-500/30 transition-all cursor-pointer">
+            <div class="flex items-center gap-6">
+              <div class="w-20 h-20 rounded-2xl bg-amber-500/10 flex items-center justify-center text-5xl group-hover:scale-110 transition-transform">
+                🌱
+              </div>
+              <div>
+                <h3 class="text-2xl font-bold text-white group-hover:text-amber-400 transition">Yard & Garden</h3>
+                <p class="text-slate-500 mt-1">Landscaping, mowing, tree work</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center mt-12">
+          <button class="text-amber-400 hover:text-amber-300 font-medium transition flex items-center gap-2 mx-auto">
+            View all 40+ categories
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trust section -->
+    <div class="py-32 bg-slate-900/50">
+      <div class="max-w-4xl mx-auto px-6 text-center">
+        <h2 class="text-5xl font-black mb-6">Safety first. Always.</h2>
+        <p class="text-xl text-slate-400 mb-16 max-w-2xl mx-auto">
+          Every worker on CrewLink goes through our rigorous verification process. Your safety is non-negotiable.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="p-6">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Background Checked</h3>
+            <p class="text-slate-500 text-sm">National criminal database screening for all workers</p>
+          </div>
+
+          <div class="p-6">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">ID Verified</h3>
+            <p class="text-slate-500 text-sm">Government ID verification for every account</p>
+          </div>
+
+          <div class="p-6">
+            <div class="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+            </div>
+            <h3 class="text-lg font-bold mb-2">Real Reviews</h3>
+            <p class="text-slate-500 text-sm">Only verified customers can leave ratings</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with selection prompt -->
+  <footer class="py-16 bg-slate-950 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-3xl font-bold mb-4">Which option do you prefer?</h2>
+      <p class="text-slate-400 mb-8">Let me know which direction you'd like to take, and I'll implement it.</p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="#option1" class="px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold hover:from-cyan-400 hover:to-blue-500 transition">1: Subtle Luxury</a>
+        <a href="#option2" class="px-6 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold hover:from-purple-400 hover:to-pink-500 transition">2: Split Layout</a>
+        <a href="#option3" class="px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold hover:from-emerald-400 hover:to-teal-500 transition">3: City Gravity</a>
+        <a href="#option4" class="px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-semibold hover:from-amber-400 hover:to-orange-500 transition">4: Premium Rebuild</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

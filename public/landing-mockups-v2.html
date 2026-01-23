@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CrewLink Landing Page Mockups V2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(2deg); }
+    }
+    @keyframes float-reverse {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-15px) rotate(-2deg); }
+    }
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+    @keyframes shimmer {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    @keyframes gradient-shift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    @keyframes fade-in-up {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes scale-in {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes blob {
+      0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+      50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+    }
+    @keyframes ping-slow {
+      0% { transform: scale(1); opacity: 1; }
+      75%, 100% { transform: scale(2); opacity: 0; }
+    }
+    @keyframes orbit {
+      from { transform: rotate(0deg) translateX(200px) rotate(0deg); }
+      to { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
+    }
+    @keyframes typewriter {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    .float { animation: float 6s ease-in-out infinite; }
+    .float-delayed { animation: float-reverse 7s ease-in-out infinite; animation-delay: 1s; }
+    .float-slow { animation: float 8s ease-in-out infinite; animation-delay: 2s; }
+    .pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+    .gradient-animate {
+      background-size: 200% 200%;
+      animation: gradient-shift 8s ease infinite;
+    }
+    .blob { animation: blob 10s ease-in-out infinite; }
+    .ping-slow { animation: ping-slow 3s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+    .fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
+    .fade-in { animation: fade-in 0.6s ease-out forwards; }
+    .scale-in { animation: scale-in 0.6s ease-out forwards; }
+
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    .delay-600 { animation-delay: 0.6s; }
+    .delay-700 { animation-delay: 0.7s; }
+
+    /* Glass effect */
+    .glass {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* Gradient text */
+    .gradient-text-cyan {
+      background: linear-gradient(135deg, #06b6d4, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-text-emerald {
+      background: linear-gradient(135deg, #10b981, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Glow effects */
+    .glow-cyan { box-shadow: 0 0 80px rgba(6, 182, 212, 0.4), 0 0 120px rgba(6, 182, 212, 0.2); }
+    .glow-emerald { box-shadow: 0 0 80px rgba(16, 185, 129, 0.4), 0 0 120px rgba(16, 185, 129, 0.2); }
+
+    /* Grid pattern */
+    .grid-pattern {
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* Noise texture */
+    .noise::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+
+    /* Button hover shine */
+    .btn-shine {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-shine::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    .btn-shine:hover::after {
+      left: 100%;
+    }
+
+    /* Option divider */
+    .option-divider {
+      height: 4px;
+      background: linear-gradient(90deg, transparent, rgba(6, 182, 212, 0.5), transparent);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-white">
+
+  <!-- Navigation Header -->
+  <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <h1 class="text-xl font-bold gradient-text-cyan">Landing Page Mockups V2</h1>
+      <div class="flex gap-3 text-sm">
+        <a href="#option1" class="px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 hover:bg-cyan-500/20 transition">Option 1</a>
+        <a href="#option2" class="px-4 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 transition">Option 2</a>
+        <a href="#option3" class="px-4 py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 transition">Option 3</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 1: IMMERSIVE AMBIENT -->
+  <!-- Like previous but more dramatic, cinematic feel -->
+  <!-- ================================================================ -->
+  <section id="option1" class="pt-20">
+    <div class="py-8 text-center border-b border-cyan-500/20 bg-gradient-to-r from-cyan-500/5 via-blue-500/10 to-cyan-500/5">
+      <h2 class="text-3xl font-bold gradient-text-cyan">Option 1: Immersive Ambient</h2>
+      <p class="text-slate-400 mt-2">Dramatic floating elements, deep atmospheric glow, cinematic reveal</p>
+    </div>
+
+    <!-- Hero -->
+    <div class="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <!-- ANIMATED BACKGROUND -->
+      <div class="absolute inset-0">
+        <!-- Large ambient orbs -->
+        <div class="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-cyan-500/20 rounded-full blur-[150px] pulse-glow"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-600/15 rounded-full blur-[120px] pulse-glow" style="animation-delay: 2s;"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/10 rounded-full blur-[180px] pulse-glow" style="animation-delay: 4s;"></div>
+
+        <!-- Grid overlay -->
+        <div class="absolute inset-0 grid-pattern opacity-50"></div>
+
+        <!-- Noise texture -->
+        <div class="absolute inset-0 noise"></div>
+      </div>
+
+      <!-- FLOATING CARDS -->
+      <div class="absolute inset-0 pointer-events-none overflow-hidden">
+        <!-- Card 1 - Top right -->
+        <div class="absolute top-[15%] right-[10%] float">
+          <div class="glass rounded-2xl p-4 shadow-2xl glow-cyan transform rotate-3">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center">
+                <span class="text-xl">🔧</span>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Handyman Help</div>
+                <div class="text-sm text-emerald-400 flex items-center gap-1">
+                  <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                  Available now
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2 - Left middle -->
+        <div class="absolute top-[35%] left-[8%] float-delayed">
+          <div class="glass rounded-2xl p-4 shadow-2xl transform -rotate-2">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
+                <span class="text-xl">🧹</span>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Deep Cleaning</div>
+                <div class="text-sm text-slate-400">$35/hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3 - Bottom right -->
+        <div class="absolute bottom-[20%] right-[15%] float-slow">
+          <div class="glass rounded-2xl p-4 shadow-2xl transform rotate-1">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Job Complete!</div>
+                <div class="text-sm text-emerald-400">+$127.50 earned</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4 - Bottom left -->
+        <div class="absolute bottom-[30%] left-[12%] float">
+          <div class="glass rounded-2xl p-4 shadow-2xl transform -rotate-1" style="animation-delay: 3s;">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-400 to-pink-600 flex items-center justify-center">
+                <span class="text-xl">📦</span>
+              </div>
+              <div>
+                <div class="font-semibold text-white">Moving Help</div>
+                <div class="text-sm text-slate-400">2 workers · $45/hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HERO CONTENT -->
+      <div class="relative z-10 max-w-5xl mx-auto px-6 text-center">
+        <!-- Live badge -->
+        <div class="opacity-0 fade-in-up inline-flex items-center gap-3 px-5 py-2.5 glass rounded-full mb-10">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="ping-slow absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-sm text-slate-300">
+            <span class="font-bold text-white">2,847</span> workers active in your area
+          </span>
+        </div>
+
+        <!-- Main headline -->
+        <h1 class="opacity-0 fade-in-up delay-200 text-6xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[0.95] mb-8">
+          <span class="text-white">Get help</span>
+          <span class="gradient-text-cyan"> today.</span>
+          <br>
+          <span class="text-white">Not</span>
+          <span class="gradient-text-cyan"> next week.</span>
+        </h1>
+
+        <!-- Subheadline -->
+        <p class="opacity-0 fade-in-up delay-300 text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+          Hire verified local workers for cleaning, moving, handyman work, and more.
+          Average match time: <span class="text-cyan-400 font-semibold">4 minutes</span>.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="opacity-0 fade-in-up delay-400 flex flex-col sm:flex-row gap-4 justify-center">
+          <button class="btn-shine group relative px-10 py-5 rounded-2xl font-semibold text-lg overflow-hidden shadow-2xl shadow-cyan-500/25">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 gradient-animate"></div>
+            <span class="relative flex items-center gap-2 text-white">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              Hire Help Now
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </button>
+
+          <button class="group px-10 py-5 rounded-2xl font-semibold text-lg border-2 border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-400/60 transition-all">
+            <span class="flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              Start Earning
+              <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </span>
+          </button>
+        </div>
+
+        <!-- Trust badges -->
+        <div class="opacity-0 fade-in delay-600 mt-14 flex flex-wrap items-center justify-center gap-8 text-slate-500 text-sm">
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            <span>Background Checked</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>Verified Reviews</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Secure Payments</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scroll indicator -->
+      <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-slate-500 opacity-0 fade-in delay-700">
+        <span class="text-xs tracking-widest uppercase">Scroll</span>
+        <div class="w-6 h-10 rounded-full border-2 border-slate-700 flex justify-center pt-2">
+          <div class="w-1.5 h-3 bg-cyan-500 rounded-full animate-bounce"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats section -->
+    <div class="py-16 border-y border-white/5 bg-slate-900/30">
+      <div class="max-w-5xl mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div class="text-center">
+            <div class="text-4xl font-black text-white mb-1">50K+</div>
+            <div class="text-sm text-slate-500">Jobs Completed</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-black text-white mb-1">12K+</div>
+            <div class="text-sm text-slate-500">Verified Workers</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-black text-white mb-1">4.9</div>
+            <div class="text-sm text-slate-500">Average Rating</div>
+          </div>
+          <div class="text-center">
+            <div class="text-4xl font-black text-white mb-1">4 min</div>
+            <div class="text-sm text-slate-500">Avg Match Time</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="option-divider my-0"></div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 2: MAP-CENTRIC DISCOVERY -->
+  <!-- Like Option 3 from before - city/location focused -->
+  <!-- ================================================================ -->
+  <section id="option2" class="pt-8">
+    <div class="py-8 text-center border-b border-emerald-500/20 bg-gradient-to-r from-emerald-500/5 via-teal-500/10 to-emerald-500/5">
+      <h2 class="text-3xl font-bold gradient-text-emerald">Option 2: Map-Centric Discovery</h2>
+      <p class="text-slate-400 mt-2">Location-first experience, live map activity, hyperlocal feel</p>
+    </div>
+
+    <!-- Hero with map background -->
+    <div class="relative min-h-screen overflow-hidden">
+      <!-- ANIMATED MAP BACKGROUND -->
+      <div class="absolute inset-0 bg-slate-900">
+        <!-- Map grid pattern -->
+        <div class="absolute inset-0 opacity-20" style="background-image:
+          linear-gradient(rgba(16, 185, 129, 0.3) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(16, 185, 129, 0.3) 1px, transparent 1px);
+          background-size: 80px 80px;"></div>
+
+        <!-- Animated location pings -->
+        <div class="absolute top-[20%] left-[20%]">
+          <div class="w-4 h-4 bg-emerald-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-emerald-500 rounded-full ping-slow"></div>
+        </div>
+        <div class="absolute top-[35%] left-[45%]">
+          <div class="w-4 h-4 bg-cyan-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-cyan-500 rounded-full ping-slow" style="animation-delay: 0.5s;"></div>
+        </div>
+        <div class="absolute top-[50%] left-[70%]">
+          <div class="w-4 h-4 bg-emerald-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-emerald-500 rounded-full ping-slow" style="animation-delay: 1s;"></div>
+        </div>
+        <div class="absolute top-[65%] left-[30%]">
+          <div class="w-4 h-4 bg-amber-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-amber-500 rounded-full ping-slow" style="animation-delay: 1.5s;"></div>
+        </div>
+        <div class="absolute top-[40%] left-[15%]">
+          <div class="w-4 h-4 bg-cyan-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-cyan-500 rounded-full ping-slow" style="animation-delay: 2s;"></div>
+        </div>
+        <div class="absolute top-[75%] left-[60%]">
+          <div class="w-4 h-4 bg-emerald-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-emerald-500 rounded-full ping-slow" style="animation-delay: 0.7s;"></div>
+        </div>
+        <div class="absolute top-[25%] left-[80%]">
+          <div class="w-4 h-4 bg-purple-500 rounded-full"></div>
+          <div class="absolute inset-0 w-4 h-4 bg-purple-500 rounded-full ping-slow" style="animation-delay: 1.2s;"></div>
+        </div>
+
+        <!-- Connecting lines (simulated network) -->
+        <svg class="absolute inset-0 w-full h-full opacity-10">
+          <line x1="20%" y1="20%" x2="45%" y2="35%" stroke="#10b981" stroke-width="1"/>
+          <line x1="45%" y1="35%" x2="70%" y2="50%" stroke="#06b6d4" stroke-width="1"/>
+          <line x1="30%" y1="65%" x2="45%" y2="35%" stroke="#10b981" stroke-width="1"/>
+          <line x1="15%" y1="40%" x2="30%" y2="65%" stroke="#06b6d4" stroke-width="1"/>
+        </svg>
+      </div>
+
+      <!-- Gradient overlays for depth -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-950/60 to-slate-950"></div>
+      <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-transparent to-slate-950/80"></div>
+
+      <!-- HERO CONTENT -->
+      <div class="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 text-center">
+        <!-- Location badge -->
+        <div class="opacity-0 fade-in-up inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 mb-8">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="ping-slow absolute inline-flex h-full w-full rounded-full bg-emerald-400"></span>
+            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <span class="text-sm text-emerald-400 font-medium">Live in your city</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="opacity-0 fade-in-up delay-200 text-6xl md:text-8xl font-black tracking-tight mb-4">
+          <span class="text-white">Your city.</span>
+        </h1>
+        <h1 class="opacity-0 fade-in-up delay-300 text-6xl md:text-8xl font-black tracking-tight mb-8">
+          <span class="gradient-text-emerald">Your crew.</span>
+        </h1>
+
+        <p class="opacity-0 fade-in-up delay-400 text-xl text-slate-400 max-w-xl mb-12">
+          Real people. Real skills. Right around the corner.
+          Discover the workforce that already exists in your neighborhood.
+        </p>
+
+        <!-- Location search -->
+        <div class="opacity-0 scale-in delay-500 w-full max-w-lg">
+          <div class="relative">
+            <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </div>
+            <input
+              type="text"
+              placeholder="Enter your address or zip code"
+              class="w-full pl-12 pr-32 py-5 rounded-2xl bg-slate-800/80 backdrop-blur-xl border border-slate-700/50 text-white placeholder-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 text-lg"
+            >
+            <button class="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/25">
+              Find Workers
+            </button>
+          </div>
+          <button class="mt-4 text-emerald-400/80 hover:text-emerald-400 text-sm flex items-center gap-2 mx-auto transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+            Use my current location
+          </button>
+        </div>
+
+        <!-- City stats -->
+        <div class="opacity-0 fade-in delay-600 mt-16 grid grid-cols-3 gap-12">
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">2.4k</p>
+            <p class="text-slate-500 text-sm">Active Workers</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">156</p>
+            <p class="text-slate-500 text-sm">Jobs Today</p>
+          </div>
+          <div class="text-center">
+            <p class="text-4xl font-black text-white">4.9</p>
+            <p class="text-slate-500 text-sm">Avg Rating</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How it works -->
+    <div class="py-24 bg-slate-950">
+      <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-center mb-16">How it works</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="group relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900/50 border border-slate-800 group-hover:border-emerald-500/30 transition-all">
+              <div class="w-14 h-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-2xl font-bold text-emerald-400 mb-6">1</div>
+              <h3 class="text-xl font-bold mb-3">Drop a pin</h3>
+              <p class="text-slate-400">Tell us where you need help. We'll show you everyone available nearby.</p>
+            </div>
+          </div>
+          <div class="group relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900/50 border border-slate-800 group-hover:border-cyan-500/30 transition-all">
+              <div class="w-14 h-14 rounded-2xl bg-cyan-500/10 flex items-center justify-center text-2xl font-bold text-cyan-400 mb-6">2</div>
+              <h3 class="text-xl font-bold mb-3">Pick your person</h3>
+              <p class="text-slate-400">Browse profiles, read reviews, and choose who fits your needs.</p>
+            </div>
+          </div>
+          <div class="group relative">
+            <div class="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div class="relative p-8 rounded-3xl bg-slate-900/50 border border-slate-800 group-hover:border-purple-500/30 transition-all">
+              <div class="w-14 h-14 rounded-2xl bg-purple-500/10 flex items-center justify-center text-2xl font-bold text-purple-400 mb-6">3</div>
+              <h3 class="text-xl font-bold mb-3">Get it done</h3>
+              <p class="text-slate-400">They come to you. Pay securely when the job's complete.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="option-divider my-0"></div>
+
+  <!-- ================================================================ -->
+  <!-- OPTION 3: BOLD SPLIT NARRATIVE -->
+  <!-- Two-column layout with sticky left, scrolling right -->
+  <!-- ================================================================ -->
+  <section id="option3" class="pt-8">
+    <div class="py-8 text-center border-b border-purple-500/20 bg-gradient-to-r from-purple-500/5 via-pink-500/10 to-purple-500/5">
+      <h2 class="text-3xl font-bold" style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Option 3: Bold Split Narrative</h2>
+      <p class="text-slate-400 mt-2">Two-column story, sticky hero, scrolling features</p>
+    </div>
+
+    <!-- Split Hero -->
+    <div class="min-h-[200vh] flex">
+      <!-- Left side - Sticky -->
+      <div class="w-1/2 sticky top-0 h-screen flex items-center overflow-hidden">
+        <!-- Background effects -->
+        <div class="absolute inset-0 bg-slate-950">
+          <div class="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-purple-500/20 rounded-full blur-[100px] pulse-glow"></div>
+          <div class="absolute bottom-1/4 right-1/4 w-[300px] h-[300px] bg-pink-500/15 rounded-full blur-[80px] pulse-glow" style="animation-delay: 2s;"></div>
+        </div>
+
+        <div class="relative z-10 max-w-lg mx-auto px-12">
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 mb-8">
+            <span class="text-purple-400 text-sm font-medium">The future of local work</span>
+          </div>
+
+          <h1 class="text-5xl lg:text-6xl font-black mb-6 leading-tight">
+            <span class="text-white">Your neighborhood.</span><br>
+            <span style="background: linear-gradient(135deg, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Your workforce.</span>
+          </h1>
+
+          <p class="text-lg text-slate-400 mb-10">
+            CrewLink connects you with skilled, verified workers who live and work in your community.
+          </p>
+
+          <div class="flex flex-col gap-4">
+            <button class="btn-shine group relative px-8 py-4 rounded-xl font-semibold text-lg overflow-hidden shadow-2xl shadow-purple-500/25">
+              <div class="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-600"></div>
+              <span class="relative flex items-center gap-2 text-white">
+                Start Exploring
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+              </span>
+            </button>
+            <button class="px-8 py-4 rounded-xl font-semibold text-lg border border-slate-700 text-slate-300 hover:bg-slate-800/50 transition-all">
+              I want to work
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right side - Scrolling content -->
+      <div class="w-1/2 bg-slate-900/30">
+        <!-- Feature 1 -->
+        <div class="min-h-screen flex items-center p-12 border-b border-slate-800/50">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-3xl mb-6 float">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Hyperlocal Discovery</h3>
+            <p class="text-slate-400 text-lg leading-relaxed mb-6">
+              See workers within walking distance. Our map-first approach means you're always connected to help that's minutes away, not miles.
+            </p>
+            <div class="p-5 glass rounded-2xl">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full bg-cyan-500/20 flex items-center justify-center">
+                  <span class="text-cyan-400 text-lg font-bold">5</span>
+                </div>
+                <div>
+                  <p class="font-semibold text-white">Workers nearby</p>
+                  <p class="text-sm text-slate-500">Within 0.5 miles of you</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="min-h-screen flex items-center p-12 border-b border-slate-800/50">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-3xl mb-6 float-delayed">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Trust Built In</h3>
+            <p class="text-slate-400 text-lg leading-relaxed mb-6">
+              Every worker is background-checked and reviewed by real customers. See ratings, read reviews, and hire with confidence.
+            </p>
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Identity verified</span>
+              </div>
+              <div class="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Background checked</span>
+              </div>
+              <div class="flex items-center gap-3 p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span class="text-slate-300">Reviews from real customers</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="min-h-screen flex items-center p-12">
+          <div class="max-w-md">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center text-3xl mb-6 float-slow">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <h3 class="text-3xl font-bold mb-4">Same-Day Service</h3>
+            <p class="text-slate-400 text-lg leading-relaxed mb-6">
+              Need help today? Post a job and get responses within minutes. Our real-time matching means you're never waiting long.
+            </p>
+            <div class="p-8 glass rounded-2xl text-center">
+              <p class="text-6xl font-black text-amber-400 mb-2">8 min</p>
+              <p class="text-slate-500">Average response time</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer with selection prompt -->
+  <footer class="py-20 bg-slate-950 border-t border-slate-800">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-4xl font-bold mb-4">Which option do you prefer?</h2>
+      <p class="text-slate-400 mb-10 text-lg">
+        Let me know and I'll implement it as the new landing page.
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <div class="px-8 py-4 rounded-2xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-500/30 text-cyan-400 font-semibold">
+          Option 1: Immersive Ambient
+        </div>
+        <div class="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30 text-emerald-400 font-semibold">
+          Option 2: Map-Centric
+        </div>
+        <div class="px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 text-purple-400 font-semibold">
+          Option 3: Split Narrative
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
