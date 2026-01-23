@@ -3,6 +3,9 @@ name: Agent C - Performance Auditor
 on:
   pull_request:
     branches: [main, develop]
+    paths:
+      - 'src/**'
+      - 'package.json'
   push:
     branches: [main]
   schedule:
@@ -15,6 +18,8 @@ jobs:
     name: Lighthouse CI Audit
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # Don't block PRs - requires LHCI token and running server
+    continue-on-error: true
 
     steps:
       - name: Checkout
@@ -52,6 +57,8 @@ jobs:
     name: Web Vitals Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # Don't block PRs - requires running app server
+    continue-on-error: true
 
     steps:
       - name: Checkout

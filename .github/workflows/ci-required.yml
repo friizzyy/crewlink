@@ -1,0 +1,196 @@
+name: CI - Required Checks
+
+# Core CI checks that run on every PR
+# Build, Lint, and Type Check are required
+# E2E tests are informational (continue-on-error)
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Build check - ensures code compiles
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+  # Lint check - code quality
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+  # Type check - TypeScript validation
+  typecheck:
+    name: Type Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript
+        run: npx tsc --noEmit
+
+  # Copy scan - Check for placeholder text
+  copy-check:
+    name: Copy Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Run copy scan
+        run: node scripts/copy-scan.js
+
+  # QA Tests - Critical user flows (informational, doesn't block)
+  qa-tests:
+    name: QA Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Don't block PRs - E2E tests require full environment
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Build application
+        run: npm run build
+
+      - name: Run QA tests
+        run: npm run test:qa
+        env:
+          CI: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: qa-test-results
+          path: |
+            test-results/
+            playwright-report/
+          retention-days: 7
+
+  # API validation (informational, doesn't block)
+  api-validation:
+    name: API Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Don't block PRs - requires running server with database
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: API validation placeholder
+        run: |
+          echo "API validation requires database connection"
+          echo "Skipping in basic CI - run locally or on staging"
+
+  # Summary job
+  ci-complete:
+    name: CI Complete
+    runs-on: ubuntu-latest
+    needs: [build, lint, typecheck, copy-check]
+    if: always()
+
+    steps:
+      - name: Check required jobs passed
+        run: |
+          echo "Build: ${{ needs.build.result }}"
+          echo "Lint: ${{ needs.lint.result }}"
+          echo "Type Check: ${{ needs.typecheck.result }}"
+          echo "Copy Check: ${{ needs.copy-check.result }}"
+
+          if [ "${{ needs.build.result }}" != "success" ] || \
+             [ "${{ needs.lint.result }}" != "success" ] || \
+             [ "${{ needs.typecheck.result }}" != "success" ] || \
+             [ "${{ needs.copy-check.result }}" != "success" ]; then
+            echo "::error::One or more required checks failed!"
+            exit 1
+          fi
+
+          echo "All required checks passed!"
