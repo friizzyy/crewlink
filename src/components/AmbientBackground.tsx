@@ -103,14 +103,20 @@ function AmbientBox({ index, intensity, reducedMotion }: AmbientBoxProps) {
         height: `${props.size}px`,
         left: `${props.left}%`,
         top: `${props.top}%`,
-        transform: `rotate(${props.rotation}deg)`,
+        transform: `rotate(${props.rotation}deg) translateZ(0)`,
+        WebkitTransform: `rotate(${props.rotation}deg) translateZ(0)`,
         background: backgroundTokens.colors.box,
         border: `1px solid ${backgroundTokens.colors.boxBorder}`,
         filter: `blur(${backgroundTokens.blur.box})`,
+        WebkitFilter: `blur(${backgroundTokens.blur.box})`,
         opacity: opacityMultiplier,
+        WebkitAnimation: reducedMotion
+          ? 'none'
+          : `ambientBoxFloat ${props.duration}s ease-in-out infinite ${props.delay}s`,
         animation: reducedMotion
           ? 'none'
-          : `ambientBoxFloat ${props.duration}s ease-in-out infinite ${props.delay}s, ambientBoxBreath ${props.duration * 0.6}s ease-in-out infinite ${props.delay}s`,
+          : `ambientBoxFloat ${props.duration}s ease-in-out infinite ${props.delay}s`,
+        willChange: reducedMotion ? 'auto' : 'transform, opacity',
       }}
     />
   )
@@ -135,12 +141,16 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
   useEffect(() => {
     setMounted(true)
 
-    // Check for reduced motion preference
+    // Check for reduced motion preference OR mobile Safari (performance)
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    setReducedMotion(motionQuery.matches)
+    const isMobileSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /WebKit/.test(navigator.userAgent)
+    const isMobile = window.innerWidth < 768
+
+    // Disable animations on mobile Safari or if user prefers reduced motion
+    setReducedMotion(motionQuery.matches || (isMobileSafari && isMobile))
 
     const handleMotionChange = (e: MediaQueryListEvent) => {
-      setReducedMotion(e.matches)
+      setReducedMotion(e.matches || (isMobileSafari && isMobile))
     }
     motionQuery.addEventListener('change', handleMotionChange)
 
@@ -180,37 +190,51 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
 
   return (
     <>
-      {/* CSS Keyframes - injected once */}
+      {/* CSS Keyframes - injected once with webkit prefixes for Safari */}
       <style jsx global>{`
+        @-webkit-keyframes ambientBoxFloat {
+          0%, 100% {
+            -webkit-transform: translate3d(0, 0, 0) scale(1);
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          50% {
+            -webkit-transform: translate3d(-10px, 10px, 0) scale(0.98);
+            transform: translate3d(-10px, 10px, 0) scale(0.98);
+          }
+        }
         @keyframes ambientBoxFloat {
           0%, 100% {
-            transform: translate(0, 0) rotate(var(--rotation, 0deg)) scale(1);
-          }
-          25% {
-            transform: translate(15px, -20px) rotate(calc(var(--rotation, 0deg) + 3deg)) scale(1.02);
+            -webkit-transform: translate3d(0, 0, 0) scale(1);
+            transform: translate3d(0, 0, 0) scale(1);
           }
           50% {
-            transform: translate(-10px, 10px) rotate(calc(var(--rotation, 0deg) - 2deg)) scale(0.98);
-          }
-          75% {
-            transform: translate(5px, 15px) rotate(calc(var(--rotation, 0deg) + 1deg)) scale(1.01);
+            -webkit-transform: translate3d(-10px, 10px, 0) scale(0.98);
+            transform: translate3d(-10px, 10px, 0) scale(0.98);
           }
         }
 
+        @-webkit-keyframes ambientBoxBreath {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 0.4; }
+        }
         @keyframes ambientBoxBreath {
-          0%, 100% {
-            opacity: var(--base-opacity, 0.6);
-          }
-          50% {
-            opacity: calc(var(--base-opacity, 0.6) * 0.7);
-          }
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 0.4; }
         }
 
+        @-webkit-keyframes scanLine {
+          0% { top: -10%; }
+          100% { top: 110%; }
+        }
         @keyframes scanLine {
           0% { top: -10%; }
           100% { top: 110%; }
         }
 
+        @-webkit-keyframes glowPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.6; }
+        }
         @keyframes glowPulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.6; }

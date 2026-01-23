@@ -85,14 +85,20 @@
   
   html {
     @apply antialiased;
-    scroll-behavior: smooth;
     -webkit-tap-highlight-color: transparent;
+    /* Smooth scroll only on desktop - causes issues on iOS Safari */
+    @media (min-width: 1024px) {
+      scroll-behavior: smooth;
+    }
   }
-  
+
   body {
     /* DARK THEME - matches landing page (source of truth) */
     @apply bg-slate-950 text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* iOS Safari scroll fixes */
+    -webkit-overflow-scrolling: touch;
+    overflow-x: hidden;
   }
   
   /* Focus styles */
