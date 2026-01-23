@@ -1,101 +1,197 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
-  Plus, Search, Filter, MapPin, Clock, DollarSign, Users,
-  MoreHorizontal, CheckCircle2, XCircle, AlertCircle, Eye,
-  MessageCircle, Edit, Trash2, ChevronDown, Star, BadgeCheck
+  Plus, Search, MapPin, Clock, DollarSign, Users,
+  MoreHorizontal, CheckCircle2, XCircle, Eye,
+  MessageCircle, Edit, Star, Loader2, RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Mock jobs data
-const mockJobs = [
-  {
-    id: '1',
-    title: 'Deep House Cleaning',
-    category: 'cleaning',
-    categoryIcon: '🧹',
-    status: 'active',
-    budget: { min: 120, max: 180 },
-    location: 'Mission District',
-    postedAt: '2 hours ago',
-    bids: 5,
-    views: 23,
-    urgency: 'today',
-  },
-  {
-    id: '2',
-    title: 'Help Moving Furniture',
-    category: 'moving',
-    categoryIcon: '📦',
-    status: 'in-progress',
-    budget: { min: 150, max: 250 },
-    location: 'SOMA',
-    postedAt: '1 day ago',
-    bids: 8,
-    views: 45,
-    urgency: 'urgent',
-    assignedTo: { name: 'Marcus T.', rating: 4.9 },
-  },
-  {
-    id: '3',
-    title: 'IKEA Furniture Assembly',
-    category: 'assembly',
-    categoryIcon: '🪑',
-    status: 'completed',
-    budget: { min: 80, max: 120 },
-    location: 'Hayes Valley',
-    postedAt: '3 days ago',
-    bids: 3,
-    views: 18,
-    urgency: 'flexible',
-    assignedTo: { name: 'Sarah K.', rating: 5.0 },
-    completedAt: '2 days ago',
-    finalAmount: 95,
-  },
-  {
-    id: '4',
-    title: 'Yard Work & Landscaping',
-    category: 'yard',
-    categoryIcon: '🌱',
-    status: 'draft',
-    budget: { min: 100, max: 150 },
-    location: 'Noe Valley',
-    postedAt: 'Draft',
-    bids: 0,
-    views: 0,
-    urgency: 'this-week',
-  },
-]
+// Category icons mapping
+const categoryIcons: Record<string, string> = {
+  cleaning: '🧹',
+  moving: '📦',
+  handyman: '🔧',
+  yard: '🌱',
+  assembly: '🪑',
+  delivery: '🚚',
+  events: '🎉',
+  other: '📋',
+}
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<any> }> = {
-  active: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
-  'in-progress': { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
+// Job type from API
+interface Job {
+  id: string
+  title: string
+  description: string
+  category: string
+  address: string
+  lat: number
+  lng: number
+  isRemote: boolean
+  scheduleType: string
+  startDate: string | null
+  endDate: string | null
+  estimatedHours: number | null
+  budgetType: string
+  budgetMin: number | null
+  budgetMax: number | null
+  status: string
+  viewCount: number
+  bidCount: number
+  createdAt: string
+  updatedAt: string
+  poster: {
+    id: string
+    name: string | null
+    avatarUrl: string | null
+  }
+}
+
+interface ApiResponse {
+  success: boolean
+  data: Job[]
+  pagination: {
+    total: number
+    limit: number
+    offset: number
+    hasMore: boolean
+  }
+}
+
+const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+  posted: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
+  in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
   completed: { label: 'Completed', color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', icon: CheckCircle2 },
   draft: { label: 'Draft', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', icon: Edit },
   cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
 }
 
+// Format relative time
+function formatRelativeTime(dateString: string): string {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 1) return 'Just now'
+  if (diffMins < 60) return `${diffMins} min ago`
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  return date.toLocaleDateString()
+}
+
+// Extract neighborhood/city from full address
+function formatLocation(address: string): string {
+  const parts = address.split(',')
+  if (parts.length >= 2) {
+    // Return city or neighborhood (usually second or second-to-last part)
+    return parts[parts.length >= 3 ? parts.length - 3 : 0].trim()
+  }
+  return address
+}
+
 export default function HiringJobsPage() {
+  const searchParams = useSearchParams()
+  const isNewJob = searchParams.get('new') === 'true'
+
   const [filter, setFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [showNewJobBanner, setShowNewJobBanner] = useState(isNewJob)
 
-  const filteredJobs = mockJobs.filter((job) => {
-    if (filter !== 'all' && job.status !== filter) return false
-    if (searchQuery && !job.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
+  // Fetch jobs from API
+  const fetchJobs = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const params = new URLSearchParams()
+      if (filter !== 'all') {
+        // Map UI filter to API status
+        const statusMap: Record<string, string> = {
+          active: 'posted',
+          'in-progress': 'in_progress',
+          completed: 'completed',
+          draft: 'draft',
+        }
+        params.set('status', statusMap[filter] || filter)
+      } else {
+        params.set('status', 'all')
+      }
+
+      const response = await fetch(`/api/jobs?${params}`)
+      const data: ApiResponse = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error('Failed to fetch jobs')
+      }
+
+      setJobs(data.data)
+    } catch (err) {
+      console.error('Error fetching jobs:', err)
+      setError('Failed to load jobs. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchJobs()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter])
+
+  // Hide new job banner after a few seconds
+  useEffect(() => {
+    if (showNewJobBanner) {
+      const timer = setTimeout(() => setShowNewJobBanner(false), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [showNewJobBanner])
+
+  // Filter by search query (client-side)
+  const filteredJobs = jobs.filter((job) => {
+    if (searchQuery && !job.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false
+    }
     return true
   })
 
+  // Calculate stats
   const stats = {
-    active: mockJobs.filter((j) => j.status === 'active').length,
-    inProgress: mockJobs.filter((j) => j.status === 'in-progress').length,
-    completed: mockJobs.filter((j) => j.status === 'completed').length,
-    total: mockJobs.length,
+    active: jobs.filter((j) => j.status === 'posted').length,
+    inProgress: jobs.filter((j) => j.status === 'in_progress').length,
+    completed: jobs.filter((j) => j.status === 'completed').length,
+    total: jobs.length,
   }
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+      {/* Success Banner */}
+      {showNewJobBanner && (
+        <div className="bg-emerald-500/20 border-b border-emerald-500/30">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-emerald-400">
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="font-medium">Job posted successfully!</span>
+            </div>
+            <button
+              onClick={() => setShowNewJobBanner(false)}
+              className="text-emerald-400 hover:text-emerald-300"
+            >
+              <XCircle className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="border-b border-white/5 bg-slate-900/50">
         <div className="max-w-5xl mx-auto px-4 py-6">
@@ -105,7 +201,7 @@ export default function HiringJobsPage() {
               <p className="text-slate-400 mt-1">Manage your job postings</p>
             </div>
             <Link
-              href="/hiring/post"
+              href="/hiring/new"
               className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25"
             >
               <Plus className="w-4 h-4" />
@@ -173,10 +269,37 @@ export default function HiringJobsPage() {
 
       {/* Jobs List */}
       <div className="max-w-5xl mx-auto px-4">
-        {filteredJobs.length > 0 ? (
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-16">
+            <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && !isLoading && (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <XCircle className="w-10 h-10 text-red-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-white mb-2">Something went wrong</h2>
+            <p className="text-slate-400 mb-6">{error}</p>
+            <button
+              onClick={fetchJobs}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors"
+            >
+              <RefreshCw className="w-5 h-5" />
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Jobs */}
+        {!isLoading && !error && filteredJobs.length > 0 && (
           <div className="space-y-4">
             {filteredJobs.map((job) => {
-              const StatusIcon = statusConfig[job.status].icon
+              const statusInfo = statusConfig[job.status] || statusConfig.posted
+              const StatusIcon = statusInfo.icon
               return (
                 <div
                   key={job.id}
@@ -185,7 +308,7 @@ export default function HiringJobsPage() {
                   <div className="flex gap-4">
                     {/* Category Icon */}
                     <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center text-3xl shrink-0">
-                      {job.categoryIcon}
+                      {categoryIcons[job.category] || '📋'}
                     </div>
 
                     {/* Job Info */}
@@ -201,21 +324,21 @@ export default function HiringJobsPage() {
                           <div className="flex items-center gap-3 mt-1.5 text-sm text-slate-400">
                             <div className="flex items-center gap-1">
                               <MapPin className="w-4 h-4" />
-                              {job.location}
+                              {formatLocation(job.address)}
                             </div>
                             <span>•</span>
-                            <span>{job.postedAt}</span>
+                            <span>{formatRelativeTime(job.createdAt)}</span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
                           <span
                             className={cn(
                               'inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border',
-                              statusConfig[job.status].color
+                              statusInfo.color
                             )}
                           >
                             <StatusIcon className="w-3.5 h-3.5" />
-                            {statusConfig[job.status].label}
+                            {statusInfo.label}
                           </span>
                           <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                             <MoreHorizontal className="w-5 h-5" />
@@ -228,30 +351,23 @@ export default function HiringJobsPage() {
                         <div className="flex items-center gap-2 text-sm">
                           <DollarSign className="w-4 h-4 text-cyan-400" />
                           <span className="text-cyan-400 font-semibold">
-                            ${job.budget.min} - ${job.budget.max}
+                            {job.budgetMin && job.budgetMax
+                              ? `$${job.budgetMin} - $${job.budgetMax}`
+                              : job.budgetMin
+                              ? `$${job.budgetMin}+`
+                              : job.budgetMax
+                              ? `Up to $${job.budgetMax}`
+                              : 'Open budget'}
                           </span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-400">
                           <Users className="w-4 h-4" />
-                          <span>{job.bids} bids</span>
+                          <span>{job.bidCount} bids</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-400">
                           <Eye className="w-4 h-4" />
-                          <span>{job.views} views</span>
+                          <span>{job.viewCount} views</span>
                         </div>
-
-                        {job.assignedTo && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-xs font-semibold">
-                              {job.assignedTo.name.charAt(0)}
-                            </div>
-                            <span className="text-white">{job.assignedTo.name}</span>
-                            <div className="flex items-center gap-0.5">
-                              <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                              <span className="text-slate-400">{job.assignedTo.rating}</span>
-                            </div>
-                          </div>
-                        )}
                       </div>
 
                       {/* Actions */}
@@ -263,16 +379,16 @@ export default function HiringJobsPage() {
                           <Eye className="w-4 h-4" />
                           View Details
                         </Link>
-                        {job.status === 'active' && (
+                        {job.status === 'posted' && (
                           <Link
                             href={`/hiring/job/${job.id}#bids`}
                             className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 text-cyan-400 text-sm font-medium rounded-xl hover:bg-cyan-500/20 transition-colors"
                           >
                             <Users className="w-4 h-4" />
-                            Review Bids ({job.bids})
+                            Review Bids ({job.bidCount})
                           </Link>
                         )}
-                        {job.status === 'in-progress' && (
+                        {job.status === 'in_progress' && (
                           <Link
                             href="/hiring/messages"
                             className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 text-cyan-400 text-sm font-medium rounded-xl hover:bg-cyan-500/20 transition-colors"
@@ -283,7 +399,7 @@ export default function HiringJobsPage() {
                         )}
                         {job.status === 'draft' && (
                           <Link
-                            href="/hiring/post"
+                            href="/hiring/new"
                             className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-400 text-sm font-medium rounded-xl hover:bg-amber-500/20 transition-colors"
                           >
                             <Edit className="w-4 h-4" />
@@ -297,7 +413,10 @@ export default function HiringJobsPage() {
               )
             })}
           </div>
-        ) : (
+        )}
+
+        {/* Empty State */}
+        {!isLoading && !error && filteredJobs.length === 0 && (
           <div className="text-center py-16">
             <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <Search className="w-10 h-10 text-slate-600" />
@@ -307,7 +426,7 @@ export default function HiringJobsPage() {
               {filter === 'all' ? "You haven't posted any jobs yet" : `No ${filter} jobs`}
             </p>
             <Link
-              href="/hiring/post"
+              href="/hiring/new"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl"
             >
               <Plus className="w-5 h-5" />

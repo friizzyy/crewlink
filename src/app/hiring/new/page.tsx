@@ -8,6 +8,7 @@ import {
   Sparkles, CheckCircle2, AlertCircle, Loader2, X, Plus,
   Zap, Shield, ChevronDown, Camera, FileText, Wand2
 } from 'lucide-react'
+import { AddressAutocomplete, type AddressResult } from '@/components/ui/AddressAutocomplete'
 
 const categories = [
   { id: 'cleaning', name: 'Cleaning', icon: '🧹', description: 'Home, office, deep clean' },
@@ -39,12 +40,16 @@ export default function NewJobPage() {
     title: '',
     description: '',
     location: '',
+    lat: null as number | null,
+    lng: null as number | null,
     urgency: '',
     budgetMin: '',
     budgetMax: '',
     duration: '',
     photos: [] as string[],
   })
+
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const [aiSuggestions, setAiSuggestions] = useState<{
     title?: string
@@ -97,9 +102,48 @@ export default function NewJobPage() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true)
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    router.push('/hiring/jobs?new=true')
+    setSubmitError(null)
+
+    // Validate coordinates before submission
+    if (!formData.lat || !formData.lng) {
+      setSubmitError('Please select a valid address from the suggestions')
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      const response = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          category: formData.category,
+          address: formData.location,
+          lat: formData.lat,
+          lng: formData.lng,
+          urgency: formData.urgency,
+          budgetMin: formData.budgetMin ? parseFloat(formData.budgetMin) : undefined,
+          budgetMax: formData.budgetMax ? parseFloat(formData.budgetMax) : undefined,
+          estimatedHours: formData.duration ? parseFloat(formData.duration) : undefined,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to create job')
+      }
+
+      // Success - redirect to jobs list
+      router.push('/hiring/jobs?new=true')
+    } catch (error) {
+      console.error('Error creating job:', error)
+      setSubmitError(error instanceof Error ? error.message : 'Failed to create job. Please try again.')
+      setIsSubmitting(false)
+    }
   }
 
   const progress = (step / 4) * 100
@@ -108,10 +152,41 @@ export default function NewJobPage() {
     switch (step) {
       case 1: return !!formData.category
       case 2: return !!formData.title && !!formData.description
-      case 3: return !!formData.location && !!formData.urgency
+      case 3: return !!formData.location && !!formData.urgency && formData.lat !== null && formData.lng !== null
       case 4: return !!formData.budgetMin
       default: return false
     }
+  }
+
+  // Handle address selection from autocomplete
+  const handleAddressSelect = (result: AddressResult) => {
+    setFormData(prev => ({
+      ...prev,
+      location: result.address,
+      lat: result.lat,
+      lng: result.lng,
+    }))
+  }
+
+  // Handle address text change (clear coordinates if user edits)
+  const handleAddressChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      location: value,
+      // Clear coordinates when user types manually - they need to select from suggestions
+      lat: null,
+      lng: null,
+    }))
+  }
+
+  // Handle address clear
+  const handleAddressClear = () => {
+    setFormData(prev => ({
+      ...prev,
+      location: '',
+      lat: null,
+      lng: null,
+    }))
   }
 
   return (
@@ -276,21 +351,26 @@ export default function NewJobPage() {
             <div className="space-y-6">
               {/* Location */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">Location</label>
-                <div className="relative">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                  <input
-                    type="text"
-                    value={formData.location}
-                    onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-                    placeholder="Enter address or neighborhood"
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
-                  />
-                </div>
+                <AddressAutocomplete
+                  label="Location"
+                  value={formData.location}
+                  onChange={handleAddressChange}
+                  onSelect={handleAddressSelect}
+                  onClear={handleAddressClear}
+                  placeholder="Enter address or neighborhood"
+                  required
+                  error={formData.location && !formData.lat ? 'Please select an address from the suggestions' : undefined}
+                />
                 <p className="mt-2 text-xs text-slate-500 flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5" />
                   Exact address shared only after booking
                 </p>
+                {formData.lat && formData.lng && (
+                  <p className="mt-1 text-xs text-emerald-400 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    Location verified
+                  </p>
+                )}
               </div>
 
               {/* Urgency */}
@@ -447,6 +527,17 @@ export default function NewJobPage() {
       {/* Footer Actions */}
       <div className="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-white/5 p-4 z-40 lg:relative lg:bg-transparent lg:border-0 lg:p-0">
         <div className="max-w-2xl mx-auto lg:mt-8">
+          {/* Error Message */}
+          {submitError && (
+            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-red-400 font-medium">Error</p>
+                <p className="text-sm text-red-300 mt-0.5">{submitError}</p>
+              </div>
+            </div>
+          )}
+
           {step < 4 ? (
             <button
               onClick={() => setStep(step + 1)}
