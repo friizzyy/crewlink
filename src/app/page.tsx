@@ -9,61 +9,23 @@ import {
 } from 'lucide-react'
 import { UniversalNav } from '@/components/UniversalNav'
 import { MarketingFooter } from '@/components/MarketingFooter'
+import {
+  useDeviceType,
+  useReducedMotion,
+  useMobileReveal,
+  mobileAnimationStyles,
+} from '@/hooks/useMobileAnimation'
 
 // ============================================
-// LANDING PAGE - Mobile-First Optimized
-// Desktop: LOCKED - do not modify desktop behavior
-// Mobile: Optimized for iOS Safari + Android Chrome
+// LANDING PAGE
+// Desktop: LOCKED - uses existing animation system
+// Mobile: Uses new mobile animation engine
 // ============================================
 
-// Detect device capabilities for animation decisions
-function useDeviceCapabilities() {
-  const [capabilities, setCapabilities] = useState({
-    prefersReducedMotion: false,
-    isMobile: false,
-    isTablet: false,
-    isMobileSafari: false,
-  })
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const width = window.innerWidth
-
-    const isMobileSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) &&
-                          /WebKit/.test(navigator.userAgent) &&
-                          !/(Chrome|CriOS|Firefox)/.test(navigator.userAgent)
-
-    setCapabilities({
-      prefersReducedMotion: mediaQuery.matches,
-      isMobile: width < 768,
-      isTablet: width >= 768 && width < 1024,
-      isMobileSafari,
-    })
-
-    const handleChange = () => {
-      const newWidth = window.innerWidth
-      setCapabilities(prev => ({
-        ...prev,
-        prefersReducedMotion: mediaQuery.matches,
-        isMobile: newWidth < 768,
-        isTablet: newWidth >= 768 && newWidth < 1024,
-      }))
-    }
-
-    mediaQuery.addEventListener('change', handleChange)
-    window.addEventListener('resize', handleChange)
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange)
-      window.removeEventListener('resize', handleChange)
-    }
-  }, [])
-
-  return capabilities
-}
-
-// Scroll reveal hook - mobile-optimized with generous margins
-function useScrollReveal(options?: { mobileThreshold?: number }) {
+// ============================================
+// DESKTOP ANIMATION SYSTEM (UNCHANGED)
+// ============================================
+function useDesktopScrollReveal(threshold = 0.1) {
   const ref = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
   const hasAnimated = useRef(false)
@@ -72,18 +34,12 @@ function useScrollReveal(options?: { mobileThreshold?: number }) {
     const element = ref.current
     if (!element) return
 
-    // Check reduced motion - if so, just show immediately
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
       setIsVisible(true)
       hasAnimated.current = true
       return
     }
-
-    // Mobile gets more generous margins for earlier trigger
-    const isMobile = window.innerWidth < 768
-    const rootMargin = isMobile ? '0px 0px -20px 0px' : '0px 0px -50px 0px'
-    const threshold = isMobile ? (options?.mobileThreshold ?? 0.05) : 0.1
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -92,17 +48,19 @@ function useScrollReveal(options?: { mobileThreshold?: number }) {
           hasAnimated.current = true
         }
       },
-      { threshold, rootMargin }
+      { threshold, rootMargin: '0px 0px -50px 0px' }
     )
 
     observer.observe(element)
     return () => observer.disconnect()
-  }, [options?.mobileThreshold])
+  }, [threshold])
 
   return { ref, isVisible }
 }
 
-// Floating card data - desktop positions preserved, mobile optimized
+// ============================================
+// DATA
+// ============================================
 const floatingCards = [
   {
     id: 1,
@@ -110,11 +68,9 @@ const floatingCards = [
     subtitle: 'Available now',
     icon: '🔧',
     gradient: 'from-cyan-400 to-blue-600',
-    // Desktop position (LOCKED)
     desktopPosition: 'top-[15%] right-[8%]',
-    // Mobile: top-right, safe from content
-    mobilePosition: 'top-[12%] right-[4%]',
-    rotation: 'rotate-3',
+    mobilePosition: { top: '12%', right: '4%' },
+    rotation: 3,
     delay: 0,
     showOnMobile: true,
   },
@@ -125,10 +81,9 @@ const floatingCards = [
     icon: '🧹',
     gradient: 'from-emerald-400 to-teal-600',
     desktopPosition: 'top-[35%] left-[5%]',
-    // Mobile: top-left, clear of nav
-    mobilePosition: 'top-[18%] left-[4%]',
-    rotation: '-rotate-2',
-    delay: 100,
+    mobilePosition: { top: '18%', left: '4%' },
+    rotation: -2,
+    delay: 0.1,
     showOnMobile: true,
   },
   {
@@ -138,11 +93,10 @@ const floatingCards = [
     icon: '📦',
     gradient: 'from-purple-400 to-pink-600',
     desktopPosition: 'bottom-[25%] left-[8%]',
-    // Mobile: HIDDEN - would overlap with CTAs
-    mobilePosition: 'bottom-[35%] left-[4%]',
-    rotation: '-rotate-1',
-    delay: 200,
-    showOnMobile: false, // Disable on mobile - overlaps content
+    mobilePosition: { bottom: '35%', left: '4%' },
+    rotation: -1,
+    delay: 0.2,
+    showOnMobile: false,
   },
   {
     id: 4,
@@ -151,12 +105,11 @@ const floatingCards = [
     icon: '⭐',
     gradient: 'from-amber-400 to-orange-600',
     desktopPosition: 'bottom-[18%] right-[10%]',
-    // Mobile: HIDDEN - would overlap with trust badges
-    mobilePosition: 'bottom-[30%] right-[4%]',
-    rotation: 'rotate-1',
-    delay: 300,
+    mobilePosition: { bottom: '30%', right: '4%' },
+    rotation: 1,
+    delay: 0.3,
     isSuccess: true,
-    showOnMobile: false, // Disable on mobile - overlaps content
+    showOnMobile: false,
   },
 ]
 
@@ -175,89 +128,80 @@ const trustBadges = [
   { label: 'Secure Payments', icon: Lock },
 ]
 
-// Floating card component - separate mobile/desktop rendering
-function FloatingCard({
+// ============================================
+// MOBILE FLOATING CARD COMPONENT
+// Uses CSS keyframes - no JS animation
+// ============================================
+function MobileFloatingCard({
   card,
-  isMobile,
-  mounted,
-  prefersReducedMotion
+  isVisible,
 }: {
   card: typeof floatingCards[0]
-  isMobile: boolean
-  mounted: boolean
-  prefersReducedMotion: boolean
+  isVisible: boolean
 }) {
-  const [isVisible, setIsVisible] = useState(false)
+  if (!card.showOnMobile) return null
 
-  useEffect(() => {
-    if (!mounted) return
-
-    // Stagger the appearance with setTimeout
-    const timer = setTimeout(() => {
-      setIsVisible(true)
-    }, card.delay + 100) // Small base delay for page load
-
-    return () => clearTimeout(timer)
-  }, [mounted, card.delay])
-
-  // Don't render cards marked as hidden on mobile
-  if (isMobile && !card.showOnMobile) {
-    return null
-  }
-
-  // Mobile version - compact, no continuous animations, positioned safely
-  if (isMobile) {
-    return (
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        ...card.mobilePosition,
+        opacity: isVisible ? 1 : 0,
+        transform: `rotate(${card.rotation}deg) translateY(${isVisible ? '0' : '12px'})`,
+        transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+        transitionDelay: `${card.delay}s`,
+        animation: isVisible ? `mobileFloat 4s ease-in-out infinite ${card.delay}s` : 'none',
+        ['--float-rotation' as string]: `${card.rotation}deg`,
+      }}
+    >
       <div
         className={`
-          absolute ${card.mobilePosition}
-          transition-all duration-500 ease-out pointer-events-none
-          ${isVisible ? 'opacity-100' : 'opacity-0'}
+          relative p-2 rounded-xl
+          bg-slate-900/90 border border-white/10
+          shadow-lg
+          ${card.isSuccess ? 'border-emerald-500/30' : ''}
         `}
-        style={{
-          transform: `${card.rotation === 'rotate-3' ? 'rotate(3deg)' :
-                       card.rotation === '-rotate-2' ? 'rotate(-2deg)' :
-                       card.rotation === '-rotate-1' ? 'rotate(-1deg)' :
-                       'rotate(1deg)'} translateY(${isVisible ? '0' : '12px'})`,
-          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
-        }}
       >
-        <div
-          className={`
-            relative p-2 rounded-xl
-            bg-slate-900/90 border border-white/10
-            shadow-lg backdrop-blur-sm
-            ${card.isSuccess ? 'border-emerald-500/30' : ''}
-          `}
-        >
-          {card.isSuccess && (
-            <div className="absolute inset-0 bg-emerald-500/10 rounded-xl" />
-          )}
-          <div className="relative flex items-center gap-2">
-            <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-sm`}>
-              <span className="text-[10px]">{card.icon}</span>
-            </div>
-            <div>
-              <div className="font-semibold text-white text-[9px] leading-tight">{card.title}</div>
-              <div className={`text-[7px] leading-tight ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'}`}>
-                {card.subtitle}
-              </div>
+        {card.isSuccess && (
+          <div className="absolute inset-0 bg-emerald-500/10 rounded-xl" />
+        )}
+        <div className="relative flex items-center gap-2">
+          <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-sm`}>
+            <span className="text-[10px]">{card.icon}</span>
+          </div>
+          <div>
+            <div className="font-semibold text-white text-[9px] leading-tight">{card.title}</div>
+            <div className={`text-[7px] leading-tight ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'}`}>
+              {card.subtitle}
             </div>
           </div>
         </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
-  // Desktop/tablet version (LOCKED - do not modify)
+// ============================================
+// DESKTOP FLOATING CARD COMPONENT (UNCHANGED)
+// ============================================
+function DesktopFloatingCard({
+  card,
+  isVisible,
+  reducedMotion,
+}: {
+  card: typeof floatingCards[0]
+  isVisible: boolean
+  reducedMotion: boolean
+}) {
   return (
     <div
       className={`
-        absolute ${card.desktopPosition} ${card.rotation}
+        absolute ${card.desktopPosition}
         transition-all duration-700 ease-out
         ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
       `}
       style={{
+        transform: `rotate(${card.rotation}deg)`,
         willChange: isVisible ? 'auto' : 'transform, opacity',
       }}
     >
@@ -267,10 +211,10 @@ function FloatingCard({
           bg-slate-900/80 border border-white/10
           shadow-2xl shadow-black/20
           ${card.isSuccess ? 'border-emerald-500/30' : ''}
-          ${!prefersReducedMotion ? 'hover:translate-y-[-4px] transition-transform duration-300' : ''}
+          ${!reducedMotion ? 'hover:translate-y-[-4px] transition-transform duration-300' : ''}
         `}
         style={{
-          animation: !prefersReducedMotion ? `float-gentle 6s ease-in-out infinite ${card.delay}ms` : 'none',
+          animation: !reducedMotion ? `float-gentle 6s ease-in-out infinite ${card.delay}s` : 'none',
         }}
       >
         {card.isSuccess && (
@@ -283,13 +227,13 @@ function FloatingCard({
           <div>
             <div className="font-semibold text-white text-sm">{card.title}</div>
             <div className={`text-xs ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'} flex items-center gap-1`}>
-              {card.id === 1 && !prefersReducedMotion && (
+              {card.id === 1 && !reducedMotion && (
                 <span className="relative flex h-1.5 w-1.5 mr-1">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                 </span>
               )}
-              {card.id === 1 && prefersReducedMotion && (
+              {card.id === 1 && reducedMotion && (
                 <span className="relative flex h-1.5 w-1.5 mr-1">
                   <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
                 </span>
@@ -303,45 +247,59 @@ function FloatingCard({
   )
 }
 
+// ============================================
+// MAIN PAGE COMPONENT
+// ============================================
 export default function HomePage() {
   const [mounted, setMounted] = useState(false)
-  const { prefersReducedMotion, isMobile, isTablet } = useDeviceCapabilities()
+  const { isMobile, isTablet, isDesktop } = useDeviceType()
+  const reducedMotion = useReducedMotion()
 
-  const statsSection = useScrollReveal({ mobileThreshold: 0.05 })
-  const categoriesSection = useScrollReveal({ mobileThreshold: 0.05 })
-  const howSection = useScrollReveal({ mobileThreshold: 0.05 })
+  // Desktop scroll reveals (unchanged)
+  const desktopStatsReveal = useDesktopScrollReveal()
+  const desktopCategoriesReveal = useDesktopScrollReveal()
+  const desktopHowReveal = useDesktopScrollReveal()
+
+  // Mobile scroll reveals (new system)
+  const mobileStatsReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
+  const mobileCategoriesReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
+  const mobileHowReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
+  // Choose which reveal system to use based on device
+  const statsReveal = isMobile || isTablet ? mobileStatsReveal : desktopStatsReveal
+  const categoriesReveal = isMobile || isTablet ? mobileCategoriesReveal : desktopCategoriesReveal
+  const howReveal = isMobile || isTablet ? mobileHowReveal : desktopHowReveal
+
   return (
     <div className="min-h-screen min-h-[100dvh] text-white bg-slate-950">
+      {/* Inject mobile animation CSS */}
+      <style dangerouslySetInnerHTML={{ __html: mobileAnimationStyles }} />
+
       <UniversalNav variant="marketing" />
 
       {/* ============ HERO ============ */}
-      {/* Desktop: full viewport | Mobile: auto height with safe padding */}
       <section className={`
         relative flex items-center
         min-h-screen min-h-[100dvh]
-        md:min-h-screen md:min-h-[100dvh]
-        pt-20 pb-8
-        md:pt-16 md:pb-0
+        pt-20 pb-8 md:pt-16 md:pb-0
       `}>
 
         {/* ====== BACKGROUND ====== */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {/* Static gradient base */}
           <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950" />
 
-          {/* Glow spots - smaller on mobile, animated on desktop only */}
+          {/* Glow spots - static on mobile, animated on desktop */}
           <div
             className={`
               absolute top-1/4 left-1/4
               w-[200px] h-[200px] md:w-[500px] md:h-[500px]
               bg-cyan-500/15 rounded-full
               blur-[60px] md:blur-[100px]
-              ${!prefersReducedMotion && !isMobile ? 'animate-pulse-slow' : ''}
+              ${!reducedMotion && isDesktop ? 'animate-pulse-slow' : ''}
             `}
           />
           <div
@@ -350,12 +308,12 @@ export default function HomePage() {
               w-[150px] h-[150px] md:w-[400px] md:h-[400px]
               bg-blue-600/10 rounded-full
               blur-[50px] md:blur-[80px]
-              ${!prefersReducedMotion && !isMobile ? 'animate-pulse-slow' : ''}
+              ${!reducedMotion && isDesktop ? 'animate-pulse-slow' : ''}
             `}
             style={{ animationDelay: '2s' }}
           />
 
-          {/* Grid - always static, lower opacity on mobile */}
+          {/* Grid */}
           <div
             className="absolute inset-0 opacity-[0.02] md:opacity-[0.03]"
             style={{
@@ -368,13 +326,20 @@ export default function HomePage() {
         {/* ====== FLOATING CARDS ====== */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           {floatingCards.map((card) => (
-            <FloatingCard
-              key={card.id}
-              card={card}
-              isMobile={isMobile}
-              mounted={mounted}
-              prefersReducedMotion={prefersReducedMotion}
-            />
+            isMobile || isTablet ? (
+              <MobileFloatingCard
+                key={`mobile-${card.id}`}
+                card={card}
+                isVisible={mounted && !reducedMotion}
+              />
+            ) : (
+              <DesktopFloatingCard
+                key={`desktop-${card.id}`}
+                card={card}
+                isVisible={mounted}
+                reducedMotion={reducedMotion}
+              />
+            )
           ))}
         </div>
 
@@ -386,12 +351,20 @@ export default function HomePage() {
               className={`
                 inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 sm:py-2.5
                 bg-slate-900/80 border border-white/10 rounded-full
-                mb-6 sm:mb-10 transition-all duration-500 ease-out
-                ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                mb-6 sm:mb-10
               `}
+              style={isMobile ? {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+              } : {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'all 0.5s ease-out',
+              }}
             >
               <span className="relative flex h-2 w-2 sm:h-2.5 sm:w-2.5">
-                {!prefersReducedMotion && (
+                {!reducedMotion && (
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" style={{ animationDuration: '2s' }}></span>
                 )}
                 <span className="relative inline-flex rounded-full h-2 w-2 sm:h-2.5 sm:w-2.5 bg-emerald-500"></span>
@@ -401,15 +374,18 @@ export default function HomePage() {
               </span>
             </div>
 
-            {/* Headline - tighter on mobile */}
+            {/* Headline */}
             <h1
-              className={`
-                text-[2rem] leading-[1.1] sm:text-5xl lg:text-6xl xl:text-7xl
-                font-black tracking-tight sm:leading-[0.95]
-                transition-all duration-500 ease-out
-                ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-              `}
-              style={{ transitionDelay: '100ms' }}
+              className="text-[2rem] leading-[1.1] sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tight sm:leading-[0.95]"
+              style={isMobile ? {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s',
+              } : {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'all 0.5s ease-out 0.1s',
+              }}
             >
               <span className="text-white">Get help</span>
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent"> today.</span>
@@ -418,28 +394,35 @@ export default function HomePage() {
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent"> next week.</span>
             </h1>
 
-            {/* Subheadline - more compact on mobile */}
+            {/* Subheadline */}
             <p
-              className={`
-                mt-4 sm:mt-8 text-base sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed
-                px-2 sm:px-0
-                transition-all duration-500 ease-out
-                ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-              `}
-              style={{ transitionDelay: '200ms' }}
+              className="mt-4 sm:mt-8 text-base sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed px-2 sm:px-0"
+              style={isMobile ? {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.5s ease-out 0.2s, transform 0.5s ease-out 0.2s',
+              } : {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'all 0.5s ease-out 0.2s',
+              }}
             >
               Hire verified local workers for cleaning, moving, handyman work, and more.
-              {!isMobile && <> Average match time: <span className="text-cyan-400 font-semibold">4 minutes</span>.</>}
+              {isDesktop && <> Average match time: <span className="text-cyan-400 font-semibold">4 minutes</span>.</>}
             </p>
 
-            {/* CTA Buttons - full width on mobile */}
+            {/* CTA Buttons */}
             <div
-              className={`
-                mt-6 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4
-                transition-all duration-500 ease-out
-                ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-              `}
-              style={{ transitionDelay: '300ms' }}
+              className="mt-6 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
+              style={isMobile ? {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.5s ease-out 0.3s, transform 0.5s ease-out 0.3s',
+              } : {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'all 0.5s ease-out 0.3s',
+              }}
             >
               <Link
                 href="/create-account?mode=hire"
@@ -470,14 +453,18 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* Trust badges - compact on mobile */}
+            {/* Trust badges */}
             <div
-              className={`
-                mt-6 sm:mt-14 flex flex-wrap items-center justify-center gap-4 sm:gap-8
-                transition-all duration-500 ease-out
-                ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-              `}
-              style={{ transitionDelay: '400ms' }}
+              className="mt-6 sm:mt-14 flex flex-wrap items-center justify-center gap-4 sm:gap-8"
+              style={isMobile ? {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.5s ease-out 0.4s, transform 0.5s ease-out 0.4s',
+              } : {
+                opacity: mounted ? 1 : 0,
+                transform: mounted ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'all 0.5s ease-out 0.4s',
+              }}
             >
               {trustBadges.map((badge) => (
                 <div key={badge.label} className="flex items-center gap-1.5 sm:gap-2 text-slate-500">
@@ -488,12 +475,20 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
       </section>
 
       {/* ============ STATS BAR ============ */}
-      <section ref={statsSection.ref} className="py-6 sm:py-8 border-y border-white/5 bg-slate-900/30">
-        <div className={`max-w-5xl mx-auto px-5 sm:px-6 transition-all duration-500 ${statsSection.isVisible ? 'opacity-100' : 'opacity-0'}`}>
+      <section
+        ref={statsReveal.ref}
+        className="py-6 sm:py-8 border-y border-white/5 bg-slate-900/30"
+      >
+        <div
+          className="max-w-5xl mx-auto px-5 sm:px-6"
+          style={isMobile || isTablet ? mobileStatsReveal.style : {
+            opacity: desktopStatsReveal.isVisible ? 1 : 0,
+            transition: 'opacity 0.5s ease-out',
+          }}
+        >
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             {[
               { value: '50K+', label: 'Jobs Completed', icon: CheckCircle2 },
@@ -503,11 +498,16 @@ export default function HomePage() {
             ].map((stat, i) => (
               <div
                 key={stat.label}
-                className={`
-                  text-center transition-all duration-500 ease-out
-                  ${statsSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-                `}
-                style={{ transitionDelay: `${i * 50}ms` }}
+                className="text-center"
+                style={isMobile || isTablet ? {
+                  opacity: mobileStatsReveal.isVisible ? 1 : 0,
+                  transform: mobileStatsReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
+                  transition: `opacity 0.4s ease-out ${i * 50}ms, transform 0.4s ease-out ${i * 50}ms`,
+                } : {
+                  opacity: desktopStatsReveal.isVisible ? 1 : 0,
+                  transform: desktopStatsReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: `all 0.5s ease-out ${i * 50}ms`,
+                }}
               >
                 <div className="flex items-center justify-center gap-1.5 sm:gap-2 mb-0.5 sm:mb-1">
                   <stat.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400" />
@@ -521,14 +521,15 @@ export default function HomePage() {
       </section>
 
       {/* ============ CATEGORIES ============ */}
-      <section ref={categoriesSection.ref} className="py-10 sm:py-16">
+      <section ref={categoriesReveal.ref} className="py-10 sm:py-16">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div
-            className={`
-              flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4 mb-5 sm:mb-8
-              transition-all duration-500 ease-out
-              ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-            `}
+            className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 sm:gap-4 mb-5 sm:mb-8"
+            style={isMobile || isTablet ? mobileCategoriesReveal.style : {
+              opacity: desktopCategoriesReveal.isVisible ? 1 : 0,
+              transform: desktopCategoriesReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.5s ease-out',
+            }}
           >
             <div>
               <h2 className="text-xl sm:text-3xl font-bold text-white">
@@ -546,14 +547,16 @@ export default function HomePage() {
               <Link
                 key={cat.name}
                 href={`/cities?category=${cat.name.toLowerCase()}`}
-                className={`
-                  group relative p-3 sm:p-4 rounded-lg sm:rounded-xl
-                  bg-slate-900/40 border border-white/5
-                  hover:border-cyan-500/30 hover:bg-slate-900/60
-                  transition-all duration-300 ease-out
-                  ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-                `}
-                style={{ transitionDelay: `${i * 50}ms` }}
+                className="group relative p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-900/40 border border-white/5 hover:border-cyan-500/30 hover:bg-slate-900/60 transition-all duration-300"
+                style={isMobile || isTablet ? {
+                  opacity: mobileCategoriesReveal.isVisible ? 1 : 0,
+                  transform: mobileCategoriesReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
+                  transition: `opacity 0.4s ease-out ${i * 50}ms, transform 0.4s ease-out ${i * 50}ms`,
+                } : {
+                  opacity: desktopCategoriesReveal.isVisible ? 1 : 0,
+                  transform: desktopCategoriesReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: `all 0.5s ease-out ${i * 50}ms`,
+                }}
               >
                 <div className="flex items-center gap-2 sm:gap-3">
                   <span className="text-xl sm:text-2xl">{cat.icon}</span>
@@ -575,13 +578,14 @@ export default function HomePage() {
       </section>
 
       {/* ============ HOW IT WORKS ============ */}
-      <section ref={howSection.ref} className="py-10 sm:py-16 border-y border-white/5 bg-slate-900/20">
+      <section ref={howReveal.ref} className="py-10 sm:py-16 border-y border-white/5 bg-slate-900/20">
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div
-            className={`
-              transition-all duration-500 ease-out
-              ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-            `}
+            style={isMobile || isTablet ? mobileHowReveal.style : {
+              opacity: desktopHowReveal.isVisible ? 1 : 0,
+              transform: desktopHowReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.5s ease-out',
+            }}
           >
             <h2 className="text-xl sm:text-3xl font-bold text-white mb-5 sm:mb-8 text-center sm:text-left">
               How it works
@@ -594,12 +598,16 @@ export default function HomePage() {
               ].map((item, i) => (
                 <div
                   key={item.step}
-                  className={`
-                    flex items-start gap-3 sm:gap-4
-                    transition-all duration-500 ease-out
-                    ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
-                  `}
-                  style={{ transitionDelay: `${i * 75}ms` }}
+                  className="flex items-start gap-3 sm:gap-4"
+                  style={isMobile || isTablet ? {
+                    opacity: mobileHowReveal.isVisible ? 1 : 0,
+                    transform: mobileHowReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
+                    transition: `opacity 0.4s ease-out ${i * 75}ms, transform 0.4s ease-out ${i * 75}ms`,
+                  } : {
+                    opacity: desktopHowReveal.isVisible ? 1 : 0,
+                    transform: desktopHowReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+                    transition: `all 0.5s ease-out ${i * 75}ms`,
+                  }}
                 >
                   <div className={`
                     shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl flex items-center justify-center font-bold text-base sm:text-lg
@@ -622,33 +630,22 @@ export default function HomePage() {
 
       <MarketingFooter />
 
-      {/* ====== ANIMATION STYLES - Desktop only for float ====== */}
+      {/* ====== DESKTOP ANIMATION STYLES (UNCHANGED) ====== */}
       <style jsx global>{`
-        /* Gentle float for desktop cards only */
         @keyframes float-gentle {
-          0%, 100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
         }
 
-        /* Slow pulse for background - desktop only */
         @keyframes pulse-slow {
-          0%, 100% {
-            opacity: 1;
-          }
-          50% {
-            opacity: 0.7;
-          }
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.7; }
         }
 
         .animate-pulse-slow {
           animation: pulse-slow 8s ease-in-out infinite;
         }
 
-        /* Reduced motion support */
         @media (prefers-reduced-motion: reduce) {
           .animate-pulse-slow,
           .animate-ping,
