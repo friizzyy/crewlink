@@ -236,11 +236,13 @@ export function LeafletMap({
       map.remove()
       mapRef.current = null
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [L])
 
   // ============================================
   // LOCATION FUNCTIONS
   // ============================================
+  // userLocation intentionally excluded - we check current value at call time, not callback creation
   const requestLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setLocationPermission('unavailable')
@@ -284,6 +286,7 @@ export function LeafletMap({
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
     )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [followMode, onLocationChange, setIsLocating, setLocationPermission, updateLocationAndRecenter])
 
   const startWatchingLocation = useCallback(() => {
@@ -426,7 +429,7 @@ export function LeafletMap({
         duration: 0.3,
       })
     }
-  }, [L, userLocation, isMapReady, followMode])
+  }, [L, userLocation, isMapReady, followMode, mode])
 
   // ============================================
   // CONTROL HANDLERS

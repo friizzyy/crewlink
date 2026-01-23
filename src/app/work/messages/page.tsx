@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import {
   MessageCircle, Search, Phone, Video, MoreHorizontal,
-  Send, Paperclip, Image, Smile, Check, CheckCheck,
+  Send, Paperclip, Image as ImageIcon, Smile, Check, CheckCheck,
   ArrowLeft, Star, Clock, MapPin, Briefcase
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -369,7 +369,7 @@ export default function WorkMessagesPage() {
                   className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
                   title="Send image"
                 >
-                  <Image className="w-5 h-5" />
+                  <ImageIcon className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex-1 relative">

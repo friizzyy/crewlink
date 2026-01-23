@@ -390,6 +390,7 @@ export function MapboxMap({
       map.current?.remove()
       map.current = null
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Only run once on mount
 
   // ============================================
@@ -407,6 +408,7 @@ export function MapboxMap({
   // ============================================
   // SYNC VIEWPORT WITH STORE (for external updates)
   // ============================================
+  // Dependencies are intentionally specific to lat/lng/zoom to avoid unnecessary re-renders
   useEffect(() => {
     if (map.current && isMapLoaded && !isDemo) {
       const currentCenter = map.current.getCenter()
@@ -426,6 +428,7 @@ export function MapboxMap({
         })
       }
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewport.center.lat, viewport.center.lng, viewport.zoom, isMapLoaded, isDemo])
 
   // ============================================

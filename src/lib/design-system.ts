@@ -420,7 +420,7 @@ export const containers = {
   full: 'max-w-full',
 } as const
 
-export default {
+const designSystem = {
   typography,
   colors,
   spacing,
@@ -435,3 +435,5 @@ export default {
   staggerDelays,
   containers,
 }
+
+export default designSystem
