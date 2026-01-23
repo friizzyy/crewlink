@@ -1,8 +1,8 @@
 name: CI - Required Checks
 
 # Core CI checks that run on every PR
-# Build, Lint, and Type Check are required
-# E2E tests are informational (continue-on-error)
+# Build, Lint, Type Check, Copy Check are REQUIRED
+# QA Tests, Security, API Validation are informational (continue-on-error)
 
 on:
   pull_request:
@@ -36,6 +36,13 @@ jobs:
 
       - name: Build application
         run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-output
+          path: .next/
+          retention-days: 1
 
   # Lint check - code quality
   lint:
@@ -104,6 +111,7 @@ jobs:
     name: QA Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    needs: build
     # Don't block PRs - E2E tests require full environment
     continue-on-error: true
 
@@ -123,8 +131,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Build application
-        run: npm run build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next/
 
       - name: Run QA tests
         run: npm run test:qa
@@ -141,11 +152,53 @@ jobs:
             playwright-report/
           retention-days: 7
 
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: qa-failure-screenshots
+          path: test-results/**/*.png
+          retention-days: 14
+
+  # Security scan (informational, doesn't block)
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Don't block PRs - npm audit may have false positives
+    continue-on-error: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security scan
+        run: node scripts/security-scan.js
+
+      - name: Check for critical vulnerabilities
+        run: |
+          CRITICAL=$(npm audit --json 2>/dev/null | jq '.metadata.vulnerabilities.critical // 0')
+          echo "Critical vulnerabilities: $CRITICAL"
+
+          if [ "$CRITICAL" -gt 0 ]; then
+            echo "::warning::Found $CRITICAL critical vulnerabilities"
+          fi
+
   # API validation (informational, doesn't block)
   api-validation:
     name: API Validation
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    needs: build
     # Don't block PRs - requires running server with database
     continue-on-error: true
 
@@ -162,15 +215,19 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build application
-        run: npm run build
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next/
 
-      - name: API validation placeholder
+      - name: API validation info
         run: |
           echo "API validation requires database connection"
-          echo "Skipping in basic CI - run locally or on staging"
+          echo "Full API testing runs on staging deployments"
+          echo "Build completed successfully - API routes are compilable"
 
-  # Summary job
+  # Summary job - only checks REQUIRED jobs
   ci-complete:
     name: CI Complete
     runs-on: ubuntu-latest
@@ -180,6 +237,7 @@ jobs:
     steps:
       - name: Check required jobs passed
         run: |
+          echo "=== Required Checks ==="
           echo "Build: ${{ needs.build.result }}"
           echo "Lint: ${{ needs.lint.result }}"
           echo "Type Check: ${{ needs.typecheck.result }}"
@@ -193,4 +251,8 @@ jobs:
             exit 1
           fi
 
+          echo ""
           echo "All required checks passed!"
+          echo ""
+          echo "Note: QA Tests, Security, and API Validation are informational"
+          echo "and do not block PR merges (they require full environment setup)."
