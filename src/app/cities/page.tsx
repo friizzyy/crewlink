@@ -104,7 +104,7 @@ function CityCard({
 }
 
 function HeroSection({ searchQuery, setSearchQuery }: { searchQuery: string; setSearchQuery: (v: string) => void }) {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="relative pt-24 pb-16 overflow-hidden">
@@ -157,7 +157,7 @@ function HeroSection({ searchQuery, setSearchQuery }: { searchQuery: string; set
 }
 
 function StatsSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   const getColorClasses = (color: string) => {
     const colors: Record<string, { bg: string; text: string; icon: string }> = {
@@ -210,7 +210,7 @@ function FeaturedCitiesSection({
   role: 'HIRER' | 'WORKER' | null
   category: string | null
 }) {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   if (cities.length === 0) return null
 
@@ -266,7 +266,7 @@ function CityListSection({
   category: string | null
   isLive?: boolean
 }) {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   if (cities.length === 0) return null
 
@@ -314,7 +314,7 @@ function CityListSection({
 }
 
 function CTASection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="py-20">

@@ -647,7 +647,7 @@ export default function HelpArticlePage() {
   const slug = params?.slug as string
   const article = articles[slug] || defaultArticle
   const [feedback, setFeedback] = useState<'helpful' | 'not-helpful' | null>(null)
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   const colors = colorClasses[article.categoryColor]
 

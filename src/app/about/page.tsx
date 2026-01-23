@@ -72,7 +72,7 @@ const partners = [
 ]
 
 function HeroSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="relative pt-24 pb-16 overflow-hidden">
@@ -131,7 +131,7 @@ function HeroSection() {
 }
 
 function StatsSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   const getColorClasses = (color: string) => {
     const colors: Record<string, { bg: string; text: string; icon: string }> = {
@@ -176,7 +176,7 @@ function StatsSection() {
 }
 
 function StorySection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="py-20">
@@ -250,7 +250,7 @@ function StorySection() {
 }
 
 function ValuesSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   const getColorClasses = (color: string) => {
     const colors: Record<string, { bg: string; border: string; icon: string }> = {
@@ -317,7 +317,7 @@ function ValuesSection() {
 }
 
 function TeamSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   const getGradient = (color: string) => {
     const gradients: Record<string, string> = {
@@ -386,7 +386,7 @@ function TeamSection() {
 }
 
 function InvestorsSection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="py-16">
@@ -424,7 +424,7 @@ function InvestorsSection() {
 }
 
 function CTASection() {
-  const { ref, isVisible } = useScrollReveal()
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
     <section className="py-20">
