@@ -123,7 +123,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen text-white overflow-hidden bg-slate-950">
+    <div className="min-h-screen text-white bg-slate-950">
       <UniversalNav variant="marketing" />
 
       {/* ============ HERO ============ */}
@@ -198,30 +198,25 @@ export default function HomePage() {
               </div>
             </div>
           ))}
-          {/* Mobile floating cards - subtle decorative elements at edges */}
+          {/* Mobile floating cards - simplified for Safari performance */}
           {floatingCards.filter(c => c.showOnMobile).map((card) => (
             <div
               key={`mobile-${card.id}`}
-              className={`absolute ${card.mobilePosition} ${card.rotation} opacity-0 ${mounted ? 'animate-float-in' : ''} lg:hidden`}
+              className={`absolute ${card.mobilePosition} ${card.rotation} lg:hidden transition-opacity duration-500 ${mounted ? 'opacity-100' : 'opacity-0'}`}
               style={{
-                animationDelay: card.delay,
-                animationFillMode: 'forwards'
+                transitionDelay: card.delay
               }}
             >
               <div
                 className={`
-                  relative p-2.5 rounded-xl backdrop-blur-lg
-                  bg-slate-900/70 border border-white/10
-                  shadow-lg shadow-black/20
+                  relative p-2.5 rounded-xl
+                  bg-slate-900/90 border border-white/10
+                  shadow-lg
                   ${card.isSuccess ? 'border-emerald-500/30' : ''}
                 `}
-                style={{
-                  animation: `float 8s ease-in-out infinite`,
-                  animationDelay: card.delay
-                }}
               >
                 {card.isSuccess && (
-                  <div className="absolute inset-0 bg-emerald-500/10 rounded-xl blur-lg" />
+                  <div className="absolute inset-0 bg-emerald-500/10 rounded-xl" />
                 )}
                 <div className="relative flex items-center gap-2">
                   <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-md`}>
@@ -232,7 +227,6 @@ export default function HomePage() {
                     <div className={`text-[8px] ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'} flex items-center gap-0.5`}>
                       {card.id === 1 && (
                         <span className="relative flex h-1 w-1 mr-0.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60"></span>
                           <span className="relative inline-flex rounded-full h-1 w-1 bg-emerald-500"></span>
                         </span>
                       )}
@@ -458,25 +452,44 @@ export default function HomePage() {
 
       <MarketingFooter />
 
-      {/* ====== CUSTOM STYLES ====== */}
+      {/* ====== CUSTOM STYLES - Safari optimized ====== */}
       <style jsx>{`
+        @-webkit-keyframes float {
+          0%, 100% { -webkit-transform: translateY(0) translateZ(0); transform: translateY(0) translateZ(0); }
+          50% { -webkit-transform: translateY(-20px) translateZ(0); transform: translateY(-20px) translateZ(0); }
+        }
         @keyframes float {
-          0%, 100% { transform: translateY(0) rotate(var(--rotation, 0deg)); }
-          50% { transform: translateY(-20px) rotate(var(--rotation, 0deg)); }
+          0%, 100% { -webkit-transform: translateY(0) translateZ(0); transform: translateY(0) translateZ(0); }
+          50% { -webkit-transform: translateY(-20px) translateZ(0); transform: translateY(-20px) translateZ(0); }
         }
 
-        @keyframes float-in {
+        @-webkit-keyframes float-in {
           from {
             opacity: 0;
-            transform: translateY(40px) scale(0.9);
+            -webkit-transform: translateY(40px) scale(0.9) translateZ(0);
+            transform: translateY(40px) scale(0.9) translateZ(0);
           }
           to {
             opacity: 1;
-            transform: translateY(0) scale(1);
+            -webkit-transform: translateY(0) scale(1) translateZ(0);
+            transform: translateY(0) scale(1) translateZ(0);
+          }
+        }
+        @keyframes float-in {
+          from {
+            opacity: 0;
+            -webkit-transform: translateY(40px) scale(0.9) translateZ(0);
+            transform: translateY(40px) scale(0.9) translateZ(0);
+          }
+          to {
+            opacity: 1;
+            -webkit-transform: translateY(0) scale(1) translateZ(0);
+            transform: translateY(0) scale(1) translateZ(0);
           }
         }
 
         .animate-float-in {
+          -webkit-animation: float-in 0.8s ease-out forwards;
           animation: float-in 0.8s ease-out forwards;
         }
       `}</style>

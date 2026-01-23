@@ -29,7 +29,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
+  // Removed maximumScale: 1 - causes scroll issues on iOS Safari
+  viewportFit: 'cover', // Support notch/safe areas
   themeColor: '#020617', // slate-950 for dark theme
 }
 
