@@ -1,13 +1,14 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, Search } from 'lucide-react'
+import { ArrowRight, Search, MapPin, Globe, Sparkles, Users, Briefcase, TrendingUp, CheckCircle2 } from 'lucide-react'
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
-import { MarketingLayout } from '@/components/MarketingLayout'
+import MarketingLayout from '@/components/MarketingLayout'
 import { useUserRole } from '@/contexts/UserRoleContext'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { cn } from '@/lib/utils'
 import {
   getCaliforniaCities,
   getTahoeCities,
@@ -21,27 +22,29 @@ import {
   buildUrlWithCategory,
 } from '@/lib/categories'
 
-// ============================================
-// CITIES PAGE - Editorial Redesign
-// Matching Pricing/Safety quality bar
-// Clean hierarchy, primary cities emphasized
-// ============================================
-
 // Priority cities to feature prominently
 const PRIORITY_CITY_IDS = ['san-francisco', 'los-angeles', 'grass-valley', 'san-jose']
 
-function CityLink({
+// Stats data
+const stats = [
+  { label: 'Cities Live', value: '35+', icon: MapPin, color: 'cyan' },
+  { label: 'Coming Soon', value: '15+', icon: TrendingUp, color: 'purple' },
+  { label: 'Active Workers', value: '50K+', icon: Users, color: 'emerald' },
+  { label: 'Jobs Completed', value: '120K+', icon: Briefcase, color: 'amber' },
+]
+
+function CityCard({
   city,
   role,
   category,
   isLive = true,
-  isPriority = false,
+  isFeatured = false,
 }: {
   city: City
   role: 'HIRER' | 'WORKER' | null
   category: string | null
   isLive?: boolean
-  isPriority?: boolean
+  isFeatured?: boolean
 }) {
   const getDestination = () => {
     if (!isLive) return `/cities/${city.id}`
@@ -50,23 +53,28 @@ function CityLink({
     return buildUrlWithCategory(basePath, category, { city: city.id })
   }
 
-  if (isPriority) {
+  if (isFeatured) {
     return (
       <Link
         href={getDestination()}
-        className="group flex items-center justify-between py-4 border-b border-white/5 last:border-0 hover:border-white/10 transition-colors"
+        className="group relative p-6 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 hover:border-cyan-500/30 transition-all hover:scale-[1.02]"
       >
-        <div>
-          <h3 className="text-lg font-medium text-white group-hover:text-cyan-400 transition-colors">
-            {city.name}
-          </h3>
-          <p className="text-sm text-slate-500 mt-0.5">{city.state}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-medium text-emerald-400 px-2 py-1 bg-emerald-500/10 rounded-full">
+        <div className="absolute top-4 right-4">
+          <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 px-2.5 py-1 bg-emerald-500/10 rounded-full">
+            <CheckCircle2 className="w-3 h-3" />
             Live
           </span>
-          <ArrowRight className="w-4 h-4 text-slate-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition-all" />
+        </div>
+        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+          <MapPin className="w-6 h-6 text-cyan-400" />
+        </div>
+        <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors mb-1">
+          {city.name}
+        </h3>
+        <p className="text-sm text-slate-400 mb-4">{city.state}</p>
+        <div className="flex items-center gap-2 text-sm text-cyan-400 font-medium">
+          <span>Explore</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </div>
       </Link>
     )
@@ -75,17 +83,280 @@ function CityLink({
   return (
     <Link
       href={getDestination()}
-      className={`group flex items-center justify-between py-2.5 transition-colors ${
-        isLive ? 'text-slate-300 hover:text-white' : 'text-slate-500 hover:text-slate-400'
-      }`}
+      className={cn(
+        'group flex items-center justify-between py-3 px-4 rounded-xl transition-all',
+        isLive
+          ? 'hover:bg-white/5 text-slate-300 hover:text-white'
+          : 'text-slate-500 hover:text-slate-400'
+      )}
     >
-      <span>{city.name}</span>
+      <div className="flex items-center gap-3">
+        <MapPin className={cn('w-4 h-4', isLive ? 'text-cyan-400' : 'text-slate-600')} />
+        <span className="font-medium">{city.name}</span>
+      </div>
       {isLive ? (
-        <ArrowRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />
+        <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
       ) : (
-        <span className="text-xs text-slate-600">Soon</span>
+        <span className="text-xs text-slate-600 bg-slate-800 px-2 py-1 rounded-full">Soon</span>
       )}
     </Link>
+  )
+}
+
+function HeroSection({ searchQuery, setSearchQuery }: { searchQuery: string; setSearchQuery: (v: string) => void }) {
+  const { ref, isVisible } = useScrollReveal()
+
+  return (
+    <section className="relative pt-24 pb-16 overflow-hidden">
+      {/* Background Effects */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/10 rounded-full blur-[120px]" />
+      </div>
+
+      <div
+        ref={ref}
+        className={cn(
+          'relative max-w-5xl mx-auto px-4 text-center',
+          getRevealClasses(isVisible)
+        )}
+      >
+        {/* Badge */}
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
+          <Globe className="w-4 h-4 text-cyan-400" />
+          <span className="text-sm font-medium text-cyan-400">Locations</span>
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
+          Where{' '}
+          <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+            CrewLink
+          </span>{' '}
+          Operates
+        </h1>
+
+        <p className="text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+          Live across California and Lake Tahoe. Find local workers and jobs in your area, with more cities launching soon.
+        </p>
+
+        {/* Search */}
+        <div className="max-w-md mx-auto relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search cities..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-4 py-4 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
+          />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StatsSection() {
+  const { ref, isVisible } = useScrollReveal()
+
+  const getColorClasses = (color: string) => {
+    const colors: Record<string, { bg: string; text: string; icon: string }> = {
+      cyan: { bg: 'bg-cyan-500/10', text: 'text-cyan-400', icon: 'text-cyan-400' },
+      emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: 'text-emerald-400' },
+      purple: { bg: 'bg-purple-500/10', text: 'text-purple-400', icon: 'text-purple-400' },
+      amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', icon: 'text-amber-400' },
+    }
+    return colors[color] || colors.cyan
+  }
+
+  return (
+    <section className="py-12">
+      <div
+        ref={ref}
+        className={cn(
+          'max-w-5xl mx-auto px-4',
+          getRevealClasses(isVisible)
+        )}
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat) => {
+            const Icon = stat.icon
+            const colors = getColorClasses(stat.color)
+            return (
+              <div
+                key={stat.label}
+                className="p-5 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 text-center hover:border-white/10 transition-colors"
+              >
+                <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3', colors.bg)}>
+                  <Icon className={cn('w-5 h-5', colors.icon)} />
+                </div>
+                <div className={cn('text-2xl font-bold mb-1', colors.text)}>{stat.value}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function FeaturedCitiesSection({
+  cities,
+  role,
+  category,
+}: {
+  cities: City[]
+  role: 'HIRER' | 'WORKER' | null
+  category: string | null
+}) {
+  const { ref, isVisible } = useScrollReveal()
+
+  if (cities.length === 0) return null
+
+  return (
+    <section className="py-16">
+      <div
+        ref={ref}
+        className={cn(
+          'max-w-5xl mx-auto px-4',
+          getRevealClasses(isVisible)
+        )}
+      >
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 border border-amber-500/20 rounded-full mb-4">
+            <Sparkles className="w-4 h-4 text-amber-400" />
+            <span className="text-sm font-medium text-amber-400">Featured Cities</span>
+          </div>
+          <h2 className="text-2xl md:text-3xl font-bold text-white">
+            Most Popular Locations
+          </h2>
+        </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {cities.map((city) => (
+            <CityCard
+              key={city.id}
+              city={city}
+              role={role}
+              category={category}
+              isFeatured
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function CityListSection({
+  title,
+  badge,
+  badgeColor,
+  cities,
+  role,
+  category,
+  isLive = true,
+}: {
+  title: string
+  badge: string
+  badgeColor: 'cyan' | 'purple' | 'emerald'
+  cities: City[]
+  role: 'HIRER' | 'WORKER' | null
+  category: string | null
+  isLive?: boolean
+}) {
+  const { ref, isVisible } = useScrollReveal()
+
+  if (cities.length === 0) return null
+
+  const colorClasses = {
+    cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500/20', text: 'text-cyan-400' },
+    purple: { bg: 'bg-purple-500/10', border: 'border-purple-500/20', text: 'text-purple-400' },
+    emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', text: 'text-emerald-400' },
+  }
+
+  const colors = colorClasses[badgeColor]
+
+  return (
+    <section className="py-12">
+      <div
+        ref={ref}
+        className={cn(
+          'max-w-5xl mx-auto px-4',
+          getRevealClasses(isVisible)
+        )}
+      >
+        <div className="p-6 bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/5">
+          <div className="flex items-center gap-3 mb-6">
+            <div className={cn('inline-flex items-center gap-2 px-3 py-1.5 rounded-full', colors.bg, colors.border)}>
+              <MapPin className={cn('w-4 h-4', colors.text)} />
+              <span className={cn('text-sm font-medium', colors.text)}>{badge}</span>
+            </div>
+            <h2 className="text-xl font-bold text-white">{title}</h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-1">
+            {cities.map((city) => (
+              <CityCard
+                key={city.id}
+                city={city}
+                role={role}
+                category={category}
+                isLive={isLive}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function CTASection() {
+  const { ref, isVisible } = useScrollReveal()
+
+  return (
+    <section className="py-20">
+      <div
+        ref={ref}
+        className={cn(
+          'max-w-5xl mx-auto px-4',
+          getRevealClasses(isVisible)
+        )}
+      >
+        <div className="relative p-8 md:p-12 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-3xl border border-cyan-500/20 overflow-hidden text-center">
+          {/* Background glow */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
+
+          <div className="relative">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+              Don&apos;t See Your City?
+            </h2>
+            <p className="text-slate-300 max-w-xl mx-auto mb-8">
+              We&apos;re expanding rapidly. Let us know where you&apos;d like to see CrewLink next, and be the first to know when we launch in your area.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/create-account"
+                className="group flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
+              >
+                Get Started
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link
+                href="/help"
+                className="group flex items-center gap-2 px-8 py-4 bg-slate-800 text-white font-semibold rounded-xl border border-white/10 hover:bg-slate-700 transition-colors"
+              >
+                Request a City
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -93,12 +364,6 @@ function CitiesPageContent() {
   const { role } = useUserRole()
   const searchParams = useSearchParams()
   const [searchQuery, setSearchQuery] = useState('')
-
-  const heroRef = useScrollReveal<HTMLDivElement>()
-  const primaryRef = useScrollReveal<HTMLDivElement>()
-  const californiaRef = useScrollReveal<HTMLDivElement>()
-  const tahoeRef = useScrollReveal<HTMLDivElement>()
-  const expansionRef = useScrollReveal<HTMLDivElement>()
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
 
@@ -149,193 +414,75 @@ function CitiesPageContent() {
 
   return (
     <MarketingLayout>
-      {/* Hero */}
-      <section className="pt-28 pb-10 sm:pt-36 sm:pb-12">
-        <div
-          ref={heroRef.ref}
-          className={`max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 ${getRevealClasses(heroRef.isVisible, 'up')}`}
-        >
-          <p className="text-sm font-medium text-cyan-400 uppercase tracking-wider mb-4">
-            Locations
-          </p>
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.15]">
-            Where CrewLink operates
-          </h1>
-          <p className="mt-5 text-lg text-slate-400 leading-relaxed">
-            Live across California and Lake Tahoe. Expanding to more cities soon.
-          </p>
+      <div className="min-h-screen bg-slate-950">
+        <HeroSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-          {/* Search */}
-          <div className="mt-8 relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search cities..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-slate-900/60 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-white/20 transition-colors"
+        {/* No Results */}
+        {!hasResults && searchQuery && (
+          <section className="py-12">
+            <div className="max-w-5xl mx-auto px-4 text-center">
+              <div className="p-8 bg-slate-900/50 rounded-2xl border border-white/5">
+                <MapPin className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                <p className="text-slate-400 mb-4">No cities match &quot;{searchQuery}&quot;</p>
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                >
+                  Clear search
+                </button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {hasResults && (
+          <>
+            <StatsSection />
+
+            {/* Featured Cities - only show when not searching */}
+            {!searchQuery && filteredPriority.length > 0 && (
+              <FeaturedCitiesSection
+                cities={filteredPriority}
+                role={role}
+                category={selectedCategory}
+              />
+            )}
+
+            {/* California Cities */}
+            <CityListSection
+              title="California"
+              badge="Live"
+              badgeColor="cyan"
+              cities={searchQuery ? [...filteredPriority, ...filteredOther] : filteredOther}
+              role={role}
+              category={selectedCategory}
             />
-          </div>
-        </div>
-      </section>
 
-      {/* No Results */}
-      {!hasResults && searchQuery && (
-        <section className="py-12">
-          <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 text-center">
-            <p className="text-slate-400">No cities match &quot;{searchQuery}&quot;</p>
-            <button
-              onClick={() => setSearchQuery('')}
-              className="mt-3 text-sm text-cyan-400 hover:underline"
-            >
-              Clear search
-            </button>
-          </div>
-        </section>
-      )}
+            {/* Lake Tahoe */}
+            <CityListSection
+              title="Lake Tahoe Region"
+              badge="Live"
+              badgeColor="emerald"
+              cities={filteredTahoe}
+              role={role}
+              category={selectedCategory}
+            />
 
-      {/* Primary Cities */}
-      {filteredPriority.length > 0 && !searchQuery && (
-        <section className="py-10 border-t border-white/5">
-          <div
-            ref={primaryRef.ref}
-            className={`max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 ${getRevealClasses(primaryRef.isVisible, 'up')}`}
-          >
-            <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider lg:pt-4">
-                Featured
-              </h2>
-              <div>
-                {filteredPriority.map((city) => (
-                  <CityLink
-                    key={city.id}
-                    city={city}
-                    role={role}
-                    category={selectedCategory}
-                    isPriority
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+            {/* Coming Soon */}
+            <CityListSection
+              title="Coming Soon"
+              badge="Expansion"
+              badgeColor="purple"
+              cities={filteredExpansion}
+              role={role}
+              category={selectedCategory}
+              isLive={false}
+            />
+          </>
+        )}
 
-      {/* California */}
-      {(filteredOther.length > 0 || (searchQuery && filteredPriority.length > 0)) && (
-        <section className="py-10 border-t border-white/5">
-          <div
-            ref={californiaRef.ref}
-            className={`max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 ${getRevealClasses(californiaRef.isVisible, 'up')}`}
-          >
-            <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider lg:pt-2">
-                California
-              </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
-                {searchQuery && filteredPriority.map((city) => (
-                  <CityLink key={city.id} city={city} role={role} category={selectedCategory} />
-                ))}
-                {filteredOther.map((city) => (
-                  <CityLink key={city.id} city={city} role={role} category={selectedCategory} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Lake Tahoe */}
-      {filteredTahoe.length > 0 && (
-        <section className="py-10 border-t border-white/5">
-          <div
-            ref={tahoeRef.ref}
-            className={`max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 ${getRevealClasses(tahoeRef.isVisible, 'up')}`}
-          >
-            <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider lg:pt-2">
-                Lake Tahoe
-              </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
-                {filteredTahoe.map((city) => (
-                  <CityLink key={city.id} city={city} role={role} category={selectedCategory} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Coming Soon */}
-      {filteredExpansion.length > 0 && (
-        <section className="py-10 border-t border-white/5">
-          <div
-            ref={expansionRef.ref}
-            className={`max-w-3xl mx-auto px-6 sm:px-8 lg:px-12 ${getRevealClasses(expansionRef.isVisible, 'up')}`}
-          >
-            <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-              <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider lg:pt-2">
-                Coming soon
-              </h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-1">
-                {filteredExpansion.map((city) => (
-                  <CityLink key={city.id} city={city} role={role} category={selectedCategory} isLive={false} />
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Stats */}
-      <section className="py-10 border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-            <h2 className="text-sm font-medium text-slate-500 uppercase tracking-wider lg:pt-1">
-              Coverage
-            </h2>
-            <div className="grid grid-cols-3 gap-8">
-              <div>
-                <div className="text-2xl font-bold text-white">{californiaCities.length + tahoeCities.length}</div>
-                <div className="text-sm text-slate-500 mt-1">Cities live</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">{expansionCities.length}</div>
-                <div className="text-sm text-slate-500 mt-1">Coming soon</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-white">2</div>
-                <div className="text-sm text-slate-500 mt-1">Regions</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-10 border-t border-white/5">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="grid lg:grid-cols-[140px_1fr] gap-6 lg:gap-12">
-            <div />
-            <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-8">
-              <Link
-                href="/create-account"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20"
-              >
-                Get started
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/help"
-                className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
-              >
-                Request a city
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+        <CTASection />
+      </div>
     </MarketingLayout>
   )
 }

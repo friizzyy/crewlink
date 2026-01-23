@@ -3,16 +3,23 @@
 import { useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Clock, ThumbsUp, ThumbsDown, ChevronRight, Check } from 'lucide-react'
-import { MarketingLayout } from '@/components/MarketingLayout'
+import {
+  ArrowLeft, Clock, ThumbsUp, ThumbsDown, ChevronRight, Check,
+  BookOpen, Sparkles, ArrowRight, MessageCircle, HelpCircle,
+  FileText, CheckCircle2, AlertCircle, Lightbulb, Info
+} from 'lucide-react'
+import MarketingLayout from '@/components/MarketingLayout'
+import { cn } from '@/lib/utils'
+import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 
 // Article content mapping - in a real app this would come from a CMS
 const articles: Record<string, {
   title: string
   category: string
   categoryHref: string
+  categoryColor: 'cyan' | 'emerald' | 'purple' | 'amber' | 'rose'
   readTime: string
-  content: { type: 'p' | 'h2' | 'ul'; text: string | string[] }[]
+  content: { type: 'p' | 'h2' | 'ul' | 'tip' | 'warning' | 'steps'; text: string | string[] }[]
   relatedArticles: { title: string; href: string }[]
 }> = {
   // Aliases for popular articles on help page
@@ -20,9 +27,11 @@ const articles: Record<string, {
     title: 'How to post your first job',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Posting a job on CrewLink is quick and easy. Follow these steps to get started and find the help you need.' },
+      { type: 'steps', text: ['Describe your task with a clear, descriptive title', 'Set your location where the work will be done', 'Choose date and time for the work', 'Set your budget (flat rate or hourly)', 'Review all details and post your job'] },
       { type: 'h2', text: 'Step 1: Describe your task' },
       { type: 'p', text: 'Start by giving your job a clear, descriptive title. Be specific about what you need done—this helps attract the right workers.' },
       { type: 'h2', text: 'Step 2: Set your location' },
@@ -33,6 +42,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Enter how much you\'re willing to pay. You can set a flat rate or hourly rate depending on the task.' },
       { type: 'h2', text: 'Step 5: Review and post' },
       { type: 'p', text: 'Review all the details and post your job. Workers will start applying within minutes!' },
+      { type: 'tip', text: 'Add photos if relevant to help workers understand the task better and provide more accurate quotes.' },
     ],
     relatedArticles: [
       { title: 'Finding the right worker', href: '/help/articles/finding-workers' },
@@ -43,6 +53,7 @@ const articles: Record<string, {
     title: 'Setting your rates as a worker',
     category: 'Working',
     categoryHref: '/help/workers',
+    categoryColor: 'emerald',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Setting the right rates is crucial for attracting clients while ensuring you\'re fairly compensated for your work.' },
@@ -54,6 +65,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Remember to factor in travel time, tools, supplies, and the platform fee when setting your rates.' },
       { type: 'h2', text: 'Start competitive, then adjust' },
       { type: 'p', text: 'If you\'re new to the platform, consider starting with slightly lower rates to build reviews, then increase as you establish your reputation.' },
+      { type: 'tip', text: 'Workers with 10+ five-star reviews can typically charge 20-30% more than new workers.' },
     ],
     relatedArticles: [
       { title: 'Getting started as a worker', href: '/help/articles/getting-started-worker' },
@@ -64,6 +76,7 @@ const articles: Record<string, {
     title: 'Understanding service fees',
     category: 'Payments',
     categoryHref: '/help/payments',
+    categoryColor: 'purple',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'CrewLink charges service fees to maintain the platform, provide customer support, and ensure secure payments for everyone.' },
@@ -83,6 +96,7 @@ const articles: Record<string, {
     title: 'How payments work',
     category: 'Payments',
     categoryHref: '/help/payments',
+    categoryColor: 'purple',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Understanding how payments work on CrewLink helps ensure a smooth experience for both clients and workers.' },
@@ -92,6 +106,7 @@ const articles: Record<string, {
       { type: 'p', text: 'After the client confirms job completion, your earnings (minus the platform fee) are available for withdrawal. Standard payouts arrive within 1-3 business days.' },
       { type: 'h2', text: 'Payment protection' },
       { type: 'p', text: 'All payments are held securely in escrow until the job is done. This protects both parties—clients know they only pay for completed work, and workers know payment is guaranteed.' },
+      { type: 'tip', text: 'Enable instant payouts to receive your earnings within minutes for a small fee.' },
     ],
     relatedArticles: [
       { title: 'Understanding service fees', href: '/help/articles/service-fees' },
@@ -102,6 +117,7 @@ const articles: Record<string, {
     title: 'Getting verified as a worker',
     category: 'Working',
     categoryHref: '/help/workers',
+    categoryColor: 'emerald',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Getting verified on CrewLink significantly increases your chances of getting hired and builds trust with potential clients.' },
@@ -111,6 +127,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Go to Settings > Verification and follow the prompts. You\'ll need to upload a photo of your government ID and take a selfie for matching.' },
       { type: 'h2', text: 'Benefits of verification' },
       { type: 'ul', text: ['Verified badge on your profile', 'Higher ranking in search results', 'Increased trust from clients', 'Access to premium job opportunities'] },
+      { type: 'tip', text: 'Verified workers earn 40% more on average than non-verified workers.' },
     ],
     relatedArticles: [
       { title: 'Getting started as a worker', href: '/help/articles/getting-started-worker' },
@@ -121,9 +138,11 @@ const articles: Record<string, {
     title: 'What to do if there\'s a dispute',
     category: 'Trust & Safety',
     categoryHref: '/help/trust',
+    categoryColor: 'rose',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Disputes are rare on CrewLink, but when they happen, we\'re here to help resolve them fairly.' },
+      { type: 'steps', text: ['Communicate first with the other party', 'Contact support if needed', 'We investigate within 48-72 hours', 'Fair resolution is reached'] },
       { type: 'h2', text: 'Step 1: Communicate first' },
       { type: 'p', text: 'Most issues can be resolved by talking directly with the other party. Use in-app messaging to discuss the problem and try to find a solution.' },
       { type: 'h2', text: 'Step 2: Contact support' },
@@ -132,6 +151,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Our team reviews all evidence and communicates with both parties. We aim to resolve disputes within 48-72 hours.' },
       { type: 'h2', text: 'Possible outcomes' },
       { type: 'ul', text: ['Full or partial refund to client', 'Payment released to worker', 'Rework arrangement', 'Mutual agreement between parties'] },
+      { type: 'warning', text: 'Always keep communication within the CrewLink app to ensure we have records for dispute resolution.' },
     ],
     relatedArticles: [
       { title: 'CrewLink Guarantee', href: '/help/guarantee' },
@@ -142,6 +162,7 @@ const articles: Record<string, {
     title: 'Cancellation policies',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Understanding our cancellation policy helps you plan ahead and avoid unexpected fees.' },
@@ -151,6 +172,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Workers should cancel as early as possible to allow clients to find a replacement. Frequent cancellations may affect your account standing.' },
       { type: 'h2', text: 'Mutual cancellations' },
       { type: 'p', text: 'If both parties agree to cancel, no fees apply. The hold on the client\'s payment method is released immediately.' },
+      { type: 'warning', text: 'Repeated last-minute cancellations may result in account restrictions.' },
     ],
     relatedArticles: [
       { title: 'How payments work', href: '/help/articles/how-payments-work' },
@@ -161,6 +183,7 @@ const articles: Record<string, {
     title: 'How to leave a review',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '2 min read',
     content: [
       { type: 'p', text: 'Reviews help the CrewLink community make informed decisions. Here\'s how to leave helpful feedback.' },
@@ -170,6 +193,7 @@ const articles: Record<string, {
       { type: 'ul', text: ['Star rating (1-5 stars)', 'Written feedback about your experience', 'Whether you\'d recommend this person'] },
       { type: 'h2', text: 'Tips for helpful reviews' },
       { type: 'ul', text: ['Be specific about what went well or could improve', 'Keep it professional and factual', 'Mention the type of work that was done', 'Note punctuality, communication, and quality'] },
+      { type: 'tip', text: 'Detailed reviews help other users and are greatly appreciated by the community.' },
     ],
     relatedArticles: [
       { title: 'Finding the right worker', href: '/help/articles/finding-workers' },
@@ -180,9 +204,11 @@ const articles: Record<string, {
     title: 'How to post your first job',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Posting a job on CrewLink is quick and easy. Follow these steps to get started and find the help you need.' },
+      { type: 'steps', text: ['Describe your task clearly', 'Set your location', 'Choose date and time', 'Set your budget', 'Review and post'] },
       { type: 'h2', text: 'Step 1: Describe your task' },
       { type: 'p', text: 'Start by giving your job a clear, descriptive title. Be specific about what you need done—this helps attract the right workers.' },
       { type: 'h2', text: 'Step 2: Set your location' },
@@ -206,6 +232,7 @@ const articles: Record<string, {
     title: 'Finding the right worker',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Choosing the right worker is key to a successful experience on CrewLink. Here\'s how to find the perfect match for your task.' },
@@ -219,6 +246,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Don\'t hesitate to message potential workers to ask questions or clarify details. This helps ensure you\'re on the same page.' },
       { type: 'h2', text: 'Trust your instincts' },
       { type: 'p', text: 'If something doesn\'t feel right, keep looking. There are plenty of great workers on CrewLink.' },
+      { type: 'tip', text: 'Workers with the "Elite" badge have completed 50+ jobs with a 4.9+ rating.' },
     ],
     relatedArticles: [
       { title: 'How to post your first job', href: '/help/articles/posting-jobs' },
@@ -230,9 +258,11 @@ const articles: Record<string, {
     title: 'Getting started as a worker',
     category: 'Working',
     categoryHref: '/help/workers',
+    categoryColor: 'emerald',
     readTime: '5 min read',
     content: [
       { type: 'p', text: 'Welcome to CrewLink! Here\'s everything you need to know to start earning money on our platform.' },
+      { type: 'steps', text: ['Create your account', 'Complete your profile', 'Get verified', 'Set up your payout method', 'Find your first job'] },
       { type: 'h2', text: 'Create your account' },
       { type: 'p', text: 'Sign up with your email and create a strong password. You will need to verify your email to get started.' },
       { type: 'h2', text: 'Complete your profile' },
@@ -245,6 +275,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Browse available jobs in your area, filter by category or pay rate, and apply to ones that match your skills.' },
       { type: 'h2', text: 'Tips for success' },
       { type: 'ul', text: ['Respond to inquiries quickly. Clients appreciate fast communication', 'Be professional and on time for every job', 'Communicate clearly about any issues or changes', 'Ask for reviews after completing jobs'] },
+      { type: 'tip', text: 'New workers who complete their profile within 24 hours are 3x more likely to get their first job.' },
     ],
     relatedArticles: [
       { title: 'Building your profile', href: '/help/articles/building-profile' },
@@ -256,6 +287,7 @@ const articles: Record<string, {
     title: 'Building your profile',
     category: 'Working',
     categoryHref: '/help/workers',
+    categoryColor: 'emerald',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Your profile is your first impression on CrewLink. A complete, professional profile helps you stand out and win more jobs.' },
@@ -267,6 +299,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Add all relevant skills to your profile. This helps you appear in more search results and shows clients your capabilities.' },
       { type: 'h2', text: 'Keep it updated' },
       { type: 'p', text: 'As you gain experience and learn new skills, update your profile to reflect your growth.' },
+      { type: 'tip', text: 'Profiles with professional photos get 70% more views than those without.' },
     ],
     relatedArticles: [
       { title: 'Getting started as a worker', href: '/help/articles/getting-started-worker' },
@@ -277,6 +310,7 @@ const articles: Record<string, {
     title: 'Getting paid',
     category: 'Payments',
     categoryHref: '/help/payments',
+    categoryColor: 'purple',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'CrewLink makes getting paid simple and secure. Here is how the payout process works.' },
@@ -288,6 +322,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Go to Settings > Payout Methods to add your bank account or other payment method. You only need to do this once.' },
       { type: 'h2', text: 'Tracking your earnings' },
       { type: 'p', text: 'View your earnings history, pending payouts, and transaction details in the Earnings section of your dashboard.' },
+      { type: 'tip', text: 'Enable instant payouts to get your money within minutes after job completion.' },
     ],
     relatedArticles: [
       { title: 'Understanding service fees', href: '/help/articles/service-fees' },
@@ -298,6 +333,7 @@ const articles: Record<string, {
     title: 'Earning great reviews',
     category: 'Working',
     categoryHref: '/help/workers',
+    categoryColor: 'emerald',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Great reviews are essential for success on CrewLink. Here is how to consistently earn 5-star ratings.' },
@@ -311,6 +347,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Dress appropriately, be courteous, and respect the client\'s space and belongings.' },
       { type: 'h2', text: 'Ask for feedback' },
       { type: 'p', text: 'After completing a job, politely ask if the client is satisfied and if they would be willing to leave a review.' },
+      { type: 'tip', text: 'Workers who ask for reviews receive 2x more reviews than those who don\'t.' },
     ],
     relatedArticles: [
       { title: 'Building your profile', href: '/help/articles/building-profile' },
@@ -321,6 +358,7 @@ const articles: Record<string, {
     title: 'Setting fair prices',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Setting the right price attracts quality workers and helps ensure a great experience.' },
@@ -332,6 +370,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Fair pay attracts better workers and leads to better results. Low-ball offers often result in fewer applicants or lower quality work.' },
       { type: 'h2', text: 'Factor in materials' },
       { type: 'p', text: 'If the job requires supplies or tools, decide if you will provide them or if the worker should include them in their rate.' },
+      { type: 'tip', text: 'Jobs priced at or above the suggested rate get 50% more applicants.' },
     ],
     relatedArticles: [
       { title: 'How to post your first job', href: '/help/articles/posting-jobs' },
@@ -342,6 +381,7 @@ const articles: Record<string, {
     title: 'Managing ongoing jobs',
     category: 'Hiring',
     categoryHref: '/help/hiring',
+    categoryColor: 'cyan',
     readTime: '4 min read',
     content: [
       { type: 'p', text: 'Once you have hired a worker, here is how to manage the job from start to finish.' },
@@ -353,6 +393,7 @@ const articles: Record<string, {
       { type: 'p', text: 'If the scope changes, discuss it with your worker and agree on any price adjustments before they do additional work.' },
       { type: 'h2', text: 'After completion' },
       { type: 'p', text: 'Review the work, confirm the job is complete in the app, and leave an honest review to help other clients.' },
+      { type: 'warning', text: 'Always confirm scope changes in writing through the app before additional work begins.' },
     ],
     relatedArticles: [
       { title: 'How to post your first job', href: '/help/articles/posting-jobs' },
@@ -363,9 +404,11 @@ const articles: Record<string, {
     title: 'Creating your account',
     category: 'Account',
     categoryHref: '/help/account',
+    categoryColor: 'amber',
     readTime: '2 min read',
     content: [
       { type: 'p', text: 'Getting started with CrewLink is quick and easy. Follow these steps to create your account.' },
+      { type: 'steps', text: ['Sign up with email or social login', 'Verify your email', 'Complete your profile', 'Choose your mode (hire or work)'] },
       { type: 'h2', text: 'Sign up' },
       { type: 'p', text: 'Click "Get Started" and enter your email address. You can also sign up with Google or Apple for faster registration.' },
       { type: 'h2', text: 'Verify your email' },
@@ -384,6 +427,7 @@ const articles: Record<string, {
     title: 'Completing your profile',
     category: 'Account',
     categoryHref: '/help/account',
+    categoryColor: 'amber',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'A complete profile helps you get the most out of CrewLink, whether you are hiring or working.' },
@@ -395,6 +439,7 @@ const articles: Record<string, {
       { type: 'p', text: 'Your location helps match you with nearby workers or jobs.' },
       { type: 'h2', text: 'Verify your identity' },
       { type: 'p', text: 'Complete identity verification to build trust and access all platform features.' },
+      { type: 'tip', text: 'Complete profiles are 5x more likely to get responses.' },
     ],
     relatedArticles: [
       { title: 'Creating your account', href: '/help/articles/create-account' },
@@ -405,6 +450,7 @@ const articles: Record<string, {
     title: 'Verifying your identity',
     category: 'Account',
     categoryHref: '/help/account',
+    categoryColor: 'amber',
     readTime: '3 min read',
     content: [
       { type: 'p', text: 'Identity verification helps keep CrewLink safe for everyone and builds trust between users.' },
@@ -426,6 +472,7 @@ const articles: Record<string, {
     title: 'Changing your password',
     category: 'Account',
     categoryHref: '/help/account',
+    categoryColor: 'amber',
     readTime: '2 min read',
     content: [
       { type: 'p', text: 'Keep your account secure by using a strong password and changing it if you suspect any unauthorized access.' },
@@ -435,6 +482,7 @@ const articles: Record<string, {
       { type: 'p', text: 'On the sign-in page, tap "Forgot password?" and enter your email. You will receive a link to create a new password.' },
       { type: 'h2', text: 'Password tips' },
       { type: 'ul', text: ['Use at least 8 characters', 'Include numbers and special characters', 'Avoid using the same password on other sites', 'Never share your password with anyone'] },
+      { type: 'warning', text: 'If you suspect unauthorized access, change your password immediately and contact support.' },
     ],
     relatedArticles: [
       { title: 'Verifying your identity', href: '/help/articles/verify-identity' },
@@ -445,9 +493,11 @@ const articles: Record<string, {
     title: 'Deleting your account',
     category: 'Account',
     categoryHref: '/help/account',
+    categoryColor: 'amber',
     readTime: '2 min read',
     content: [
       { type: 'p', text: 'If you need to delete your CrewLink account, you can do so in your settings. Please note this action is permanent.' },
+      { type: 'warning', text: 'Account deletion is permanent and cannot be undone. Make sure to withdraw any earnings first.' },
       { type: 'h2', text: 'Before you delete' },
       { type: 'ul', text: ['Complete or cancel any pending jobs', 'Withdraw any remaining earnings', 'Download any data you want to keep'] },
       { type: 'h2', text: 'How to delete' },
@@ -469,6 +519,7 @@ const defaultArticle = {
   title: 'Help Article',
   category: 'Help Center',
   categoryHref: '/help',
+  categoryColor: 'cyan' as const,
   readTime: '2 min read',
   content: [
     { type: 'p' as const, text: 'We\'re still working on this article. Our help center is constantly being updated with new content.' },
@@ -480,11 +531,125 @@ const defaultArticle = {
   ],
 }
 
+const colorClasses = {
+  cyan: {
+    bg: 'bg-cyan-500/10',
+    border: 'border-cyan-500/20',
+    text: 'text-cyan-400',
+    badge: 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400',
+  },
+  emerald: {
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/20',
+    text: 'text-emerald-400',
+    badge: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
+  },
+  purple: {
+    bg: 'bg-purple-500/10',
+    border: 'border-purple-500/20',
+    text: 'text-purple-400',
+    badge: 'bg-purple-500/10 border-purple-500/20 text-purple-400',
+  },
+  amber: {
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/20',
+    text: 'text-amber-400',
+    badge: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
+  },
+  rose: {
+    bg: 'bg-rose-500/10',
+    border: 'border-rose-500/20',
+    text: 'text-rose-400',
+    badge: 'bg-rose-500/10 border-rose-500/20 text-rose-400',
+  },
+}
+
+function ContentBlock({ block, colors }: { block: { type: string; text: string | string[] }; colors: typeof colorClasses.cyan }) {
+  if (block.type === 'h2') {
+    return (
+      <h2 className="text-xl font-semibold text-white mt-10 mb-4 flex items-center gap-3">
+        <div className={cn('w-1 h-6 rounded-full', colors.bg.replace('/10', '/50'))} />
+        {block.text as string}
+      </h2>
+    )
+  }
+
+  if (block.type === 'ul') {
+    return (
+      <ul className="space-y-3 my-6">
+        {(block.text as string[]).map((item, i) => (
+          <li key={i} className="flex items-start gap-3 text-slate-300">
+            <CheckCircle2 className={cn('w-5 h-5 mt-0.5 flex-shrink-0', colors.text)} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+
+  if (block.type === 'steps') {
+    return (
+      <div className={cn('p-6 rounded-2xl border my-8', colors.bg, colors.border)}>
+        <div className="flex items-center gap-2 mb-4">
+          <FileText className={cn('w-5 h-5', colors.text)} />
+          <span className={cn('font-medium', colors.text)}>Quick Overview</span>
+        </div>
+        <ol className="space-y-2">
+          {(block.text as string[]).map((step, i) => (
+            <li key={i} className="flex items-center gap-3 text-slate-300">
+              <span className={cn(
+                'w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0',
+                colors.bg, colors.text
+              )}>
+                {i + 1}
+              </span>
+              <span>{step}</span>
+            </li>
+          ))}
+        </ol>
+      </div>
+    )
+  }
+
+  if (block.type === 'tip') {
+    return (
+      <div className="p-5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl my-6 flex gap-4">
+        <Lightbulb className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <span className="font-medium text-emerald-400">Pro tip: </span>
+          <span className="text-slate-300">{block.text as string}</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (block.type === 'warning') {
+    return (
+      <div className="p-5 bg-amber-500/10 border border-amber-500/20 rounded-xl my-6 flex gap-4">
+        <AlertCircle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+        <div>
+          <span className="font-medium text-amber-400">Important: </span>
+          <span className="text-slate-300">{block.text as string}</span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <p className="text-slate-300 my-4 leading-relaxed">
+      {block.text as string}
+    </p>
+  )
+}
+
 export default function HelpArticlePage() {
   const params = useParams()
   const slug = params?.slug as string
   const article = articles[slug] || defaultArticle
   const [feedback, setFeedback] = useState<'helpful' | 'not-helpful' | null>(null)
+  const { ref, isVisible } = useScrollReveal()
+
+  const colors = colorClasses[article.categoryColor]
 
   const handleFeedback = (type: 'helpful' | 'not-helpful') => {
     setFeedback(type)
@@ -492,121 +657,148 @@ export default function HelpArticlePage() {
 
   return (
     <MarketingLayout>
-      <div className="pt-28 pb-20 sm:pt-32">
-        <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-slate-400 mb-8">
-            <Link href="/help" className="hover:text-white transition-colors">Help Center</Link>
-            <ChevronRight className="w-4 h-4" />
-            <Link href={article.categoryHref} className="hover:text-white transition-colors">{article.category}</Link>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-slate-500 truncate">{article.title}</span>
+      <div className="min-h-screen bg-slate-950">
+        {/* Hero */}
+        <section className="relative pt-24 pb-12 overflow-hidden">
+          {/* Background Effects */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-cyan-500/5 rounded-full blur-[120px]" />
+            <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-purple-500/5 rounded-full blur-[120px]" />
           </div>
 
-          {/* Header */}
-          <div className="mb-8">
+          <div
+            ref={ref}
+            className={cn(
+              'relative max-w-4xl mx-auto px-4',
+              getRevealClasses(isVisible)
+            )}
+          >
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-sm text-slate-400 mb-6 flex-wrap">
+              <Link href="/help" className="hover:text-white transition-colors flex items-center gap-1">
+                <HelpCircle className="w-4 h-4" />
+                Help Center
+              </Link>
+              <ChevronRight className="w-4 h-4" />
+              <Link href={article.categoryHref} className={cn('hover:text-white transition-colors', colors.text)}>
+                {article.category}
+              </Link>
+            </div>
+
+            {/* Back button */}
             <Link
               href={article.categoryHref}
-              className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-4"
+              className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors mb-6"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to {article.category}
             </Link>
-            <h1 className="font-display text-3xl sm:text-4xl font-bold text-white mb-4">
+
+            {/* Category badge */}
+            <div className={cn('inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6', colors.badge)}>
+              <BookOpen className="w-4 h-4" />
+              <span className="text-sm font-medium">{article.category}</span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
               {article.title}
             </h1>
-            <div className="flex items-center gap-2 text-slate-500">
-              <Clock className="w-4 h-4" />
-              <span>{article.readTime}</span>
+
+            {/* Meta */}
+            <div className="flex items-center gap-4 text-slate-400">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4" />
+                <span>{article.readTime}</span>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Content */}
-          <div className="prose prose-invert prose-slate max-w-none mb-12">
-            {article.content.map((block, index) => {
-              if (block.type === 'h2') {
-                return (
-                  <h2 key={index} className="text-xl font-semibold text-white mt-8 mb-4">
-                    {block.text as string}
-                  </h2>
-                )
-              }
-              if (block.type === 'ul') {
-                return (
-                  <ul key={index} className="list-disc list-inside text-slate-400 space-y-2 my-4">
-                    {(block.text as string[]).map((item, i) => (
-                      <li key={i}>{item}</li>
+        {/* Content */}
+        <section className="pb-20">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="grid lg:grid-cols-[1fr_280px] gap-12">
+              {/* Main Content */}
+              <div>
+                <div className="prose prose-invert prose-slate max-w-none">
+                  {article.content.map((block, index) => (
+                    <ContentBlock key={index} block={block} colors={colors} />
+                  ))}
+                </div>
+
+                {/* Feedback */}
+                <div className="mt-12 p-6 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5">
+                  <h3 className="font-semibold text-white mb-4">Was this article helpful?</h3>
+                  {feedback ? (
+                    <div className="flex items-center gap-2 text-emerald-400">
+                      <Check className="w-5 h-5" />
+                      <span>Thanks for your feedback!</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleFeedback('helpful')}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-slate-300 rounded-xl hover:bg-emerald-500/20 hover:text-emerald-400 transition-all border border-white/5 hover:border-emerald-500/30"
+                      >
+                        <ThumbsUp className="w-4 h-4" />
+                        Yes, helpful
+                      </button>
+                      <button
+                        onClick={() => handleFeedback('not-helpful')}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-slate-300 rounded-xl hover:bg-rose-500/20 hover:text-rose-400 transition-all border border-white/5 hover:border-rose-500/30"
+                      >
+                        <ThumbsDown className="w-4 h-4" />
+                        No
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Related Articles */}
+                <div className="p-6 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 sticky top-24">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Sparkles className="w-5 h-5 text-cyan-400" />
+                    <h3 className="font-semibold text-white">Related Articles</h3>
+                  </div>
+                  <div className="space-y-2">
+                    {article.relatedArticles.map((related) => (
+                      <Link
+                        key={related.title}
+                        href={related.href}
+                        className="flex items-center justify-between p-3 rounded-xl hover:bg-white/5 transition-all group"
+                      >
+                        <span className="text-sm text-slate-300 group-hover:text-white transition-colors">
+                          {related.title}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors" />
+                      </Link>
                     ))}
-                  </ul>
-                )
-              }
-              return (
-                <p key={index} className="text-slate-400 my-4">
-                  {block.text as string}
-                </p>
-              )
-            })}
-          </div>
+                  </div>
+                </div>
 
-          {/* Feedback */}
-          <div className="p-6 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/5 mb-12">
-            <h3 className="font-medium text-white mb-4">Was this article helpful?</h3>
-            {feedback ? (
-              <div className="flex items-center gap-2 text-emerald-400">
-                <Check className="w-5 h-5" />
-                <span>Thanks for your feedback!</span>
+                {/* Contact CTA */}
+                <div className="p-6 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-2xl border border-cyan-500/20">
+                  <div className="w-12 h-12 bg-cyan-500/20 rounded-xl flex items-center justify-center mb-4">
+                    <MessageCircle className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h3 className="font-semibold text-white mb-2">Still have questions?</h3>
+                  <p className="text-sm text-slate-400 mb-4">Our support team is here to help 24/7.</p>
+                  <Link
+                    href="/help/contact"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-medium rounded-xl hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
+                  >
+                    Contact Support
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
               </div>
-            ) : (
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => handleFeedback('helpful')}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-emerald-500/20 hover:text-emerald-400 transition-all"
-                >
-                  <ThumbsUp className="w-4 h-4" />
-                  Yes
-                </button>
-                <button
-                  onClick={() => handleFeedback('not-helpful')}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-red-500/20 hover:text-red-400 transition-all"
-                >
-                  <ThumbsDown className="w-4 h-4" />
-                  No
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Related Articles */}
-          <div>
-            <h3 className="font-semibold text-white mb-4">Related articles</h3>
-            <div className="space-y-2">
-              {article.relatedArticles.map((related) => (
-                <Link
-                  key={related.title}
-                  href={related.href}
-                  className="flex items-center justify-between p-4 bg-slate-900/50 backdrop-blur-xl rounded-xl border border-white/5 hover:border-cyan-500/30 transition-all group"
-                >
-                  <span className="font-medium text-white group-hover:text-cyan-400 transition-colors">
-                    {related.title}
-                  </span>
-                  <ChevronRight className="w-5 h-5 text-slate-500 group-hover:text-cyan-400 transition-colors" />
-                </Link>
-              ))}
             </div>
           </div>
-
-          {/* Contact */}
-          <div className="mt-12 p-6 bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl border border-cyan-500/20 text-center">
-            <h3 className="text-lg font-semibold text-white mb-2">Still have questions?</h3>
-            <p className="text-slate-400 mb-4">Our support team is here to help</p>
-            <Link
-              href="/help/contact"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-500 text-white font-medium rounded-xl hover:bg-cyan-400 transition-colors"
-            >
-              Contact support
-            </Link>
-          </div>
-        </div>
+        </section>
       </div>
     </MarketingLayout>
   )
