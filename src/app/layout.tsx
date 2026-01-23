@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { Toaster } from '@/components/ui/Toast'
 import { AmbientBackground } from '@/components/AmbientBackground'
 import { UserRoleProvider } from '@/contexts/UserRoleContext'
+import { SessionProvider } from '@/components/providers/SessionProvider'
 import './globals.css'
 
 // ============================================
@@ -42,17 +43,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} antialiased`}>
       <body className="font-sans text-white bg-slate-950 min-h-screen">
-        {/* Universal animated background - appears on ALL pages */}
-        <AmbientBackground />
+        <SessionProvider>
+          {/* Universal animated background - appears on ALL pages */}
+          <AmbientBackground />
 
-        {/* Main content container - sits above background at z-10+ */}
-        <UserRoleProvider>
-          <div className="relative z-10">
-            {children}
-          </div>
-        </UserRoleProvider>
+          {/* Main content container - sits above background at z-10+ */}
+          <UserRoleProvider>
+            <div className="relative z-10">
+              {children}
+            </div>
+          </UserRoleProvider>
 
-        <Toaster />
+          <Toaster />
+        </SessionProvider>
       </body>
     </html>
   )

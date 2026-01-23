@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import {
   Users, Mail, Lock, Eye, EyeOff, ArrowRight, Loader2,
   Chrome, Apple, Sparkles, Shield, Zap
@@ -11,12 +12,11 @@ import { useToast } from '@/components/ui/Toast'
 
 // ============================================
 // SIGN IN PAGE - Premium Authentication Experience
-// Design: Entrance animations, focus glow states,
-// staggered reveals, floating background elements
 // ============================================
 
 export default function SignInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const toast = useToast()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,13 +26,23 @@ export default function SignInPage() {
   const [mounted, setMounted] = useState(false)
   const [focusedField, setFocusedField] = useState<string | null>(null)
 
+  // Get the callback URL for redirect after login
+  const callbackUrl = searchParams.get('callbackUrl') || '/hiring/map'
+
   useEffect(() => {
     setMounted(true)
-  }, [])
+    // Check for error from NextAuth
+    const authError = searchParams.get('error')
+    if (authError) {
+      setError(authError === 'CredentialsSignin' ? 'Invalid email or password' : authError)
+    }
+  }, [searchParams])
 
-  // OAuth with Google/Apple - will redirect to OAuth provider
-  const handleSocialLogin = (provider: 'google' | 'apple') => {
+  // OAuth with Google/Apple
+  const handleSocialLogin = async (provider: 'google' | 'apple') => {
     toast.info(`${provider === 'google' ? 'Google' : 'Apple'} sign-in will be available shortly.`)
+    // When ready, uncomment:
+    // await signIn(provider, { callbackUrl })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -40,16 +50,31 @@ export default function SignInPage() {
     setError('')
     setIsLoading(true)
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+      })
 
-    // For demo, accept any credentials - redirect to hiring by default
-    router.push('/hiring/map')
+      if (result?.error) {
+        setError(result.error)
+        setIsLoading(false)
+        return
+      }
+
+      // Success - redirect to intended page
+      toast.success('Welcome back!')
+      router.push(callbackUrl)
+      router.refresh()
+    } catch (err) {
+      setError('Something went wrong. Please try again.')
+      setIsLoading(false)
+    }
   }
 
   // Staggered animation classes
   const getStaggerClass = (index: number) => {
-    const baseDelay = 100
     return mounted
       ? `opacity-100 translate-y-0 transition-all duration-700 ease-out`
       : 'opacity-0 translate-y-4'
@@ -133,6 +158,18 @@ export default function SignInPage() {
             <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
           </div>
 
+          {/* Demo Account Info */}
+          <div
+            className={`mb-6 p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-xl ${getStaggerClass(3)}`}
+            style={getStaggerStyle(3)}
+          >
+            <p className="text-sm text-cyan-300 font-medium mb-1">Demo Account</p>
+            <p className="text-sm text-slate-400">
+              Email: <span className="text-white">demo@crewlink.app</span><br />
+              Password: <span className="text-white">password123</span>
+            </p>
+          </div>
+
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
@@ -148,7 +185,6 @@ export default function SignInPage() {
             >
               <label className="block text-sm font-medium text-slate-300 mb-2">Email</label>
               <div className="relative group">
-                {/* Focus glow effect */}
                 <div
                   className={`absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl opacity-0 blur transition-opacity duration-300 ${
                     focusedField === 'email' ? 'opacity-30' : 'group-hover:opacity-10'
@@ -187,7 +223,6 @@ export default function SignInPage() {
                 </Link>
               </div>
               <div className="relative group">
-                {/* Focus glow effect */}
                 <div
                   className={`absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-xl opacity-0 blur transition-opacity duration-300 ${
                     focusedField === 'password' ? 'opacity-30' : 'group-hover:opacity-10'
@@ -203,7 +238,7 @@ export default function SignInPage() {
                     onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     className="w-full pl-12 pr-12 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
                     required
                   />
@@ -228,7 +263,6 @@ export default function SignInPage() {
                 disabled={isLoading}
                 className="relative w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all duration-300 shadow-lg shadow-cyan-500/25 hover:shadow-xl hover:shadow-cyan-500/30 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg flex items-center justify-center gap-2 group overflow-hidden active:scale-[0.98]"
               >
-                {/* Shimmer effect */}
                 <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
                 {isLoading ? (
@@ -298,7 +332,6 @@ export default function SignInPage() {
             <div className="relative w-full h-full rounded-3xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
               <Users className="w-14 h-14 text-white" />
             </div>
-            {/* Floating particles */}
             <div className="absolute -top-2 -right-2 w-4 h-4 bg-cyan-400 rounded-full animate-bounce" style={{ animationDuration: '2s', animationDelay: '0.5s' }} />
             <div className="absolute -bottom-1 -left-3 w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDuration: '2.5s' }} />
           </div>
