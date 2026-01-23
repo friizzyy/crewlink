@@ -118,10 +118,39 @@ npm run audit:copy       # Agent E - Copy
 
 All agents are integrated with GitHub Actions:
 
+- **On every PR:** Required CI checks (build, lint, typecheck, QA tests, security, copy)
 - **On PR:** Agents A, B, C run automatically
 - **On merge to main:** Full agent suite runs
 - **Weekly:** Agent D (Security) runs
 - **On demand:** Agent E (Copy) can be triggered manually
+
+### Required Checks Setup (IMPORTANT)
+
+To prevent bugs from reaching production, you must configure GitHub branch protection:
+
+1. Go to **Settings > Branches** in your GitHub repository
+2. Click **Add rule** or edit the rule for `main` branch
+3. Enable **Require status checks to pass before merging**
+4. Search for and add these required checks:
+   - `CI Complete` (from ci-required.yml - this is the main one)
+   - Or individually: `Build`, `Lint`, `Type Check`, `QA Tests`, `Security Scan`, `Copy Check`, `API Validation`
+5. Enable **Require branches to be up to date before merging**
+6. Save changes
+
+Once configured, PRs cannot be merged until all CI checks pass. This would have prevented bugs like:
+- Jobs being created without valid coordinates
+- Missing API validation
+- Placeholder text shipping to production
+
+### Workflow Files
+
+| Workflow | File | Trigger |
+|----------|------|---------|
+| **CI Required** | `.github/workflows/ci-required.yml` | Every PR, push to main |
+| QA Sentinel | `.github/workflows/qa-sentinel.yml` | PRs, push to main |
+| Visual Regression | `.github/workflows/ui-visual-regression.yml` | PRs |
+| Performance | `.github/workflows/perf-lighthouse.yml` | PRs, nightly |
+| Security | `.github/workflows/security-watch.yml` | Weekly, dependency changes |
 
 ## Configuration
 
