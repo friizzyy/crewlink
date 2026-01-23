@@ -54,53 +54,54 @@ export function useScrollReveal<T extends HTMLElement = HTMLElement>(
   const ref = useRef<T>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [hasAnimated, setHasAnimated] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
-
-  // Wait for mount to ensure CSS hidden state is applied before observing
-  useEffect(() => {
-    const timer = requestAnimationFrame(() => {
-      setIsMounted(true)
-    })
-    return () => cancelAnimationFrame(timer)
-  }, [])
+  const observerRef = useRef<IntersectionObserver | null>(null)
 
   useEffect(() => {
-    // Wait for mount before setting up observer
-    if (!isMounted) return
-
     // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) {
-      setIsVisible(true)
-      setHasAnimated(true)
-      return
+    if (typeof window !== 'undefined') {
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      if (prefersReducedMotion) {
+        setIsVisible(true)
+        setHasAnimated(true)
+        return
+      }
     }
 
     const element = ref.current
     if (!element) return
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && (!triggerOnce || !hasAnimated)) {
-          if (delay > 0) {
-            setTimeout(() => {
-              setIsVisible(true)
-              setHasAnimated(true)
-            }, delay)
-          } else {
-            setIsVisible(true)
-            setHasAnimated(true)
+    // Small delay to ensure CSS is painted before observing
+    const initTimer = setTimeout(() => {
+      observerRef.current = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting && (!triggerOnce || !hasAnimated)) {
+            // Use requestAnimationFrame for smooth animation start
+            requestAnimationFrame(() => {
+              if (delay > 0) {
+                setTimeout(() => {
+                  setIsVisible(true)
+                  setHasAnimated(true)
+                }, delay)
+              } else {
+                setIsVisible(true)
+                setHasAnimated(true)
+              }
+            })
+          } else if (!triggerOnce && !entry.isIntersecting) {
+            setIsVisible(false)
           }
-        } else if (!triggerOnce && !entry.isIntersecting) {
-          setIsVisible(false)
-        }
-      },
-      { threshold, rootMargin }
-    )
+        },
+        { threshold, rootMargin }
+      )
 
-    observer.observe(element)
-    return () => observer.disconnect()
-  }, [threshold, rootMargin, triggerOnce, delay, hasAnimated, isMounted])
+      observerRef.current.observe(element)
+    }, 100) // 100ms delay ensures CSS is ready
+
+    return () => {
+      clearTimeout(initTimer)
+      observerRef.current?.disconnect()
+    }
+  }, [threshold, rootMargin, triggerOnce, delay, hasAnimated])
 
   return { ref, isVisible }
 }
@@ -143,7 +144,8 @@ export function getRevealClasses(
   isVisible: boolean,
   variant: 'up' | 'left' | 'right' | 'scale' = 'up'
 ) {
-  const baseTransition = 'transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]'
+  // GPU-accelerated transition with will-change for smooth mobile performance
+  const baseTransition = 'transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-[transform,opacity]'
 
   const hiddenMap = {
     up: 'opacity-0 translate-y-6',
