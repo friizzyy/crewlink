@@ -730,7 +730,7 @@ export function buildSelector(qaValue: string): string {
   return `[data-qa="${qaValue}"]`
 }
 
-export default {
+const clickTargetsExports = {
   allClickTargets,
   criticalRoutes,
   getTargetsForRoute,
@@ -739,3 +739,5 @@ export default {
   getTargetsByCategory,
   buildSelector,
 }
+
+export default clickTargetsExports

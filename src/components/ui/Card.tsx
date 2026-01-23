@@ -1,6 +1,7 @@
 'use client'
 
 import { forwardRef } from 'react'
+import NextImage from 'next/image'
 import { cn, getInitials } from '@/lib/utils'
 import { Star, MapPin, Clock, DollarSign, CheckCircle, XCircle } from 'lucide-react'
 
@@ -131,9 +132,9 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
     }
 
     return (
-      <div ref={ref} className={cn('avatar', sizes[size], className)} {...props}>
+      <div ref={ref} className={cn('avatar', sizes[size], 'relative', className)} {...props}>
         {src ? (
-          <img src={src} alt={name || 'Avatar'} className="w-full h-full object-cover" />
+          <NextImage src={src} alt={name || 'Avatar'} fill className="object-cover" unoptimized />
         ) : (
           <span className="font-medium text-slate-600">{name ? getInitials(name) : '?'}</span>
         )}

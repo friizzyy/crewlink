@@ -6,7 +6,7 @@ import {
   User, Mail, Phone, MapPin, Camera, Edit, Shield,
   Star, CheckCircle2, Calendar, Briefcase, DollarSign,
   Settings, ChevronRight, BadgeCheck, Award, Clock,
-  Plus, Trash2, Image
+  Plus, Trash2, Image as ImageIcon
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -219,7 +219,7 @@ export default function WorkProfilePage() {
                 key={item.id}
                 className="aspect-square bg-slate-800 rounded-xl flex items-center justify-center group cursor-pointer hover:bg-slate-700 transition-colors"
               >
-                <Image className="w-8 h-8 text-slate-600 group-hover:text-slate-500" />
+                <ImageIcon className="w-8 h-8 text-slate-600 group-hover:text-slate-500" />
               </div>
             ))}
             <button className="aspect-square bg-slate-800/50 border-2 border-dashed border-slate-700 rounded-xl flex flex-col items-center justify-center hover:border-emerald-500/50 transition-colors">

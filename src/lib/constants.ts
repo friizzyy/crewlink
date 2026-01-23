@@ -4,7 +4,26 @@
 
 export const APP_NAME = 'CrewLink'
 export const APP_DESCRIPTION = 'Find work. Hire help. Get it done.'
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+// Determine APP_URL with proper HTTPS handling for Vercel deployments
+const getAppUrl = (): string => {
+  // First priority: explicitly set app URL
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL
+  }
+  // Second priority: Vercel deployment URL (automatically set by Vercel)
+  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+  }
+  // Third priority: Vercel system URL (server-side only)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  // Fallback: localhost for development
+  return 'http://localhost:3000'
+}
+
+export const APP_URL = getAppUrl()
 
 // ============================================
 // CATEGORIES
