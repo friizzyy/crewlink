@@ -54,8 +54,20 @@ export function useScrollReveal<T extends HTMLElement = HTMLElement>(
   const ref = useRef<T>(null)
   const [isVisible, setIsVisible] = useState(false)
   const [hasAnimated, setHasAnimated] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  // Wait for mount to ensure CSS hidden state is applied before observing
+  useEffect(() => {
+    const timer = requestAnimationFrame(() => {
+      setIsMounted(true)
+    })
+    return () => cancelAnimationFrame(timer)
+  }, [])
 
   useEffect(() => {
+    // Wait for mount before setting up observer
+    if (!isMounted) return
+
     // Check for reduced motion preference
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (prefersReducedMotion) {
@@ -88,7 +100,7 @@ export function useScrollReveal<T extends HTMLElement = HTMLElement>(
 
     observer.observe(element)
     return () => observer.disconnect()
-  }, [threshold, rootMargin, triggerOnce, delay, hasAnimated])
+  }, [threshold, rootMargin, triggerOnce, delay, hasAnimated, isMounted])
 
   return { ref, isVisible }
 }
