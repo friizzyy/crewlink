@@ -15,34 +15,28 @@ import { MarketingFooter } from '@/components/MarketingFooter'
 // Tight, premium, intentional sections
 // ============================================
 
-function useScrollReveal(threshold = 0.1) {
+function useScrollReveal(threshold = 0.05) {
   const ref = useRef<HTMLDivElement>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const observerRef = useRef<IntersectionObserver | null>(null)
+  const hasAnimated = useRef(false)
 
   useEffect(() => {
     const element = ref.current
     if (!element) return
 
-    // Small delay to ensure CSS is painted before observing
-    const initTimer = setTimeout(() => {
-      observerRef.current = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            requestAnimationFrame(() => {
-              setIsVisible(true)
-            })
-          }
-        },
-        { threshold, rootMargin: '0px 0px -50px 0px' }
-      )
-      observerRef.current.observe(element)
-    }, 100)
+    // NO DELAY - immediate observation
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          setIsVisible(true)
+          hasAnimated.current = true
+        }
+      },
+      { threshold, rootMargin: '0px 0px -20px 0px' }
+    )
+    observer.observe(element)
 
-    return () => {
-      clearTimeout(initTimer)
-      observerRef.current?.disconnect()
-    }
+    return () => observer.disconnect()
   }, [threshold])
 
   return { ref, isVisible }
@@ -258,8 +252,8 @@ export default function HomePage() {
             <div className={`
               inline-flex items-center gap-3 px-5 py-2.5
               bg-slate-900/60 backdrop-blur-xl border border-white/10 rounded-full
-              mb-10 transition-all duration-700
-              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              mb-10 transition-[transform,opacity] duration-300
+              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}>
               <span className="relative flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" style={{ animationDuration: '2s' }}></span>
@@ -273,8 +267,8 @@ export default function HomePage() {
             {/* Headline */}
             <h1 className={`
               text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tight leading-[0.95]
-              transition-all duration-700 delay-100
-              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              transition-[transform,opacity] duration-300 delay-75
+              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}>
               <span className="text-white">Get help</span>
               <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent"> today.</span>
@@ -286,8 +280,8 @@ export default function HomePage() {
             {/* Subheadline */}
             <p className={`
               mt-8 text-xl sm:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed
-              transition-all duration-700 delay-200
-              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              transition-[transform,opacity] duration-300 delay-100
+              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}>
               Hire verified local workers for cleaning, moving, handyman work, and more.
               Average match time: <span className="text-cyan-400 font-semibold">4 minutes</span>.
@@ -296,8 +290,8 @@ export default function HomePage() {
             {/* CTA Buttons */}
             <div className={`
               mt-12 flex flex-col sm:flex-row items-center justify-center gap-4
-              transition-all duration-700 delay-300
-              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              transition-[transform,opacity] duration-300 delay-150
+              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}>
               <Link
                 href="/create-account?mode=hire"
@@ -334,8 +328,8 @@ export default function HomePage() {
             {/* Trust badges */}
             <div className={`
               mt-14 flex flex-wrap items-center justify-center gap-8
-              transition-all duration-700 delay-400
-              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+              transition-[transform,opacity] duration-300 delay-200
+              ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
             `}>
               {trustBadges.map((badge) => (
                 <div key={badge.label} className="flex items-center gap-2 text-slate-500">
@@ -351,7 +345,7 @@ export default function HomePage() {
 
       {/* ============ STATS BAR ============ */}
       <section ref={statsSection.ref} className="py-8 border-y border-white/5 bg-slate-900/30">
-        <div className={`max-w-5xl mx-auto px-6 transition-all duration-700 ${statsSection.isVisible ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`max-w-5xl mx-auto px-6 transition-[opacity] duration-300 ${statsSection.isVisible ? 'opacity-100' : 'opacity-0'}`}>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
             {[
               { value: '50K+', label: 'Jobs Completed', icon: CheckCircle2 },
@@ -361,8 +355,8 @@ export default function HomePage() {
             ].map((stat, i) => (
               <div
                 key={stat.label}
-                className={`text-center transition-all duration-500 ${statsSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                style={{ transitionDelay: `${i * 100}ms` }}
+                className={`text-center transition-[transform,opacity] duration-300 ${statsSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
+                style={{ transitionDelay: `${i * 40}ms` }}
               >
                 <div className="flex items-center justify-center gap-2 mb-1">
                   <stat.icon className="w-4 h-4 text-cyan-400" />
@@ -378,7 +372,7 @@ export default function HomePage() {
       {/* ============ CATEGORIES - COMPACT ============ */}
       <section ref={categoriesSection.ref} className="py-14 sm:py-16">
         <div className="max-w-5xl mx-auto px-6 sm:px-8">
-          <div className={`flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 transition-all duration-700 ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 transition-[transform,opacity] duration-300 ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 What do you need?
@@ -399,10 +393,10 @@ export default function HomePage() {
                   group relative p-4 rounded-xl
                   bg-slate-900/40 border border-white/5
                   hover:border-cyan-500/30 hover:bg-slate-900/60
-                  transition-all duration-300
-                  ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}
+                  transition-[transform,opacity,border-color,background-color] duration-200
+                  ${categoriesSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}
                 `}
-                style={{ transitionDelay: `${i * 50}ms` }}
+                style={{ transitionDelay: `${i * 30}ms` }}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{cat.icon}</span>
@@ -427,7 +421,7 @@ export default function HomePage() {
       <section ref={howSection.ref} className="py-14 sm:py-16 border-y border-white/5 bg-slate-900/20">
         <div className="max-w-5xl mx-auto px-6 sm:px-8">
           {/* How it works - horizontal */}
-          <div className={`mb-12 transition-all duration-700 ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+          <div className={`mb-12 transition-[transform,opacity] duration-300 ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
             <h2 className="text-2xl sm:text-3xl font-bold text-white mb-8 text-center sm:text-left">
               How it works
             </h2>
@@ -439,8 +433,8 @@ export default function HomePage() {
               ].map((item, i) => (
                 <div
                   key={item.step}
-                  className={`flex items-start gap-4 transition-all duration-500 ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
-                  style={{ transitionDelay: `${i * 100}ms` }}
+                  className={`flex items-start gap-4 transition-[transform,opacity] duration-300 ${howSection.isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}
+                  style={{ transitionDelay: `${i * 40}ms` }}
                 >
                   <div className={`
                     shrink-0 w-10 h-10 rounded-xl flex items-center justify-center font-bold text-lg
