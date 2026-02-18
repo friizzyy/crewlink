@@ -378,7 +378,7 @@ export function MobileBottomSheet({
   const styles = modeStyles[mode]
 
   return (
-    <div className="lg:hidden fixed bottom-16 left-0 right-0 z-[35]">
+    <div className="lg:hidden fixed bottom-16 left-0 right-0 z-[35]" style={{ bottom: 'calc(4rem + env(safe-area-inset-bottom, 0px))' }}>
       <div className={cn(
         'bg-slate-900/95 backdrop-blur-xl',
         'border-t border-white/[0.08]',
@@ -420,14 +420,14 @@ export function MobileBottomSheet({
           </button>
         </div>
 
-        {/* Category chips */}
-        <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
+        {/* Category chips - sized for 44px touch targets */}
+        <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide scroll-momentum">
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => onCategoryChange(cat.id)}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap shrink-0',
+                'flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium whitespace-nowrap shrink-0 min-h-[36px]',
                 'border transition-all duration-200',
                 selectedCategory === cat.id
                   ? cn(

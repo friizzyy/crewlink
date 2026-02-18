@@ -7,6 +7,55 @@ import { X } from 'lucide-react'
 import { IconButton } from './Button'
 
 // ============================================
+// FOCUS TRAP HOOK
+// Traps focus within a container for modals/sheets/drawers
+// ============================================
+function useFocusTrap(isOpen: boolean, containerRef: React.RefObject<HTMLElement | null>) {
+  const previousFocusRef = useRef<HTMLElement | null>(null)
+
+  useEffect(() => {
+    if (!isOpen || !containerRef.current) return
+
+    previousFocusRef.current = document.activeElement as HTMLElement
+
+    const container = containerRef.current
+    const focusableElements = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )
+    const firstFocusable = focusableElements[0]
+    const lastFocusable = focusableElements[focusableElements.length - 1]
+
+    // Focus first focusable element
+    if (firstFocusable) {
+      setTimeout(() => firstFocusable.focus(), 50)
+    }
+
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key !== 'Tab') return
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstFocusable) {
+          e.preventDefault()
+          lastFocusable?.focus()
+        }
+      } else {
+        if (document.activeElement === lastFocusable) {
+          e.preventDefault()
+          firstFocusable?.focus()
+        }
+      }
+    }
+
+    container.addEventListener('keydown', handleKeyDown)
+    return () => {
+      container.removeEventListener('keydown', handleKeyDown)
+      // Restore focus on close
+      previousFocusRef.current?.focus()
+    }
+  }, [isOpen, containerRef])
+}
+
+// ============================================
 // MODAL COMPONENT
 // ============================================
 
@@ -34,6 +83,9 @@ export function Modal({
   className,
 }: ModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap(isOpen, dialogRef)
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -74,8 +126,9 @@ export function Modal({
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
     >
       <div
+        ref={dialogRef}
         className={cn(
-          'relative w-full bg-white rounded-2xl shadow-xl animate-scale-in',
+          'relative w-full bg-white rounded-2xl shadow-xl animate-scale-in overscroll-contain',
           sizes[size],
           className
         )}
@@ -146,6 +199,8 @@ export function BottomSheet({
   const [isDragging, setIsDragging] = useState(false)
   const [dragY, setDragY] = useState(0)
   const startY = useRef(0)
+
+  useFocusTrap(isOpen, sheetRef)
 
   useEffect(() => {
     if (isOpen) {
@@ -230,7 +285,8 @@ export function BottomSheet({
         ref={sheetRef}
         className={cn(
           'absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl',
-          'animate-slide-up overflow-hidden',
+          'animate-slide-up overflow-hidden overscroll-contain',
+          'pb-safe-area',
           heights[height],
           className
         )}
@@ -354,6 +410,10 @@ export function Drawer({
   width = '320px',
   className,
 }: DrawerProps) {
+  const drawerRef = useRef<HTMLDivElement>(null)
+
+  useFocusTrap(isOpen, drawerRef)
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -372,12 +432,14 @@ export function Drawer({
         onClick={onClose}
       />
       <div
+        ref={drawerRef}
         className={cn(
-          'absolute top-0 bottom-0 bg-white shadow-xl overflow-auto',
+          'absolute top-0 bottom-0 bg-white shadow-xl overflow-auto overscroll-contain',
+          'w-[min(320px,calc(100vw-2rem))]',
           side === 'right' ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left',
           className
         )}
-        style={{ width }}
+        style={{ width: `min(${width}, calc(100vw - 2rem))` }}
       >
         {title && (
           <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
@@ -411,6 +473,7 @@ export interface TooltipProps {
 
 export function Tooltip({ content, children, side = 'top', className }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const positions = {
     top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
@@ -419,18 +482,44 @@ export function Tooltip({ content, children, side = 'top', className }: TooltipP
     right: 'left-full top-1/2 -translate-y-1/2 ml-2',
   }
 
+  const showTooltip = useCallback(() => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    setIsVisible(true)
+  }, [])
+
+  const hideTooltip = useCallback(() => {
+    timeoutRef.current = setTimeout(() => setIsVisible(false), 150)
+  }, [])
+
+  // Touch: show on tap, hide after 2s
+  const handleTouch = useCallback(() => {
+    setIsVisible(true)
+    if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    timeoutRef.current = setTimeout(() => setIsVisible(false), 2000)
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
+
   return (
     <div
       className="relative inline-block"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
+      onTouchStart={handleTouch}
+      onFocus={showTooltip}
+      onBlur={hideTooltip}
     >
       {children}
       {isVisible && (
         <div
+          role="tooltip"
           className={cn(
             'absolute z-50 px-2.5 py-1.5 text-xs font-medium text-white bg-slate-900 rounded-lg whitespace-nowrap',
-            'animate-fade-in',
+            'animate-fade-in pointer-events-none',
             positions[side],
             className
           )}

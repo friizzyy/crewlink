@@ -111,7 +111,7 @@ export function MarketingFooter() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.label}
-                  className="w-9 h-9 rounded-lg bg-slate-800 hover:bg-cyan-500/20 flex items-center justify-center text-slate-400 hover:text-cyan-400 transition-all duration-200 hover:scale-105"
+                  className="w-11 h-11 rounded-lg bg-slate-800 hover:bg-cyan-500/20 active:bg-cyan-500/30 flex items-center justify-center text-slate-400 hover:text-cyan-400 active:text-cyan-400 transition-all duration-200 hover:scale-105"
                 >
                   {social.icon}
                 </a>

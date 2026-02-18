@@ -170,8 +170,8 @@ function MobileFloatingCard({
             <span className="text-[10px]">{card.icon}</span>
           </div>
           <div>
-            <div className="font-semibold text-white text-[9px] leading-tight">{card.title}</div>
-            <div className={`text-[7px] leading-tight ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'}`}>
+            <div className="font-semibold text-white text-[10px] leading-tight">{card.title}</div>
+            <div className={`text-[8px] leading-tight ${card.isSuccess ? 'text-emerald-400' : 'text-slate-400'}`}>
               {card.subtitle}
             </div>
           </div>

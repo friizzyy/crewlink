@@ -241,12 +241,13 @@ export default function CreateAccountPage() {
                         <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                         <input
                           type="text"
+                          autoComplete="given-name"
                           value={formData.firstName}
                           onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
                           onFocus={() => setFocusedField('firstName')}
                           onBlur={() => setFocusedField(null)}
                           placeholder="John"
-                          className={`w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all`}
+                          className={`w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all`}
                           required
                         />
                       </div>
@@ -264,12 +265,13 @@ export default function CreateAccountPage() {
                       />
                       <input
                         type="text"
+                        autoComplete="family-name"
                         value={formData.lastName}
                         onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
                         onFocus={() => setFocusedField('lastName')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="Doe"
-                        className="relative w-full px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="relative w-full px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -289,12 +291,14 @@ export default function CreateAccountPage() {
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                       <input
                         type="email"
+                        inputMode="email"
+                        autoComplete="email"
                         value={formData.email}
                         onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                         onFocus={() => setFocusedField('email')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="you@example.com"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -314,12 +318,14 @@ export default function CreateAccountPage() {
                       <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                       <input
                         type="tel"
+                        inputMode="tel"
+                        autoComplete="tel"
                         value={formData.phone}
                         onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
                         onFocus={() => setFocusedField('phone')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="+1 (555) 123-4567"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -339,18 +345,20 @@ export default function CreateAccountPage() {
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                       <input
                         type={showPassword ? 'text' : 'password'}
+                        autoComplete="new-password"
                         value={formData.password}
                         onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                         onFocus={() => setFocusedField('password')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="Create a strong password"
-                        className="w-full pl-12 pr-12 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-12 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white active:text-white transition-colors p-2 touch-target"
+                        aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>

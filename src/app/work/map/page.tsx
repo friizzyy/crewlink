@@ -395,7 +395,7 @@ function WorkerMapContent() {
   }
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col lg:flex-row relative overflow-hidden bg-slate-950">
+    <div className="h-[calc(100dvh-64px)] lg:h-[calc(100vh-64px)] flex flex-col lg:flex-row relative overflow-hidden bg-slate-950">
       {/* ============ DESKTOP SIDEBAR ============ */}
       <aside
         className={cn(

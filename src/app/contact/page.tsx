@@ -145,7 +145,8 @@ function ContactForm() {
                 <input
                   type="text"
                   id="name"
-                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                  autoComplete="name"
+                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white text-base placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
                   placeholder="Your name"
                 />
               </div>
@@ -154,7 +155,9 @@ function ContactForm() {
                 <input
                   type="email"
                   id="email"
-                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
+                  inputMode="email"
+                  autoComplete="email"
+                  className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white text-base placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -164,7 +167,7 @@ function ContactForm() {
               <label htmlFor="subject" className="block text-sm font-medium text-slate-300 mb-2">Subject</label>
               <select
                 id="subject"
-                className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white focus:outline-none focus:border-cyan-500/50 transition-colors appearance-none"
+                className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white text-base focus:outline-none focus:border-cyan-500/50 transition-colors appearance-none"
               >
                 <option value="">Select a topic</option>
                 <option value="general">General inquiry</option>
@@ -181,7 +184,7 @@ function ContactForm() {
               <textarea
                 id="message"
                 rows={5}
-                className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
+                className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white text-base placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 transition-colors resize-none"
                 placeholder="How can we help?"
               />
             </div>

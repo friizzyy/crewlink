@@ -141,16 +141,15 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
   useEffect(() => {
     setMounted(true)
 
-    // Check for reduced motion preference OR mobile Safari (performance)
+    // Check for reduced motion preference OR any mobile device (performance)
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const isMobileSafari = /iPhone|iPad|iPod/.test(navigator.userAgent) && /WebKit/.test(navigator.userAgent)
-    const isMobile = window.innerWidth < 768
+    const isMobile = window.innerWidth < 768 || 'ontouchstart' in window
 
-    // Disable animations on mobile Safari or if user prefers reduced motion
-    setReducedMotion(motionQuery.matches || (isMobileSafari && isMobile))
+    // Disable animations on all mobile devices or if user prefers reduced motion
+    setReducedMotion(motionQuery.matches || isMobile)
 
     const handleMotionChange = (e: MediaQueryListEvent) => {
-      setReducedMotion(e.matches || (isMobileSafari && isMobile))
+      setReducedMotion(e.matches || isMobile)
     }
     motionQuery.addEventListener('change', handleMotionChange)
 
@@ -223,12 +222,12 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
         }
 
         @-webkit-keyframes scanLine {
-          0% { top: -10%; }
-          100% { top: 110%; }
+          0% { -webkit-transform: translateY(-10vh); transform: translateY(-10vh); }
+          100% { -webkit-transform: translateY(110vh); transform: translateY(110vh); }
         }
         @keyframes scanLine {
-          0% { top: -10%; }
-          100% { top: 110%; }
+          0% { transform: translateY(-10vh); }
+          100% { transform: translateY(110vh); }
         }
 
         @-webkit-keyframes glowPulse {
@@ -262,11 +261,12 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
           }}
         />
 
-        {/* Scanning line effect - from Option E */}
+        {/* Scanning line effect - from Option E (GPU-accelerated with translateY) */}
         <div
-          className="absolute left-0 right-0 h-32 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"
+          className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"
           style={{
             animation: reducedMotion ? 'none' : `scanLine ${speeds.scan}s linear infinite`,
+            willChange: reducedMotion ? 'auto' : 'transform',
           }}
         />
 

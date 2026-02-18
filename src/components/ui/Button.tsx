@@ -195,10 +195,11 @@ export const LinkButton = forwardRef<HTMLButtonElement, LinkButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'text-cyan-400 hover:text-cyan-300 font-medium underline-offset-4 hover:underline',
+          'text-cyan-400 hover:text-cyan-300 active:text-cyan-200 font-medium underline-offset-4 hover:underline',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950',
           'disabled:opacity-50 disabled:pointer-events-none',
           'transition-colors duration-200',
+          'min-h-[44px] inline-flex items-center',
           className
         )}
         {...props}
@@ -221,8 +222,8 @@ export const GlowButton = forwardRef<HTMLButtonElement, GlowButtonProps>(
   ({ className, children, ...props }, ref) => {
     return (
       <div className="relative group">
-        {/* Animated glow background */}
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse" />
+        {/* Animated glow background - GPU-accelerated opacity only */}
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse" style={{ willChange: 'opacity' }} />
         <Button
           ref={ref}
           variant="primary"

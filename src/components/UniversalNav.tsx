@@ -252,11 +252,13 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                 </Link>
               </div>
 
-              {/* Mobile menu button */}
+              {/* Mobile menu button - 44px minimum touch target */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 text-slate-400 hover:text-white"
+                className="md:hidden p-2.5 -mr-1 text-slate-400 hover:text-white active:text-white touch-target"
                 data-qa="mobile-nav-toggle"
+                aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={mobileMenuOpen}
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -676,58 +678,58 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
 
       {/* ===== MOBILE: Keep existing bottom nav ===== */}
       {/* Mobile Bottom Navigation - Symmetric 5-item layout with centered action button */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe z-40">
-        <div className="flex items-center justify-between py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-white/10 px-2 z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <div className="flex items-center justify-between py-1">
           {/* Left side - 2 items */}
           <div className="flex items-center flex-1 justify-around">
             {effectiveMode === 'hire' ? (
               <>
                 <Link
                   href={`${routePrefix}/map`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors ${
                     pathname === `${routePrefix}/map` || pathname.startsWith(`${routePrefix}/map/`)
                       ? 'text-cyan-400'
-                      : 'text-slate-500'
+                      : 'text-slate-500 active:text-slate-300'
                   }`}
                 >
                   <Map className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">Map</span>
+                  <span className="text-[11px] font-medium">Map</span>
                 </Link>
                 <Link
                   href={`${routePrefix}/jobs`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors ${
                     pathname === `${routePrefix}/jobs` || pathname.startsWith(`${routePrefix}/jobs/`)
                       ? 'text-cyan-400'
-                      : 'text-slate-500'
+                      : 'text-slate-500 active:text-slate-300'
                   }`}
                 >
                   <ClipboardList className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">My Jobs</span>
+                  <span className="text-[11px] font-medium">My Jobs</span>
                 </Link>
               </>
             ) : (
               <>
                 <Link
                   href={`${routePrefix}/jobs`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors ${
                     pathname === `${routePrefix}/jobs` || pathname.startsWith(`${routePrefix}/jobs/`) || pathname.startsWith(`${routePrefix}/job/`) || pathname === `${routePrefix}/map` || pathname.startsWith(`${routePrefix}/map/`)
                       ? 'text-emerald-400'
-                      : 'text-slate-500'
+                      : 'text-slate-500 active:text-slate-300'
                   }`}
                 >
                   <Compass className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">Find Jobs</span>
+                  <span className="text-[11px] font-medium">Find Jobs</span>
                 </Link>
                 <Link
                   href={`${routePrefix}/earnings`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors ${
                     pathname === `${routePrefix}/earnings` || pathname.startsWith(`${routePrefix}/earnings/`) || pathname === `${routePrefix}/transactions` || pathname.startsWith(`${routePrefix}/transactions/`)
                       ? 'text-emerald-400'
-                      : 'text-slate-500'
+                      : 'text-slate-500 active:text-slate-300'
                   }`}
                 >
                   <DollarSign className="w-5 h-5" />
-                  <span className="text-[10px] font-medium">Earnings</span>
+                  <span className="text-[11px] font-medium">Earnings</span>
                 </Link>
               </>
             )}
@@ -738,6 +740,7 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
             <Link
               href={effectiveMode === 'hire' ? `${routePrefix}/post` : `${routePrefix}/map`}
               className="flex flex-col items-center -mt-4"
+              aria-label={effectiveMode === 'hire' ? 'Post a new job' : 'Find work'}
             >
               <div className="relative">
                 <div className={`absolute inset-0 rounded-full blur-md opacity-50 ${
@@ -758,10 +761,10 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
           <div className="flex items-center flex-1 justify-around">
             <Link
               href={`${routePrefix}/messages`}
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors relative ${
+              className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors relative ${
                 pathname === `${routePrefix}/messages` || pathname.startsWith(`${routePrefix}/messages/`)
                   ? effectiveMode === 'work' ? 'text-emerald-400' : 'text-cyan-400'
-                  : 'text-slate-500'
+                  : 'text-slate-500 active:text-slate-300'
               }`}
             >
               <div className="relative">
@@ -772,18 +775,18 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                   }`} />
                 )}
               </div>
-              <span className="text-[10px] font-medium">Messages</span>
+              <span className="text-[11px] font-medium">Messages</span>
             </Link>
             <Link
               href={`${routePrefix}/profile`}
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+              className={`flex flex-col items-center justify-center gap-0.5 min-w-[48px] min-h-[48px] px-2 py-1 rounded-xl transition-colors ${
                 pathname === `${routePrefix}/profile` || pathname.startsWith(`${routePrefix}/profile/`) || pathname === `${routePrefix}/settings` || pathname.startsWith(`${routePrefix}/settings/`)
                   ? effectiveMode === 'work' ? 'text-emerald-400' : 'text-cyan-400'
-                  : 'text-slate-500'
+                  : 'text-slate-500 active:text-slate-300'
               }`}
             >
               <User className="w-5 h-5" />
-              <span className="text-[10px] font-medium">Profile</span>
+              <span className="text-[11px] font-medium">Profile</span>
             </Link>
           </div>
         </div>

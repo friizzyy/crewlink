@@ -42,9 +42,19 @@ export function useDeviceType() {
       })
     }
 
+    // Debounced resize handler to avoid excessive recalculations
+    let resizeTimeout: NodeJS.Timeout
+    const debouncedCheck = () => {
+      clearTimeout(resizeTimeout)
+      resizeTimeout = setTimeout(checkDevice, 150)
+    }
+
     checkDevice()
-    window.addEventListener('resize', checkDevice)
-    return () => window.removeEventListener('resize', checkDevice)
+    window.addEventListener('resize', debouncedCheck)
+    return () => {
+      window.removeEventListener('resize', debouncedCheck)
+      clearTimeout(resizeTimeout)
+    }
   }, [])
 
   return deviceType

@@ -10,7 +10,7 @@ export function Toaster() {
   if (toasts.length === 0) return null
 
   return (
-    <div className="fixed bottom-20 lg:bottom-4 right-4 z-50 flex flex-col gap-2 max-w-sm">
+    <div className="fixed bottom-20 lg:bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 sm:max-w-sm pb-safe-area">
       {toasts.map((toast, index) => (
         <Toast
           key={toast.id}
@@ -59,7 +59,8 @@ function Toast({ type, message, onClose, index = 0 }: ToastProps) {
       <p className="flex-1 text-sm text-slate-200">{message}</p>
       <button
         onClick={onClose}
-        className="text-slate-500 hover:text-white transition-colors"
+        className="text-slate-500 hover:text-white active:text-white transition-colors p-2 -m-1 touch-target shrink-0"
+        aria-label="Dismiss notification"
       >
         <X className="w-4 h-4" />
       </button>

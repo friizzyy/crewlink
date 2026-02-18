@@ -64,13 +64,13 @@ export default function PostJobPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 pb-safe-area">
       {/* Header */}
       <div className="border-b border-white/5 bg-slate-900/50">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/hiring/map"
-            className="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm mb-4 transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white active:text-white text-sm mb-4 py-2 transition-colors touch-target"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to map
@@ -93,7 +93,7 @@ export default function PostJobPage() {
               value={formData.title}
               onChange={(e) => updateField('title', e.target.value)}
               placeholder="e.g., Deep House Cleaning Needed"
-              className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+              className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
             />
           </div>
 
@@ -135,7 +135,7 @@ export default function PostJobPage() {
               onChange={(e) => updateField('description', e.target.value)}
               placeholder="Describe the job in detail. Include what needs to be done, any special requirements, and what you'll provide."
               rows={5}
-              className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 resize-none"
+              className="w-full px-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 resize-none"
             />
           </div>
 
@@ -151,7 +151,8 @@ export default function PostJobPage() {
                 value={formData.location}
                 onChange={(e) => updateField('location', e.target.value)}
                 placeholder="Enter address or neighborhood"
-                className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                autoComplete="street-address"
               />
             </div>
           </div>
@@ -166,10 +167,11 @@ export default function PostJobPage() {
                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={formData.budgetMin}
                   onChange={(e) => updateField('budgetMin', e.target.value)}
                   placeholder="Min"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                 />
               </div>
               <span className="text-slate-500">to</span>
@@ -177,10 +179,11 @@ export default function PostJobPage() {
                 <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
                   type="number"
+                  inputMode="decimal"
                   value={formData.budgetMax}
                   onChange={(e) => updateField('budgetMax', e.target.value)}
                   placeholder="Max"
-                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
                 />
               </div>
             </div>

@@ -134,16 +134,16 @@ export default function SignInPage() {
           >
             <button
               onClick={() => handleSocialLogin('google')}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] active:bg-slate-800/90 group"
             >
-              <Chrome className="w-5 h-5 group-hover:text-cyan-400 transition-colors" />
+              <Chrome className="w-5 h-5 group-hover:text-cyan-400 group-active:text-cyan-400 transition-colors" />
               Continue with Google
             </button>
             <button
               onClick={() => handleSocialLogin('apple')}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
+              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.97] active:bg-slate-800/90 group"
             >
-              <Apple className="w-5 h-5 group-hover:text-cyan-400 transition-colors" />
+              <Apple className="w-5 h-5 group-hover:text-cyan-400 group-active:text-cyan-400 transition-colors" />
               Continue with Apple
             </button>
           </div>
@@ -196,12 +196,14 @@ export default function SignInPage() {
                   }`} />
                   <input
                     type="email"
+                    inputMode="email"
+                    autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     placeholder="you@example.com"
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
+                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
                     required
                   />
                 </div>
@@ -217,7 +219,7 @@ export default function SignInPage() {
                 <label className="block text-sm font-medium text-slate-300">Password</label>
                 <Link
                   href="/forgot-password"
-                  className="text-sm text-cyan-400 hover:text-cyan-300 transition-colors"
+                  className="text-sm text-cyan-400 hover:text-cyan-300 active:text-cyan-200 transition-colors py-1 px-1"
                 >
                   Forgot password?
                 </Link>
@@ -234,18 +236,20 @@ export default function SignInPage() {
                   }`} />
                   <input
                     type={showPassword ? 'text' : 'password'}
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
                     placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
+                    className="w-full pl-12 pr-12 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white text-base placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white active:text-white transition-colors p-2 rounded-lg hover:bg-white/5 active:bg-white/10 touch-target"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>

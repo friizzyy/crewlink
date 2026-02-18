@@ -704,9 +704,10 @@
   -webkit-backdrop-filter: blur(4px);
 }
 
-/* Interactive card hover */
+/* Interactive card hover - GPU-accelerated */
 .interactive-card {
-  transition: all 300ms ease;
+  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+  will-change: transform;
 }
 
 .interactive-card:hover {
@@ -848,11 +849,71 @@
   .animate-fadeInUp,
   .animate-fadeInScale,
   .animate-slideUp,
-  .animate-shimmer {
+  .animate-shimmer,
+  .interactive-card {
     animation: none !important;
+  }
+
+  .interactive-card:hover {
+    transform: none !important;
   }
 
   .pulse-dot::before {
     animation: none !important;
+  }
+}
+
+/* ============================================
+   MOBILE-FIRST POLISH UTILITIES
+   ============================================ */
+
+/* Touch-action manipulation on all interactive elements - eliminates 300ms tap delay */
+button,
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Overscroll containment for modals/drawers/sheets */
+.overscroll-contain {
+  overscroll-behavior: contain;
+}
+
+/* Safe area padding utilities for notch/home indicator */
+.pb-safe-area {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.pt-safe-area {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.mb-safe-area {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Momentum scrolling for scrollable containers */
+.scroll-momentum {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+/* Minimum touch target size utility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Backdrop filter performance fallback */
+@supports not (backdrop-filter: blur(1px)) {
+  .backdrop-blur-sm,
+  .backdrop-blur-md,
+  .backdrop-blur-lg,
+  .backdrop-blur-xl {
+    background-color: rgba(15, 23, 42, 0.95) !important;
   }
 }
