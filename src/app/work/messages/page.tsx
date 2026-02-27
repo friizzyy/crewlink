@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   MessageCircle, Search, Phone, Video, MoreHorizontal,
   Send, Paperclip, Image as ImageIcon, Smile, Check, CheckCheck,
-  ArrowLeft, Star, Clock, MapPin, Briefcase
+  ArrowLeft, Star, Clock, MapPin, Briefcase, Sparkles, Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
@@ -122,6 +122,9 @@ export default function WorkMessagesPage() {
   const [selectedConversation, setSelectedConversation] = useState<string | null>('1')
   const [messageText, setMessageText] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [aiSuggestions, setAiSuggestions] = useState<string[]>([])
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
 
   const filteredConversations = mockConversations.filter((conv) =>
     conv.hirer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -137,6 +140,48 @@ export default function WorkMessagesPage() {
     // In real app, send message via API
     toast.success('Message sent')
     setMessageText('')
+    setShowSuggestions(false)
+    setAiSuggestions([])
+  }
+
+  const handleFetchSuggestions = async () => {
+    if (!selectedConversation) return
+
+    // If suggestions are already showing, toggle them off
+    if (showSuggestions && aiSuggestions.length > 0) {
+      setShowSuggestions(false)
+      setAiSuggestions([])
+      return
+    }
+
+    setIsLoadingSuggestions(true)
+    setShowSuggestions(true)
+
+    try {
+      const response = await fetch('/api/ai/chat-suggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ threadId: selectedConversation }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch suggestions')
+      }
+
+      const data: { suggestions: string[] } = await response.json()
+      setAiSuggestions(data.suggestions)
+    } catch {
+      toast.error('Could not load AI suggestions')
+      setShowSuggestions(false)
+    } finally {
+      setIsLoadingSuggestions(false)
+    }
+  }
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    setMessageText(suggestion)
+    setShowSuggestions(false)
+    setAiSuggestions([])
   }
 
   const handleCall = () => {
@@ -355,6 +400,32 @@ export default function WorkMessagesPage() {
 
           {/* Message Input */}
           <div className="p-4 border-t border-white/5 bg-slate-900/50">
+            {/* AI Suggestions */}
+            {showSuggestions && (
+              <div className="mb-3">
+                {isLoadingSuggestions ? (
+                  <div className="flex items-center gap-2 text-slate-400 text-sm py-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+                    <span>Generating suggestions...</span>
+                  </div>
+                ) : (
+                  aiSuggestions.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {aiSuggestions.map((suggestion, index) => (
+                        <button
+                          key={index}
+                          onClick={() => handleSelectSuggestion(suggestion)}
+                          className="bg-slate-800 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 rounded-lg px-3 py-1.5 text-sm transition-colors cursor-pointer"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )
+                )}
+              </div>
+            )}
+
             <div className="flex items-end gap-3">
               <div className="flex gap-2">
                 <button
@@ -389,6 +460,23 @@ export default function WorkMessagesPage() {
               </div>
               <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                 <Smile className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleFetchSuggestions}
+                disabled={isLoadingSuggestions}
+                className={cn(
+                  'p-2 rounded-lg transition-colors',
+                  showSuggestions && aiSuggestions.length > 0
+                    ? 'text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                )}
+                title="AI suggestions"
+              >
+                {isLoadingSuggestions ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Sparkles className="w-5 h-5" />
+                )}
               </button>
               <button
                 onClick={handleSendMessage}

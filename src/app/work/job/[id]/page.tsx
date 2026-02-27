@@ -7,17 +7,24 @@ import {
   ArrowLeft, MapPin, Clock, DollarSign, Users, Star,
   MessageCircle, Bookmark, BookmarkCheck, Share2, Calendar,
   CheckCircle2, AlertCircle, Send, Zap, Award, BadgeCheck,
-  Briefcase, ChevronRight
+  Briefcase, ChevronRight, Sparkles, Loader2
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
+
+// Response type for the AI bid writer API
+interface AiBidWriterResponse {
+  message: string
+  suggestedAmount: number | null
+  keySellingPoints: string[]
+}
 
 // Mock job detail data
 const mockJob = {
   id: '1',
   title: 'Deep House Cleaning',
   category: 'cleaning',
-  categoryIcon: '🧹',
+  categoryIcon: '\uD83E\uDDF9',
   description: `Looking for an experienced cleaner to do a thorough deep cleaning of my 2-bedroom apartment.
 
 Tasks include:
@@ -71,17 +78,73 @@ export default function WorkJobDetailPage() {
   const [bidMessage, setBidMessage] = useState('')
   const [showBidForm, setShowBidForm] = useState(false)
   const [bidSubmitted, setBidSubmitted] = useState(false)
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false)
+  const [isAiGenerating, setIsAiGenerating] = useState(false)
   const toast = useToast()
 
-  const handleSubmitBid = () => {
+  const handleAiWriteBid = async () => {
+    setIsAiGenerating(true)
+    try {
+      const response = await fetch('/api/ai/bid-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jobId: params.id }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to generate bid' }))
+        throw new Error(errorData.error || 'Failed to generate bid')
+      }
+
+      const data: AiBidWriterResponse = await response.json()
+
+      setBidMessage(data.message)
+
+      if (data.suggestedAmount !== null) {
+        setBidAmount(String(data.suggestedAmount))
+      }
+
+      toast.success('AI bid draft generated!')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate AI bid'
+      toast.error(errorMessage)
+    } finally {
+      setIsAiGenerating(false)
+    }
+  }
+
+  const handleSubmitBid = async () => {
     if (!bidAmount || !bidMessage) {
       toast.error('Please enter your bid amount and message')
       return
     }
-    // In real app, submit bid via API
-    toast.success('Bid submitted successfully!')
-    setBidSubmitted(true)
-    setShowBidForm(false)
+
+    setIsSubmittingBid(true)
+    try {
+      const response = await fetch('/api/bids', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jobId: params.id,
+          amount: parseFloat(bidAmount),
+          message: bidMessage,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to submit bid' }))
+        throw new Error(errorData.error || 'Failed to submit bid')
+      }
+
+      toast.success('Bid submitted successfully!')
+      setBidSubmitted(true)
+      setShowBidForm(false)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit bid'
+      toast.error(errorMessage)
+    } finally {
+      setIsSubmittingBid(false)
+    }
   }
 
   const handleShare = () => {
@@ -247,9 +310,24 @@ export default function WorkJobDetailPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">
-                      Cover Letter
-                    </label>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-medium text-slate-300">
+                        Cover Letter
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleAiWriteBid}
+                        disabled={isAiGenerating}
+                        className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isAiGenerating ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Sparkles className="w-4 h-4" />
+                        )}
+                        {isAiGenerating ? 'Generating...' : 'AI Write Bid'}
+                      </button>
+                    </div>
                     <textarea
                       value={bidMessage}
                       onChange={(e) => setBidMessage(e.target.value)}
@@ -262,10 +340,15 @@ export default function WorkJobDetailPage() {
                   <div className="flex items-center gap-3 pt-2">
                     <button
                       onClick={handleSubmitBid}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors"
+                      disabled={isSubmittingBid}
+                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Send className="w-5 h-5" />
-                      Submit Bid
+                      {isSubmittingBid ? (
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                      ) : (
+                        <Send className="w-5 h-5" />
+                      )}
+                      {isSubmittingBid ? 'Submitting...' : 'Submit Bid'}
                     </button>
                     <button
                       onClick={() => setShowBidForm(false)}

@@ -85,6 +85,7 @@ model User {
   messageThreads     ThreadParticipant[]
   notifications      Notification[]
   paymentRecords     PaymentRecord[]
+  aiUsageLogs        AIUsageLog[]       @relation("AIUsage")
 }
 
 model WorkerProfile {
@@ -443,6 +444,35 @@ model Notification {
 
   @@index([userId, isRead])
   @@index([userId, createdAt])
+}
+
+// ============================================
+// AI TRACKING
+// ============================================
+
+model AIUsageLog {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation("AIUsage", fields: [userId], references: [id], onDelete: Cascade)
+  feature     String
+  tokensUsed  Int      @default(0)
+  cached      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([userId, feature, createdAt])
+  @@index([userId])
+}
+
+model AIResponseCache {
+  id          String   @id @default(cuid())
+  feature     String
+  inputHash   String
+  response    String   @db.Text
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@unique([feature, inputHash])
+  @@index([expiresAt])
 }
 
 // ============================================

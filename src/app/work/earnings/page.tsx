@@ -1,101 +1,278 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import {
-  DollarSign, TrendingUp, Download, Calendar, ChevronRight,
+  DollarSign, TrendingUp, Download, ChevronRight,
   CreditCard, Building2, ArrowUpRight, ArrowDownRight,
-  Clock, CheckCircle2, AlertCircle, Filter, ChevronDown
+  Clock, CheckCircle2, AlertCircle, Star, Briefcase,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Skeleton, SkeletonStatCard } from '@/components/ui/Skeleton'
+import { EarningsChart } from '@/components/charts/EarningsChart'
+import toast from 'react-hot-toast'
 
-// Mock earnings data
-const mockEarnings = {
-  available: 1245.50,
-  pending: 350.00,
-  totalEarned: 8450.00,
-  thisMonth: 1595.50,
-  lastMonth: 2100.00,
-  monthlyChange: -24,
+// ============================================
+// TYPES
+// ============================================
+
+interface DailyEarning {
+  date: string
+  amount: number
 }
 
-const mockTransactions = [
-  {
-    id: '1',
-    type: 'earning',
-    title: 'Deep House Cleaning',
-    hirer: 'Alex J.',
-    amount: 175,
-    status: 'completed',
-    date: 'Today, 4:30 PM',
-  },
-  {
-    id: '2',
-    type: 'withdrawal',
-    title: 'Bank Transfer to ****4523',
-    hirer: null,
-    amount: -500,
-    status: 'processing',
-    date: 'Today, 12:00 PM',
-  },
-  {
-    id: '3',
-    type: 'earning',
-    title: 'IKEA Furniture Assembly',
-    hirer: 'Jordan K.',
-    amount: 95,
-    status: 'completed',
-    date: 'Yesterday, 2:15 PM',
-  },
-  {
-    id: '4',
-    type: 'earning',
-    title: 'Help Moving Furniture',
-    hirer: 'Sam W.',
-    amount: 225,
-    status: 'completed',
-    date: 'Jan 18, 2024',
-  },
-  {
-    id: '5',
-    type: 'earning',
-    title: 'Yard Work & Landscaping',
-    hirer: 'Chris M.',
-    amount: 150,
-    status: 'pending',
-    date: 'Jan 17, 2024',
-  },
-  {
-    id: '6',
-    type: 'withdrawal',
-    title: 'Bank Transfer to ****4523',
-    hirer: null,
-    amount: -1000,
-    status: 'completed',
-    date: 'Jan 15, 2024',
-  },
-]
+interface Transaction {
+  id: string
+  amount: number
+  type: string
+  status: string
+  description: string
+  date: string
+}
 
-const mockPayoutMethods = [
+interface EarningsData {
+  availableBalance: number
+  totalEarned: number
+  totalWithdrawn: number
+  thisMonthEarnings: number
+  lastMonthEarnings: number
+  monthlyChange: number
+  completedJobs: number
+  averageRating: number
+  dailyEarnings: DailyEarning[]
+  transactions: Transaction[]
+}
+
+interface EarningsApiResponse {
+  success: boolean
+  data: EarningsData
+}
+
+// ============================================
+// STATIC PAYOUT METHODS (no API yet)
+// ============================================
+
+const payoutMethods = [
   {
     id: '1',
-    type: 'bank',
+    type: 'bank' as const,
     name: 'Chase Bank',
     last4: '4523',
     isDefault: true,
   },
   {
     id: '2',
-    type: 'card',
+    type: 'card' as const,
     name: 'Visa Debit',
     last4: '8891',
     isDefault: false,
   },
 ]
 
+// ============================================
+// LOADING SKELETON
+// ============================================
+
+function EarningsLoadingSkeleton() {
+  return (
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+      {/* Header skeleton */}
+      <div className="border-b border-white/5 bg-slate-900/50">
+        <div className="max-w-4xl mx-auto px-4 py-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+            <Skeleton variant="rectangular" className="h-10 w-28" />
+          </div>
+
+          {/* Stats Cards skeleton */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <SkeletonStatCard className="bg-slate-900/50 border-emerald-500/10" />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Chart skeleton */}
+        <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+          <Skeleton className="h-5 w-36 mb-4" />
+          <Skeleton variant="rectangular" className="h-[200px] w-full" />
+        </div>
+
+        {/* Payout methods skeleton */}
+        <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+          <div className="p-5 border-b border-white/5 flex items-center justify-between">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-4 w-16" />
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="flex items-center gap-4">
+              <Skeleton variant="rectangular" className="h-12 w-12" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Skeleton variant="rectangular" className="h-12 w-12" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-3 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Transaction history skeleton */}
+        <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+          <div className="p-5 border-b border-white/5 flex items-center justify-between">
+            <Skeleton className="h-5 w-40" />
+            <Skeleton variant="rectangular" className="h-8 w-32" />
+          </div>
+          <div className="divide-y divide-white/5">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="p-4 flex items-center gap-4">
+                <Skeleton variant="rectangular" className="h-10 w-10" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-40" />
+                  <Skeleton className="h-3 w-24" />
+                </div>
+                <div className="space-y-2 text-right">
+                  <Skeleton className="h-4 w-16 ml-auto" />
+                  <Skeleton className="h-3 w-12 ml-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// ERROR STATE
+// ============================================
+
+function EarningsErrorState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center pb-24 lg:pb-8">
+      <div className="text-center max-w-md mx-auto px-4">
+        <div className="w-16 h-16 bg-red-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <AlertCircle className="w-8 h-8 text-red-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white mb-2">Failed to load earnings</h2>
+        <p className="text-slate-400 mb-6">
+          We could not retrieve your earnings data. Please check your connection and try again.
+        </p>
+        <button
+          onClick={onRetry}
+          className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-all"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// MAIN PAGE COMPONENT
+// ============================================
+
 export default function WorkEarningsPage() {
+  const [earnings, setEarnings] = useState<EarningsData | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [hasError, setHasError] = useState(false)
   const [selectedPeriod, setSelectedPeriod] = useState('this-month')
   const [showWithdrawModal, setShowWithdrawModal] = useState(false)
+  const [withdrawAmount, setWithdrawAmount] = useState('')
+  const [isWithdrawing, setIsWithdrawing] = useState(false)
+
+  const fetchEarnings = useCallback(async () => {
+    setIsLoading(true)
+    setHasError(false)
+
+    try {
+      const response = await fetch('/api/earnings')
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch earnings: ${response.status}`)
+      }
+
+      const result: EarningsApiResponse = await response.json()
+
+      if (!result.success) {
+        throw new Error('Earnings API returned unsuccessful response')
+      }
+
+      setEarnings(result.data)
+    } catch {
+      setHasError(true)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchEarnings()
+  }, [fetchEarnings])
+
+  const handleWithdraw = async () => {
+    const amount = parseFloat(withdrawAmount)
+
+    if (isNaN(amount) || amount <= 0) {
+      toast.error('Please enter a valid amount')
+      return
+    }
+
+    if (earnings && amount > earnings.availableBalance) {
+      toast.error('Amount exceeds available balance')
+      return
+    }
+
+    setIsWithdrawing(true)
+
+    try {
+      const response = await fetch('/api/payments/payout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount }),
+      })
+
+      if (!response.ok) {
+        const errorData: { error?: string } = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Withdrawal failed')
+      }
+
+      toast.success(`Withdrawal of $${amount.toLocaleString()} initiated successfully`)
+      setShowWithdrawModal(false)
+      setWithdrawAmount('')
+
+      // Refresh earnings to reflect the new balance
+      fetchEarnings()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Withdrawal failed. Please try again.'
+      toast.error(message)
+    } finally {
+      setIsWithdrawing(false)
+    }
+  }
+
+  // Show loading skeleton
+  if (isLoading) {
+    return <EarningsLoadingSkeleton />
+  }
+
+  // Show error state
+  if (hasError || !earnings) {
+    return <EarningsErrorState onRetry={fetchEarnings} />
+  }
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
@@ -108,7 +285,10 @@ export default function WorkEarningsPage() {
               <p className="text-slate-400 mt-1">Track your income and payouts</p>
             </div>
             <button
-              onClick={() => setShowWithdrawModal(true)}
+              onClick={() => {
+                setWithdrawAmount(earnings.availableBalance.toString())
+                setShowWithdrawModal(true)
+              }}
               className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/25"
             >
               <Download className="w-4 h-4" />
@@ -124,7 +304,7 @@ export default function WorkEarningsPage() {
                 <span className="text-sm font-medium">Available</span>
               </div>
               <div className="text-3xl font-bold text-white">
-                ${mockEarnings.available.toLocaleString()}
+                ${earnings.availableBalance.toLocaleString()}
               </div>
               <p className="text-xs text-slate-400 mt-1">Ready to withdraw</p>
             </div>
@@ -132,12 +312,12 @@ export default function WorkEarningsPage() {
             <div className="p-5 bg-slate-900 border border-white/5 rounded-2xl">
               <div className="flex items-center gap-2 text-amber-400 mb-2">
                 <Clock className="w-5 h-5" />
-                <span className="text-sm font-medium">Pending</span>
+                <span className="text-sm font-medium">Withdrawn</span>
               </div>
               <div className="text-3xl font-bold text-white">
-                ${mockEarnings.pending.toLocaleString()}
+                ${earnings.totalWithdrawn.toLocaleString()}
               </div>
-              <p className="text-xs text-slate-400 mt-1">Being processed</p>
+              <p className="text-xs text-slate-400 mt-1">Total payouts</p>
             </div>
 
             <div className="p-5 bg-slate-900 border border-white/5 rounded-2xl">
@@ -146,10 +326,10 @@ export default function WorkEarningsPage() {
                 <span className="text-sm font-medium">This Month</span>
               </div>
               <div className="text-3xl font-bold text-white">
-                ${mockEarnings.thisMonth.toLocaleString()}
+                ${earnings.thisMonthEarnings.toLocaleString()}
               </div>
               <div className="flex items-center gap-1 mt-1">
-                {mockEarnings.monthlyChange >= 0 ? (
+                {earnings.monthlyChange >= 0 ? (
                   <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
                 ) : (
                   <ArrowDownRight className="w-3.5 h-3.5 text-red-400" />
@@ -157,10 +337,10 @@ export default function WorkEarningsPage() {
                 <span
                   className={cn(
                     'text-xs',
-                    mockEarnings.monthlyChange >= 0 ? 'text-emerald-400' : 'text-red-400'
+                    earnings.monthlyChange >= 0 ? 'text-emerald-400' : 'text-red-400'
                   )}
                 >
-                  {Math.abs(mockEarnings.monthlyChange)}% vs last month
+                  {Math.abs(earnings.monthlyChange)}% vs last month
                 </span>
               </div>
             </div>
@@ -171,15 +351,51 @@ export default function WorkEarningsPage() {
                 <span className="text-sm font-medium">Total Earned</span>
               </div>
               <div className="text-3xl font-bold text-white">
-                ${mockEarnings.totalEarned.toLocaleString()}
+                ${earnings.totalEarned.toLocaleString()}
               </div>
               <p className="text-xs text-slate-400 mt-1">All time</p>
+            </div>
+          </div>
+
+          {/* Secondary Stats Row */}
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <div className="p-4 bg-slate-900 border border-white/5 rounded-2xl flex items-center gap-3">
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div>
+                <div className="text-lg font-bold text-white">{earnings.completedJobs}</div>
+                <div className="text-xs text-slate-400">Completed Jobs</div>
+              </div>
+            </div>
+            <div className="p-4 bg-slate-900 border border-white/5 rounded-2xl flex items-center gap-3">
+              <div className="w-10 h-10 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                <Star className="w-5 h-5 text-amber-400" />
+              </div>
+              <div>
+                <div className="text-lg font-bold text-white">
+                  {earnings.averageRating > 0 ? earnings.averageRating.toFixed(1) : 'N/A'}
+                </div>
+                <div className="text-xs text-slate-400">Average Rating</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
+        {/* Earnings Chart */}
+        {earnings.dailyEarnings.length > 0 && (
+          <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+            <div className="p-5 border-b border-white/5">
+              <h2 className="font-semibold text-white">Earnings Over Time</h2>
+            </div>
+            <div className="p-5">
+              <EarningsChart data={earnings.dailyEarnings} />
+            </div>
+          </div>
+        )}
+
         {/* Payout Methods */}
         <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
           <div className="p-5 border-b border-white/5 flex items-center justify-between">
@@ -187,7 +403,7 @@ export default function WorkEarningsPage() {
             <button className="text-sm text-emerald-400 hover:underline">+ Add New</button>
           </div>
           <div className="divide-y divide-white/5">
-            {mockPayoutMethods.map((method) => (
+            {payoutMethods.map((method) => (
               <div key={method.id} className="p-4 flex items-center gap-4">
                 <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center">
                   {method.type === 'bank' ? (
@@ -234,64 +450,75 @@ export default function WorkEarningsPage() {
             </div>
           </div>
 
-          <div className="divide-y divide-white/5">
-            {mockTransactions.map((tx) => (
-              <div key={tx.id} className="p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
-                <div
-                  className={cn(
-                    'w-10 h-10 rounded-xl flex items-center justify-center',
-                    tx.type === 'earning' ? 'bg-emerald-500/20' : 'bg-slate-800'
-                  )}
-                >
-                  {tx.type === 'earning' ? (
-                    <ArrowDownRight className="w-5 h-5 text-emerald-400" />
-                  ) : (
-                    <ArrowUpRight className="w-5 h-5 text-slate-400" />
-                  )}
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-white truncate">{tx.title}</div>
-                  <div className="text-sm text-slate-400">
-                    {tx.hirer ? `From ${tx.hirer}` : tx.date}
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div
-                    className={cn(
-                      'font-semibold',
-                      tx.amount > 0 ? 'text-emerald-400' : 'text-white'
-                    )}
-                  >
-                    {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toLocaleString()}
-                  </div>
-                  <div
-                    className={cn(
-                      'text-xs',
-                      tx.status === 'completed'
-                        ? 'text-slate-500'
-                        : tx.status === 'pending'
-                        ? 'text-amber-400'
-                        : 'text-blue-400'
-                    )}
-                  >
-                    {tx.status === 'completed'
-                      ? 'Completed'
-                      : tx.status === 'pending'
-                      ? 'Pending'
-                      : 'Processing'}
-                  </div>
-                </div>
+          {earnings.transactions.length === 0 ? (
+            <div className="p-12 text-center">
+              <div className="w-12 h-12 bg-slate-800 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <DollarSign className="w-6 h-6 text-slate-500" />
               </div>
-            ))}
-          </div>
+              <p className="text-slate-400 text-sm">No transactions yet</p>
+              <p className="text-slate-500 text-xs mt-1">
+                Complete jobs to start earning
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {earnings.transactions.map((tx) => {
+                const isEarning = tx.type === 'earning' || tx.amount > 0
+                return (
+                  <div key={tx.id} className="p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
+                    <div
+                      className={cn(
+                        'w-10 h-10 rounded-xl flex items-center justify-center',
+                        isEarning ? 'bg-emerald-500/20' : 'bg-slate-800'
+                      )}
+                    >
+                      {isEarning ? (
+                        <ArrowDownRight className="w-5 h-5 text-emerald-400" />
+                      ) : (
+                        <ArrowUpRight className="w-5 h-5 text-slate-400" />
+                      )}
+                    </div>
 
-          <div className="p-4 border-t border-white/5 text-center">
-            <button className="text-sm text-emerald-400 hover:underline">
-              View All Transactions
-            </button>
-          </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-white truncate">{tx.description}</div>
+                      <div className="text-sm text-slate-400">{tx.date}</div>
+                    </div>
+
+                    <div className="text-right">
+                      <div
+                        className={cn(
+                          'font-semibold',
+                          tx.amount > 0 ? 'text-emerald-400' : 'text-white'
+                        )}
+                      >
+                        {tx.amount > 0 ? '+' : ''}${Math.abs(tx.amount).toLocaleString()}
+                      </div>
+                      <div
+                        className={cn(
+                          'text-xs capitalize',
+                          tx.status === 'completed'
+                            ? 'text-slate-500'
+                            : tx.status === 'pending'
+                            ? 'text-amber-400'
+                            : 'text-blue-400'
+                        )}
+                      >
+                        {tx.status}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {earnings.transactions.length > 0 && (
+            <div className="p-4 border-t border-white/5 text-center">
+              <button className="text-sm text-emerald-400 hover:underline">
+                View All Transactions
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Tax Info */}
@@ -323,7 +550,9 @@ export default function WorkEarningsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowWithdrawModal(false)}
+            onClick={() => {
+              if (!isWithdrawing) setShowWithdrawModal(false)
+            }}
           />
           <div className="relative bg-slate-900 border border-white/10 rounded-2xl w-full max-w-md p-6">
             <h2 className="text-xl font-bold text-white mb-4">Withdraw Funds</h2>
@@ -331,7 +560,7 @@ export default function WorkEarningsPage() {
             <div className="p-4 bg-slate-800/50 rounded-xl mb-4">
               <div className="text-sm text-slate-400 mb-1">Available Balance</div>
               <div className="text-3xl font-bold text-emerald-400">
-                ${mockEarnings.available.toLocaleString()}
+                ${earnings.availableBalance.toLocaleString()}
               </div>
             </div>
 
@@ -342,16 +571,24 @@ export default function WorkEarningsPage() {
                 <input
                   type="number"
                   placeholder="0.00"
-                  defaultValue={mockEarnings.available}
-                  className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  min={0}
+                  max={earnings.availableBalance}
+                  step={0.01}
+                  disabled={isWithdrawing}
+                  className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50"
                 />
               </div>
             </div>
 
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-300 mb-2">Payout To</label>
-              <select className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
-                {mockPayoutMethods.map((method) => (
+              <select
+                disabled={isWithdrawing}
+                className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 disabled:opacity-50"
+              >
+                {payoutMethods.map((method) => (
                   <option key={method.id} value={method.id}>
                     {method.name} (****{method.last4})
                   </option>
@@ -362,18 +599,24 @@ export default function WorkEarningsPage() {
             <div className="flex gap-3">
               <button
                 onClick={() => setShowWithdrawModal(false)}
-                className="flex-1 px-4 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
+                disabled={isWithdrawing}
+                className="flex-1 px-4 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
-                onClick={() => {
-                  alert('Withdrawal initiated!')
-                  setShowWithdrawModal(false)
-                }}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors"
+                onClick={handleWithdraw}
+                disabled={isWithdrawing}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                Withdraw
+                {isWithdrawing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  'Withdraw'
+                )}
               </button>
             </div>
           </div>

@@ -1,14 +1,29 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import Link from 'next/link'
 import {
   User, Mail, Phone, MapPin, Camera, Edit, Shield,
   Star, CheckCircle2, Calendar, Briefcase, DollarSign,
   Settings, ChevronRight, BadgeCheck, Award, Clock,
-  Plus, Trash2, Image as ImageIcon
+  Plus, Trash2, Image as ImageIcon, Sparkles, Loader2, X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import toast from 'react-hot-toast'
+
+// ============================================
+// TYPES
+// ============================================
+
+interface AIProfileResponse {
+  headline: string
+  bio: string
+  suggestedSkillsToAdd: string[]
+}
+
+// ============================================
+// MOCK DATA
+// ============================================
 
 // Mock worker profile data
 const mockProfile = {
@@ -69,8 +84,73 @@ const mockProfile = {
   ],
 }
 
+// ============================================
+// COMPONENT
+// ============================================
+
 export default function WorkProfilePage() {
   const [isEditing, setIsEditing] = useState(false)
+  const [bio, setBio] = useState(mockProfile.bio)
+  const [skills, setSkills] = useState<string[]>(mockProfile.skills)
+
+  // AI Profile Writer state
+  const [isAILoading, setIsAILoading] = useState(false)
+  const [aiResult, setAIResult] = useState<AIProfileResponse | null>(null)
+  const [aiEditedHeadline, setAIEditedHeadline] = useState('')
+  const [aiEditedBio, setAIEditedBio] = useState('')
+  const [showAIPreview, setShowAIPreview] = useState(false)
+
+  const handleAIWriteBio = useCallback(async () => {
+    setIsAILoading(true)
+    setShowAIPreview(false)
+    setAIResult(null)
+
+    try {
+      const response = await fetch('/api/ai/profile-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to generate profile' }))
+        throw new Error(errorData.error || 'Failed to generate profile')
+      }
+
+      const data: AIProfileResponse = await response.json()
+      setAIResult(data)
+      setAIEditedHeadline(data.headline)
+      setAIEditedBio(data.bio)
+      setShowAIPreview(true)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      toast.error(message)
+    } finally {
+      setIsAILoading(false)
+    }
+  }, [])
+
+  const handleAcceptAI = useCallback(() => {
+    setBio(aiEditedBio)
+    setShowAIPreview(false)
+    setAIResult(null)
+    toast.success('Bio updated with AI-generated content')
+  }, [aiEditedBio])
+
+  const handleDismissAI = useCallback(() => {
+    setShowAIPreview(false)
+    setAIResult(null)
+    setAIEditedHeadline('')
+    setAIEditedBio('')
+  }, [])
+
+  const handleAddSuggestedSkill = useCallback((skill: string) => {
+    setSkills((prev) => {
+      if (prev.includes(skill)) return prev
+      return [...prev, skill]
+    })
+    toast.success(`Added "${skill}" to your skills`)
+  }, [])
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
@@ -182,8 +262,150 @@ export default function WorkProfilePage() {
 
         {/* Bio */}
         <div className="bg-slate-900 rounded-xl border border-white/5 p-5">
-          <h2 className="font-semibold text-white mb-3">About Me</h2>
-          <p className="text-slate-300">{mockProfile.bio}</p>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-white">About Me</h2>
+            <button
+              onClick={handleAIWriteBio}
+              disabled={isAILoading}
+              className={cn(
+                'flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-all',
+                'bg-gradient-to-r from-emerald-500 to-teal-500 text-white',
+                'hover:from-emerald-400 hover:to-teal-400',
+                'disabled:opacity-50 disabled:cursor-not-allowed',
+                'shadow-lg shadow-emerald-500/20'
+              )}
+            >
+              {isAILoading ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Sparkles className="w-4 h-4" />
+              )}
+              {isAILoading ? 'Writing...' : 'AI Write Bio'}
+            </button>
+          </div>
+
+          {/* AI Loading Skeleton */}
+          {isAILoading && (
+            <div className="space-y-3 mb-4">
+              <div className="h-4 bg-slate-800 rounded-lg animate-pulse w-3/4" />
+              <div className="h-4 bg-slate-800 rounded-lg animate-pulse w-full" />
+              <div className="h-4 bg-slate-800 rounded-lg animate-pulse w-5/6" />
+              <div className="h-4 bg-slate-800 rounded-lg animate-pulse w-2/3" />
+            </div>
+          )}
+
+          {/* AI Preview Section */}
+          {showAIPreview && aiResult && (
+            <div className="bg-slate-800/50 border border-emerald-500/20 rounded-xl p-4 mb-4">
+              {/* AI Generated Label */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xs font-medium text-emerald-400 uppercase tracking-wider">
+                    AI Generated
+                  </span>
+                </div>
+                <button
+                  onClick={handleDismissAI}
+                  className="p-1 rounded-lg hover:bg-slate-700/50 text-slate-400 hover:text-white transition-colors"
+                  aria-label="Dismiss AI suggestion"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Editable Headline */}
+              <div className="mb-3">
+                <label className="block text-xs text-slate-400 mb-1.5">Headline</label>
+                <input
+                  type="text"
+                  value={aiEditedHeadline}
+                  onChange={(e) => setAIEditedHeadline(e.target.value)}
+                  className={cn(
+                    'w-full px-3 py-2 bg-slate-900/70 border border-white/10 rounded-lg',
+                    'text-white text-sm font-medium placeholder-slate-500',
+                    'focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30',
+                    'transition-colors'
+                  )}
+                />
+              </div>
+
+              {/* Editable Bio */}
+              <div className="mb-4">
+                <label className="block text-xs text-slate-400 mb-1.5">Bio</label>
+                <textarea
+                  value={aiEditedBio}
+                  onChange={(e) => setAIEditedBio(e.target.value)}
+                  rows={4}
+                  className={cn(
+                    'w-full px-3 py-2 bg-slate-900/70 border border-white/10 rounded-lg',
+                    'text-slate-300 text-sm placeholder-slate-500 resize-none',
+                    'focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30',
+                    'transition-colors'
+                  )}
+                />
+              </div>
+
+              {/* Suggested Skills */}
+              {aiResult.suggestedSkillsToAdd.length > 0 && (
+                <div className="mb-4">
+                  <label className="block text-xs text-slate-400 mb-2">Suggested skills to add</label>
+                  <div className="flex flex-wrap gap-2">
+                    {aiResult.suggestedSkillsToAdd.map((skill) => {
+                      const alreadyAdded = skills.includes(skill)
+                      return (
+                        <button
+                          key={skill}
+                          onClick={() => handleAddSuggestedSkill(skill)}
+                          disabled={alreadyAdded}
+                          className={cn(
+                            'flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-all',
+                            alreadyAdded
+                              ? 'bg-emerald-500/10 text-emerald-400/50 border border-emerald-500/10 cursor-default'
+                              : 'bg-slate-900/70 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/10 hover:border-emerald-500/40'
+                          )}
+                        >
+                          {alreadyAdded ? (
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                          ) : (
+                            <Plus className="w-3.5 h-3.5" />
+                          )}
+                          {skill}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3 pt-2 border-t border-white/5">
+                <button
+                  onClick={handleAcceptAI}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all',
+                    'bg-gradient-to-r from-emerald-500 to-teal-500 text-white',
+                    'hover:from-emerald-400 hover:to-teal-400',
+                    'shadow-lg shadow-emerald-500/20'
+                  )}
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  Accept Bio
+                </button>
+                <button
+                  onClick={handleDismissAI}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg text-slate-400 hover:text-white hover:bg-slate-700/50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Current Bio Text */}
+          {!isAILoading && (
+            <p className="text-slate-300">{bio}</p>
+          )}
         </div>
 
         {/* Skills */}
@@ -193,7 +415,7 @@ export default function WorkProfilePage() {
             <button className="text-sm text-emerald-400 hover:underline">+ Add Skill</button>
           </div>
           <div className="flex flex-wrap gap-2">
-            {mockProfile.skills.map((skill) => (
+            {skills.map((skill) => (
               <span
                 key={skill}
                 className="px-3 py-1.5 bg-slate-800 text-slate-300 text-sm rounded-lg"
