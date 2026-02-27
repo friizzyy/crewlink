@@ -8,16 +8,38 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
 
-    setIsSubmitted(true)
-    setIsLoading(false)
+      const data = await res.json()
+
+      if (!res.ok && res.status !== 429) {
+        setError(data.error || 'Something went wrong')
+        return
+      }
+
+      if (res.status === 429) {
+        setError('Too many requests. Please wait a moment and try again.')
+        return
+      }
+
+      setIsSubmitted(true)
+    } catch {
+      setError('Network error. Please check your connection and try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -55,6 +77,11 @@ export default function ForgotPasswordPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
+                    {error}
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-slate-300 mb-2">Email address</label>
                   <div className="relative">

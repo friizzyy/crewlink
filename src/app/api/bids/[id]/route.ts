@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { sendBidAcceptedEmail } from '@/lib/email'
 
 // GET /api/bids/[id] - Get a single bid
 export async function GET(
@@ -104,6 +105,7 @@ export async function POST(
           select: {
             id: true,
             name: true,
+            email: true,
           },
         },
       },
@@ -190,6 +192,18 @@ export async function POST(
           actionUrl: `/work/job/${bid.jobId}`,
         },
       })
+
+      // Send bid accepted email (non-blocking)
+      if (bid.worker.email) {
+        sendBidAcceptedEmail(
+          bid.worker.email,
+          bid.worker.name || 'Worker',
+          bid.job.title,
+          bid.jobId
+        ).catch((err) => {
+          console.error('Failed to send bid accepted email:', err)
+        })
+      }
 
       // Create or get conversation between hirer and worker
       let conversation = await prisma.messageThread.findFirst({

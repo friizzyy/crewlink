@@ -56,6 +56,7 @@ export default function HelpContactPage() {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState('')
 
   const heroRef = useScrollReveal<HTMLDivElement>()
   const optionsRef = useScrollReveal<HTMLDivElement>()
@@ -64,12 +65,28 @@ export default function HelpContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
 
-    setIsSubmitted(true)
-    setIsLoading(false)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to send message')
+        return
+      }
+
+      setIsSubmitted(true)
+    } catch {
+      setError('Network error. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -143,6 +160,11 @@ export default function HelpContactPage() {
 
             {!isSubmitted ? (
               <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="grid sm:grid-cols-2 gap-6">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">

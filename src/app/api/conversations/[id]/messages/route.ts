@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
+import { sanitizeHtml } from '@/lib/sanitize'
+import { rateLimit, getRateLimitKey } from '@/lib/rate-limit'
 
 const messageSchema = z.object({
   content: z.string().min(1, 'Message cannot be empty').max(5000, 'Message too long'),
@@ -113,6 +115,18 @@ export async function POST(
       )
     }
 
+    // Rate limit: 30 messages per minute per user
+    const { success: allowed } = rateLimit(
+      getRateLimitKey(session.user.id, 'messages/send'),
+      { windowMs: 60_000, maxRequests: 30 }
+    )
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many messages. Please slow down.' },
+        { status: 429 }
+      )
+    }
+
     // Check if user is participant
     const conversation = await prisma.messageThread.findUnique({
       where: { id: params.id },
@@ -151,13 +165,14 @@ export async function POST(
     }
 
     const { content, messageType, metadata } = validation.data
+    const sanitizedContent = sanitizeHtml(content)
 
     // Create message
     const message = await prisma.message.create({
       data: {
         threadId: params.id,
         senderId: session.user.id,
-        content,
+        content: sanitizedContent,
         messageType: messageType || 'text',
         metadata: metadata ? JSON.parse(JSON.stringify(metadata)) : undefined,
       },
@@ -178,7 +193,7 @@ export async function POST(
       where: { id: params.id },
       data: {
         lastMessageAt: new Date(),
-        lastMessagePreview: content.substring(0, 100),
+        lastMessagePreview: sanitizedContent.substring(0, 100),
       },
     })
 
@@ -202,7 +217,7 @@ export async function POST(
           userId: participant.userId,
           type: 'new_message',
           title: 'New Message',
-          body: `${session.user.name || 'Someone'}: ${content.substring(0, 50)}${content.length > 50 ? '...' : ''}`,
+          body: `${session.user.name || 'Someone'}: ${sanitizedContent.substring(0, 50)}${sanitizedContent.length > 50 ? '...' : ''}`,
           data: { conversationId: params.id, messageId: message.id },
           actionUrl: `/messages/${params.id}`,
         },

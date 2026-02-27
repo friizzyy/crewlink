@@ -41,9 +41,11 @@ export default function PostJobPage() {
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
 
     if (!formData.title || !formData.category || !formData.description) {
       toast.error('Please fill in all required fields')
@@ -52,11 +54,37 @@ export default function PostJobPage() {
 
     setIsSubmitting(true)
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const res = await fetch('/api/jobs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: formData.title,
+          category: formData.category,
+          description: formData.description,
+          address: formData.location || undefined,
+          urgency: formData.urgency || undefined,
+          budgetMin: formData.budgetMin ? parseFloat(formData.budgetMin) : undefined,
+          budgetMax: formData.budgetMax ? parseFloat(formData.budgetMax) : undefined,
+        }),
+      })
 
-    toast.success('Job posted successfully!')
-    router.push('/hiring/jobs')
+      const data = await res.json()
+
+      if (!res.ok) {
+        setError(data.error || 'Failed to post job')
+        toast.error(data.error || 'Failed to post job')
+        return
+      }
+
+      toast.success('Job posted successfully!')
+      router.push('/hiring/jobs')
+    } catch {
+      setError('Network error. Please try again.')
+      toast.error('Network error. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const updateField = (field: string, value: string) => {

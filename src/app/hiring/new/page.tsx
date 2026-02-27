@@ -6,7 +6,7 @@ import Link from 'next/link'
 import {
   ArrowLeft, ArrowRight, MapPin, Calendar, Clock, DollarSign,
   Sparkles, CheckCircle2, AlertCircle, Loader2, X, Plus,
-  Zap, Shield, ChevronDown, Camera, FileText, Wand2
+  Zap, Shield, ChevronDown, Camera, FileText
 } from 'lucide-react'
 import { AddressAutocomplete, type AddressResult } from '@/components/ui/AddressAutocomplete'
 
@@ -32,7 +32,7 @@ export default function NewJobPage() {
   const router = useRouter()
   const [step, setStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [aiSuggesting, setAiSuggesting] = useState(false)
+
   const [mounted, setMounted] = useState(false)
 
   const [formData, setFormData] = useState({
@@ -63,35 +63,17 @@ export default function NewJobPage() {
 
   const handleCategorySelect = (categoryId: string) => {
     setFormData(prev => ({ ...prev, category: categoryId }))
-    // Simulate AI suggestions based on category
-    setTimeout(() => {
-      const suggestions: Record<string, any> = {
-        cleaning: { title: 'House Cleaning', description: 'I need help with cleaning my home including vacuuming, mopping, and bathroom cleaning.', budget: { min: 80, max: 150 } },
-        moving: { title: 'Moving Help', description: 'Need help moving furniture and boxes. Will need to lift heavy items.', budget: { min: 100, max: 250 } },
-        handyman: { title: 'Home Repairs', description: 'Looking for someone to help with general repairs around the house.', budget: { min: 60, max: 120 } },
-        assembly: { title: 'Furniture Assembly', description: 'Need help assembling furniture from IKEA or similar.', budget: { min: 50, max: 100 } },
-      }
-      if (suggestions[categoryId]) {
-        setAiSuggestions(suggestions[categoryId])
-      }
-    }, 500)
+    // Show template suggestions based on category
+    const templates: Record<string, { title?: string; description?: string; budget?: { min: number; max: number } }> = {
+      cleaning: { title: 'House Cleaning', description: 'I need help with cleaning my home including vacuuming, mopping, and bathroom cleaning.', budget: { min: 80, max: 150 } },
+      moving: { title: 'Moving Help', description: 'Need help moving furniture and boxes. Will need to lift heavy items.', budget: { min: 100, max: 250 } },
+      handyman: { title: 'Home Repairs', description: 'Looking for someone to help with general repairs around the house.', budget: { min: 60, max: 120 } },
+      assembly: { title: 'Furniture Assembly', description: 'Need help assembling furniture from IKEA or similar.', budget: { min: 50, max: 100 } },
+    }
+    if (templates[categoryId]) {
+      setAiSuggestions(templates[categoryId])
+    }
     setStep(2)
-  }
-
-  const handleAiEnhance = () => {
-    if (!formData.description) return
-    setAiSuggesting(true)
-    setTimeout(() => {
-      // Simulate AI enhancement
-      const enhanced = formData.description
-        .replace(/clean/gi, 'thoroughly clean')
-        .replace(/help/gi, 'professional assistance')
-      setFormData(prev => ({
-        ...prev,
-        description: enhanced + '\n\nAdditional details: Please bring all necessary supplies. Access to water and electricity available.'
-      }))
-      setAiSuggesting(false)
-    }, 1500)
   }
 
   const applySuggestion = (field: 'title' | 'description') => {
@@ -283,7 +265,7 @@ export default function NewJobPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 text-cyan-400 text-xs font-medium rounded-lg hover:bg-cyan-500/20 transition-colors"
                     >
                       <Sparkles className="w-3.5 h-3.5" />
-                      Suggestion
+                      Template
                     </button>
                   )}
                 </div>
@@ -293,18 +275,6 @@ export default function NewJobPage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium text-slate-300">Description</label>
-                  <button
-                    onClick={handleAiEnhance}
-                    disabled={aiSuggesting || !formData.description}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-medium rounded-lg hover:from-cyan-500/20 hover:to-blue-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {aiSuggesting ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Wand2 className="w-3.5 h-3.5" />
-                    )}
-                    AI Enhance
-                  </button>
                 </div>
                 <textarea
                   value={formData.description}
@@ -319,7 +289,7 @@ export default function NewJobPage() {
                     className="mt-2 flex items-center gap-1.5 px-3 py-1.5 bg-cyan-500/10 text-cyan-400 text-xs font-medium rounded-lg hover:bg-cyan-500/20 transition-colors"
                   >
                     <Sparkles className="w-3.5 h-3.5" />
-                    Use AI suggestion
+                    Use template
                   </button>
                 )}
               </div>
@@ -469,7 +439,7 @@ export default function NewJobPage() {
                       <Sparkles className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
                       <div>
                         <p className="text-sm text-white font-medium">Suggested budget: ${aiSuggestions.budget.min} - ${aiSuggestions.budget.max}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">Based on similar jobs in your area</p>
+                        <p className="text-xs text-slate-400 mt-0.5">Based on typical rates for this category</p>
                         <button
                           onClick={() => setFormData(prev => ({
                             ...prev,

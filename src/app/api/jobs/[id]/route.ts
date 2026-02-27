@@ -71,10 +71,29 @@ export async function GET(
       data: { viewCount: { increment: 1 } },
     })
 
+    // Filter bids based on who is requesting
+    const session = await getServerSession(authOptions)
+    let filteredBids = job.bids
+    if (session?.user?.id) {
+      if (job.poster.id === session.user.id) {
+        // Job owner sees all bids
+        filteredBids = job.bids
+      } else {
+        // Workers only see their own bid
+        filteredBids = job.bids.filter(
+          (bid) => bid.worker.id === session.user.id
+        )
+      }
+    } else {
+      // Unauthenticated users see no bids
+      filteredBids = []
+    }
+
     return NextResponse.json({
       success: true,
       data: {
         ...job,
+        bids: filteredBids,
         bidCount: job._count.bids,
       },
     })

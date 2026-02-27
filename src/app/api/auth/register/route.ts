@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { hashPassword } from '@/lib/auth'
 import { z } from 'zod'
+import { rateLimit, getRateLimitKey } from '@/lib/rate-limit'
+import { sendWelcomeEmail } from '@/lib/email'
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -12,6 +14,19 @@ const registerSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 5 registrations per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { success: allowed } = rateLimit(
+      getRateLimitKey(ip, 'auth/register'),
+      { windowMs: 60_000, maxRequests: 5 }
+    )
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
+      )
+    }
+
     const body = await request.json()
 
     // Validate input
@@ -59,6 +74,11 @@ export async function POST(request: NextRequest) {
         role: true,
         createdAt: true,
       },
+    })
+
+    // Send welcome email (non-blocking — don't fail registration if email fails)
+    sendWelcomeEmail(user.email, user.name || '').catch((err) => {
+      console.error('Failed to send welcome email:', err)
     })
 
     return NextResponse.json(

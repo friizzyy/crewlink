@@ -117,26 +117,40 @@ export function UserRoleProvider({ children }: UserRoleProviderProps) {
   // Check if user has selected a role
   const isRoleSelected = role !== null
 
+  // Persist role to server (non-blocking — localStorage is primary for speed)
+  const persistRoleToServer = useCallback((newRole: UserRole) => {
+    const dbRole = newRole === 'HIRER' ? 'hirer' : 'worker'
+    fetch('/api/auth/set-role', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ role: dbRole }),
+    }).catch((err) => {
+      console.error('Failed to persist role to server:', err)
+    })
+  }, [])
+
   // Set role and persist
   const setRole = useCallback((newRole: UserRole) => {
     setRoleState(newRole)
     setStorageItem(ROLE_STORAGE_KEY, newRole)
+    persistRoleToServer(newRole)
 
     // Navigate to the appropriate home after role selection
     const homeRoute = newRole === 'HIRER' ? '/hiring/map' : '/work/map'
     router.push(homeRoute)
-  }, [router])
+  }, [router, persistRoleToServer])
 
   // Switch to the other role
   const switchRole = useCallback(() => {
     const newRole = role === 'HIRER' ? 'WORKER' : 'HIRER'
     setRoleState(newRole)
     setStorageItem(ROLE_STORAGE_KEY, newRole)
+    persistRoleToServer(newRole)
 
     // Navigate to the new role's home
     const homeRoute = newRole === 'HIRER' ? '/hiring/map' : '/work/map'
     router.push(homeRoute)
-  }, [role, router])
+  }, [role, router, persistRoleToServer])
 
   // Clear role (for logout or role reset)
   const clearRole = useCallback(() => {

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { z } from 'zod'
+import { rateLimit, getRateLimitKey } from '@/lib/rate-limit'
 
 const bidSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
@@ -94,6 +95,19 @@ export async function POST(
       return NextResponse.json(
         { success: false, error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    // Rate limit: 10 bids per minute per user
+    const ip = request.headers.get('x-forwarded-for') || 'unknown'
+    const { success: allowed } = rateLimit(
+      getRateLimitKey(session.user.id, 'bids/create'),
+      { windowMs: 60_000, maxRequests: 10 }
+    )
+    if (!allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please try again later.' },
+        { status: 429 }
       )
     }
 

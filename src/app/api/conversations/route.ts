@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 // GET /api/conversations - Get user's conversations
 export async function GET(request: NextRequest) {
@@ -104,6 +105,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (participantId === session.user.id) {
+      return NextResponse.json(
+        { success: false, error: 'Cannot create a conversation with yourself' },
+        { status: 400 }
+      )
+    }
+
     // Check if conversation already exists
     const existingConversation = await prisma.messageThread.findFirst({
       where: {
@@ -150,11 +158,12 @@ export async function POST(request: NextRequest) {
 
     // Add initial message if provided
     if (initialMessage) {
+      const sanitizedMessage = sanitizeHtml(initialMessage)
       await prisma.message.create({
         data: {
           threadId: conversation.id,
           senderId: session.user.id,
-          content: initialMessage,
+          content: sanitizedMessage,
         },
       })
 
@@ -162,7 +171,7 @@ export async function POST(request: NextRequest) {
         where: { id: conversation.id },
         data: {
           lastMessageAt: new Date(),
-          lastMessagePreview: initialMessage.substring(0, 100),
+          lastMessagePreview: sanitizedMessage.substring(0, 100),
         },
       })
 

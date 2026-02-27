@@ -88,9 +88,9 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'crewlink-auth',
       partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
-      // Auto-initialize mock user on hydration if not already set
+      // Auto-initialize mock user on hydration — development only
       onRehydrateStorage: () => (state) => {
-        if (state && !state.user) {
+        if (process.env.NODE_ENV === 'development' && state && !state.user) {
           state.user = MOCK_USER
           state.isAuthenticated = true
         }

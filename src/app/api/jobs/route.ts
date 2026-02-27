@@ -168,6 +168,21 @@ const createJobSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    if (session.user.role !== 'hirer') {
+      return NextResponse.json(
+        { success: false, error: 'Only hirers can create jobs' },
+        { status: 403 }
+      )
+    }
+
     const body = await request.json()
 
     // Validate input
@@ -184,31 +199,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = validation.data
-
-    // Get poster ID from session or create demo user
-    let posterId: string
-
-    if (session?.user?.id) {
-      posterId = session.user.id
-    } else {
-      // For demo purposes, create or find demo user
-      let demoUser = await prisma.user.findFirst({
-        where: { email: 'demo@crewlink.app' },
-      })
-
-      if (!demoUser) {
-        demoUser = await prisma.user.create({
-          data: {
-            email: 'demo@crewlink.app',
-            name: 'Demo User',
-            role: 'hirer',
-            hirerProfile: { create: {} },
-          },
-        })
-      }
-
-      posterId = demoUser.id
-    }
+    const posterId = session.user.id
 
     // Map urgency to schedule type
     const scheduleTypeMap: Record<string, string> = {

@@ -36,15 +36,68 @@ export default function CreateAccountPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [error, setError] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError('')
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters')
+      setIsLoading(false)
+      return
+    }
 
-    router.push(userType === 'work' ? '/work/map' : '/hiring/map')
+    // Map 'both' to 'hirer' as default starting role
+    const role = userType === 'work' ? 'worker' : 'hirer'
+
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          name: `${formData.firstName} ${formData.lastName}`.trim(),
+          role,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        if (res.status === 429) {
+          setError('Too many attempts. Please wait a moment and try again.')
+        } else {
+          setError(data.error || 'Failed to create account')
+        }
+        return
+      }
+
+      toast.success('Account created! Signing you in...')
+
+      // Sign in with the new credentials
+      const { signIn } = await import('next-auth/react')
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (signInResult?.error) {
+        // Account created but auto-sign-in failed — redirect to sign-in
+        toast.info('Account created. Please sign in.')
+        router.push('/sign-in')
+        return
+      }
+
+      router.push(userType === 'work' ? '/work/map' : '/hiring/map')
+    } catch {
+      setError('Network error. Please check your connection and try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // Get color scheme based on user type selection
@@ -226,6 +279,11 @@ export default function CreateAccountPage() {
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
+                {error && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm">
+                    {error}
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-4">
                   {/* First Name */}
                   <div className="animate-slide-up" style={{ animationDelay: '50ms' }}>

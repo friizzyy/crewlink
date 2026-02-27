@@ -46,6 +46,7 @@ function ApplicationFormContent() {
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [touched, setTouched] = useState<Record<string, boolean>>({})
 
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
@@ -133,28 +134,33 @@ function ApplicationFormContent() {
     }
 
     setIsSubmitting(true)
-
-    // Simulate submission delay (in real app, this would be an API call)
-    await new Promise(resolve => setTimeout(resolve, 1500))
-
-    // Store submission in localStorage for demo purposes
-    const submission = {
-      ...formData,
-      role: role?.title || 'General Application',
-      roleSlug: roleSlug || 'general',
-      submittedAt: new Date().toISOString(),
-    }
+    setSubmitError('')
 
     try {
-      const existingSubmissions = JSON.parse(localStorage.getItem('crewlink:applications') || '[]')
-      existingSubmissions.push(submission)
-      localStorage.setItem('crewlink:applications', JSON.stringify(existingSubmissions))
-    } catch (err) {
-      console.error('Failed to save application locally:', err)
-    }
+      const res = await fetch('/api/careers/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          role: role?.title || 'General Application',
+          roleSlug: roleSlug || 'general',
+        }),
+      })
 
-    // Navigate to success page
-    router.push(`/careers/apply/success?role=${roleSlug || 'general'}&name=${encodeURIComponent(formData.name)}`)
+      const data = await res.json()
+
+      if (!res.ok) {
+        setSubmitError(data.error || 'Failed to submit application')
+        setIsSubmitting(false)
+        return
+      }
+
+      // Navigate to success page
+      router.push(`/careers/apply/success?role=${roleSlug || 'general'}&name=${encodeURIComponent(formData.name)}`)
+    } catch {
+      setSubmitError('Network error. Please try again.')
+      setIsSubmitting(false)
+    }
   }
 
   // Build mailto fallback link
@@ -371,6 +377,12 @@ Best regards`
 
           {/* Submit */}
           <div className="pt-4 space-y-4">
+            {submitError && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-300 text-sm flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                {submitError}
+              </div>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}
