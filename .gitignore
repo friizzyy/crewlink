@@ -45,3 +45,6 @@ prisma/*.db-journal
 # Local files
 *.local
 *.log
+
+# Git worktrees
+.worktrees/
