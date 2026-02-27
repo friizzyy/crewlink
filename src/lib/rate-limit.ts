@@ -33,7 +33,7 @@ export function getRateLimitKey(ip: string, route: string): string {
 if (typeof setInterval !== 'undefined') {
   setInterval(() => {
     const now = Date.now()
-    for (const [key, entry] of rateLimitMap.entries()) {
+    for (const [key, entry] of Array.from(rateLimitMap.entries())) {
       if (now > entry.resetTime) {
         rateLimitMap.delete(key)
       }
