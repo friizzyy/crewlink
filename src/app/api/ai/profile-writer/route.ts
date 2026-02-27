@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, profileWriter } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
@@ -41,39 +41,20 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
     );
   }
 
-  const recentReviews = await prisma.review.findMany({
-    where: {
-      subjectId: session.user.id,
-      isPublic: true,
-    },
-    select: {
-      rating: true,
-      content: true,
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 5,
-  });
-
-  const prompt = AI_PROMPTS.profileWriter({
-    name: workerProfile.user.name,
+  const prompt = profileWriter({
+    name: workerProfile.user.name ?? 'Worker',
     skills: workerProfile.skills,
-    hourlyRate: workerProfile.hourlyRate,
+    experience: workerProfile.bio ?? undefined,
     completedJobs: workerProfile.completedJobs,
-    averageRating: workerProfile.averageRating,
-    currentHeadline: workerProfile.headline,
-    currentBio: workerProfile.bio,
-    recentReviews: recentReviews.map((r) => ({
-      rating: r.rating,
-      content: r.content,
-    })),
+    averageRating: workerProfile.averageRating ?? 0,
   });
 
-  const { data, cached } = await callAIJSON<ProfileWriterResponse>(prompt, {
-    feature: 'profile-writer',
-    userId: session.user.id,
-    temperature: 0.7,
-    maxTokens: 800,
-  });
+  const { data, cached } = await callAIJSON<ProfileWriterResponse>(
+    session.user.id,
+    'profile-writer',
+    prompt,
+    { temperature: 0.7, maxTokens: 800 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

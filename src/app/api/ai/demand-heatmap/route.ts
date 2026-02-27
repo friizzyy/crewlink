@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, demandHeatmap } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -79,29 +79,26 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
   const aggregatedData = Array.from(categoryStats.entries()).map(
     ([category, stats]) => ({
       category,
-      jobCount: stats.count,
-      avgBudget:
+      budgetAvg:
         stats.budgetEntries > 0
           ? Math.round(stats.totalBudget / stats.budgetEntries)
           : 0,
+      count: stats.count,
     })
   );
 
-  const prompt = AI_PROMPTS.demandHeatmap({
-    location,
-    categoryData: aggregatedData,
-    totalJobs: recentJobs.length,
-    periodDays: 30,
+  const prompt = demandHeatmap({
+    city: location,
+    recentJobs: aggregatedData,
+    timeframe: 'last 30 days',
   });
 
-  const { data, cached } = await callAIJSON<DemandHeatmapResponse>(prompt, {
-    feature: 'demand-heatmap',
-    userId: session.user.id,
-    cacheKey: { location, date: new Date().toISOString().slice(0, 10) },
-    cacheTTLHours: 6,
-    temperature: 0.4,
-    maxTokens: 1000,
-  });
+  const { data, cached } = await callAIJSON<DemandHeatmapResponse>(
+    session.user.id,
+    'demand-heatmap',
+    prompt,
+    { cacheTTLHours: 6, temperature: 0.4, maxTokens: 1000 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

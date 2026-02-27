@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, searchParse } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -30,16 +30,21 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { query } = parsed.data;
 
-  const prompt = AI_PROMPTS.search({ query });
-
-  const { data, cached } = await callAIJSON<SearchParseResponse>(prompt, {
-    feature: 'search',
-    userId: session.user.id,
-    cacheKey: { query: query.toLowerCase().trim() },
-    cacheTTLHours: 24,
-    temperature: 0.2,
-    maxTokens: 500,
+  const prompt = searchParse({
+    query,
+    availableCategories: [
+      'cleaning', 'moving', 'handyman', 'yard-work', 'painting',
+      'plumbing', 'electrical', 'assembly', 'delivery', 'pet-care',
+    ],
+    availableCities: [],
   });
+
+  const { data, cached } = await callAIJSON<SearchParseResponse>(
+    session.user.id,
+    'search',
+    prompt,
+    { cacheTTLHours: 24, temperature: 0.2, maxTokens: 500 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

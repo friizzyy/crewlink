@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, generateDescription } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -36,16 +36,18 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { category, briefDescription, location } = parsed.data;
 
-  const prompt = AI_PROMPTS.generateDescription({ category, briefDescription, location });
-
-  const { data, cached } = await callAIJSON<GeneratedDescription>(prompt, {
-    feature: 'generate-description',
-    userId: session.user.id,
-    cacheKey: { category, briefDescription, location },
-    cacheTTLHours: 1,
-    temperature: 0.7,
-    maxTokens: 1000,
+  const prompt = generateDescription({
+    title: briefDescription,
+    category,
+    notes: `Location: ${location}`,
   });
+
+  const { data, cached } = await callAIJSON<GeneratedDescription>(
+    session.user.id,
+    'generate-description',
+    prompt,
+    { cacheTTLHours: 1, temperature: 0.7, maxTokens: 1000 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

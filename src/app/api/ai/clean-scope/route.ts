@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, cleanScope } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -34,16 +34,14 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { description, category } = parsed.data;
 
-  const prompt = AI_PROMPTS.cleanScope({ description, category });
+  const prompt = cleanScope({ rawScope: description, category });
 
-  const { data, cached } = await callAIJSON<CleanScopeResponse>(prompt, {
-    feature: 'clean-scope',
-    userId: session.user.id,
-    cacheKey: { description, category },
-    cacheTTLHours: 12,
-    temperature: 0.4,
-    maxTokens: 1500,
-  });
+  const { data, cached } = await callAIJSON<CleanScopeResponse>(
+    session.user.id,
+    'clean-scope',
+    prompt,
+    { cacheTTLHours: 12, temperature: 0.4, maxTokens: 1500 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

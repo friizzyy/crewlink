@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, onboardingTips } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -27,20 +27,19 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { currentStep, profileCompleteness } = parsed.data;
 
-  const prompt = AI_PROMPTS.onboardingTips({
-    currentStep,
+  const prompt = onboardingTips({
+    role: session.user.role as 'hirer' | 'worker',
     profileCompleteness,
-    userRole: session.user.role,
+    completedSteps: [currentStep],
+    missingSteps: [],
   });
 
-  const { data, cached } = await callAIJSON<OnboardingTipsResponse>(prompt, {
-    feature: 'onboarding-tips',
-    userId: session.user.id,
-    cacheKey: { currentStep, profileCompleteness, role: session.user.role },
-    cacheTTLHours: 24,
-    temperature: 0.7,
-    maxTokens: 400,
-  });
+  const { data, cached } = await callAIJSON<OnboardingTipsResponse>(
+    session.user.id,
+    'onboarding-tips',
+    prompt,
+    { cacheTTLHours: 24, temperature: 0.7, maxTokens: 400 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

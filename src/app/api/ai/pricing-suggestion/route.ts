@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, pricingSuggestion } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,16 +29,14 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { category, location, description } = parsed.data;
 
-  const prompt = AI_PROMPTS.pricingSuggestion({ category, location, description });
+  const prompt = pricingSuggestion({ category, city: location, description });
 
-  const { data, cached, tokensUsed } = await callAIJSON<PricingSuggestion>(prompt, {
-    feature: 'pricing-suggestion',
-    userId: session.user.id,
-    cacheKey: { category, location, description },
-    cacheTTLHours: 24,
-    temperature: 0.3,
-    maxTokens: 500,
-  });
+  const { data, cached } = await callAIJSON<PricingSuggestion>(
+    session.user.id,
+    'pricing-suggestion',
+    prompt,
+    { cacheTTLHours: 24, temperature: 0.3, maxTokens: 500 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

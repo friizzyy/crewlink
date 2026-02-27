@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, matchJobs } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { NextRequest, NextResponse } from 'next/server';
@@ -91,47 +91,27 @@ export const GET = withAIAuth(async (request: NextRequest, session) => {
     });
   }
 
-  const prompt = AI_PROMPTS.matchJobs({
-    workerProfile: {
-      skills: workerProfile.skills,
-      hourlyRate: workerProfile.hourlyRate,
-      serviceRadius: workerProfile.serviceRadius,
-      baseLat: workerProfile.baseLat,
-      baseLng: workerProfile.baseLng,
-      bio: workerProfile.bio,
-      headline: workerProfile.headline,
-      completedJobs: workerProfile.completedJobs,
-      averageRating: workerProfile.averageRating,
-    },
-    jobs: recentJobs.map((job) => ({
+  const prompt = matchJobs({
+    workerSkills: workerProfile.skills,
+    workerBio: workerProfile.bio ?? '',
+    workerRating: workerProfile.averageRating ?? 0,
+    availableJobs: recentJobs.map((job) => ({
       id: job.id,
       title: job.title,
-      description: job.description,
       category: job.category,
+      description: job.description,
+      budgetMin: job.budgetMin ?? undefined,
+      budgetMax: job.budgetMax ?? undefined,
       skills: job.skills,
-      budgetMin: job.budgetMin,
-      budgetMax: job.budgetMax,
-      budgetType: job.budgetType,
-      address: job.address,
-      city: job.city,
-      lat: job.lat,
-      lng: job.lng,
-      scheduleType: job.scheduleType,
-      estimatedHours: job.estimatedHours,
     })),
   });
 
-  const { data, cached } = await callAIJSON<MatchJobsResponse>(prompt, {
-    feature: 'match-jobs',
-    userId: session.user.id,
-    cacheKey: {
-      workerSkills: workerProfile.skills,
-      jobIds: recentJobs.map((j) => j.id),
-    },
-    cacheTTLHours: 1,
-    temperature: 0.3,
-    maxTokens: 2000,
-  });
+  const { data, cached } = await callAIJSON<MatchJobsResponse>(
+    session.user.id,
+    'match-jobs',
+    prompt,
+    { cacheTTLHours: 1, temperature: 0.3, maxTokens: 2000 }
+  );
 
   const jobMap = new Map(recentJobs.map((j) => [j.id, j]));
   const enrichedMatches = data.matches

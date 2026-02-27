@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, bidWriter } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -81,37 +81,22 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
     );
   }
 
-  const prompt = AI_PROMPTS.bidWriter({
-    job: {
-      title: job.title,
-      description: job.description,
-      category: job.category,
-      skills: job.skills,
-      budgetMin: job.budgetMin,
-      budgetMax: job.budgetMax,
-      budgetType: job.budgetType,
-      scheduleType: job.scheduleType,
-      estimatedHours: job.estimatedHours,
-    },
-    worker: {
-      name: workerProfile.user.name,
-      skills: workerProfile.skills,
-      hourlyRate: workerProfile.hourlyRate,
-      completedJobs: workerProfile.completedJobs,
-      averageRating: workerProfile.averageRating,
-      headline: workerProfile.headline,
-      bio: workerProfile.bio,
-    },
+  const prompt = bidWriter({
+    jobTitle: job.title,
+    jobDescription: job.description,
+    jobBudgetMin: job.budgetMin ?? undefined,
+    jobBudgetMax: job.budgetMax ?? undefined,
+    workerName: workerProfile.user.name ?? 'Worker',
+    workerSkills: workerProfile.skills,
+    workerRating: workerProfile.averageRating ?? 0,
   });
 
-  const { data, cached } = await callAIJSON<BidWriterResponse>(prompt, {
-    feature: 'bid-writer',
-    userId: session.user.id,
-    cacheKey: { jobId, workerId: session.user.id },
-    cacheTTLHours: 1,
-    temperature: 0.7,
-    maxTokens: 600,
-  });
+  const { data, cached } = await callAIJSON<BidWriterResponse>(
+    session.user.id,
+    'bid-writer',
+    prompt,
+    { cacheTTLHours: 1, temperature: 0.7, maxTokens: 600 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

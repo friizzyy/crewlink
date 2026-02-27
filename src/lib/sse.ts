@@ -32,13 +32,13 @@ class SSEManager {
     const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
     const encoder = new TextEncoder()
 
-    for (const client of userClients) {
+    Array.from(userClients).forEach((client) => {
       try {
         client.controller.enqueue(encoder.encode(message))
       } catch {
         this.removeClient(client)
       }
-    }
+    })
   }
 }
 

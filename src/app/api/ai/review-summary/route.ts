@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, reviewSummary } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -28,6 +28,11 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { workerId } = parsed.data;
 
+  const worker = await prisma.user.findUnique({
+    where: { id: workerId },
+    select: { name: true },
+  });
+
   const reviews = await prisma.review.findMany({
     where: {
       subjectId: workerId,
@@ -42,6 +47,13 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
       timelinessRating: true,
       valueRating: true,
       createdAt: true,
+      booking: {
+        select: {
+          job: {
+            select: { category: true },
+          },
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
     take: 50,
@@ -54,26 +66,21 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
     );
   }
 
-  const prompt = AI_PROMPTS.reviewSummary({
+  const prompt = reviewSummary({
+    workerName: worker?.name ?? 'Worker',
     reviews: reviews.map((r) => ({
       rating: r.rating,
-      title: r.title,
-      content: r.content,
-      communicationRating: r.communicationRating,
-      qualityRating: r.qualityRating,
-      timelinessRating: r.timelinessRating,
-      valueRating: r.valueRating,
+      content: r.content ?? '',
+      category: r.booking?.job?.category ?? 'general',
     })),
   });
 
-  const { data, cached } = await callAIJSON<ReviewSummaryResponse>(prompt, {
-    feature: 'review-summary',
-    userId: session.user.id,
-    cacheKey: { workerId, reviewCount: reviews.length },
-    cacheTTLHours: 48,
-    temperature: 0.4,
-    maxTokens: 800,
-  });
+  const { data, cached } = await callAIJSON<ReviewSummaryResponse>(
+    session.user.id,
+    'review-summary',
+    prompt,
+    { cacheTTLHours: 48, temperature: 0.4, maxTokens: 800 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

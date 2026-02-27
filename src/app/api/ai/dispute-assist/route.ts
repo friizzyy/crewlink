@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, disputeAssist } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -73,32 +73,20 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const userRole = booking.hirerId === session.user.id ? 'hirer' : 'worker';
 
-  const prompt = AI_PROMPTS.disputeAssist({
-    issue,
-    userRole,
-    booking: {
-      status: booking.status,
-      agreedAmount: booking.agreedAmount,
-      scheduledStart: booking.scheduledStart.toISOString(),
-      scheduledEnd: booking.scheduledEnd?.toISOString() ?? null,
-      actualStart: booking.actualStart?.toISOString() ?? null,
-      actualEnd: booking.actualEnd?.toISOString() ?? null,
-    },
-    job: {
-      title: booking.job.title,
-      description: booking.job.description,
-      category: booking.job.category,
-      budgetMin: booking.job.budgetMin,
-      budgetMax: booking.job.budgetMax,
-    },
+  const prompt = disputeAssist({
+    hirerMessage: userRole === 'hirer' ? issue : 'No statement provided yet.',
+    workerMessage: userRole === 'worker' ? issue : 'No statement provided yet.',
+    jobTitle: booking.job.title,
+    agreedAmount: booking.agreedAmount,
+    jobStatus: booking.status,
   });
 
-  const { data, cached } = await callAIJSON<DisputeAssistResponse>(prompt, {
-    feature: 'dispute-assist',
-    userId: session.user.id,
-    temperature: 0.3,
-    maxTokens: 1200,
-  });
+  const { data, cached } = await callAIJSON<DisputeAssistResponse>(
+    session.user.id,
+    'dispute-assist',
+    prompt,
+    { temperature: 0.3, maxTokens: 1200 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

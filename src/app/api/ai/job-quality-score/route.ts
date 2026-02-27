@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, jobQualityScore } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,16 +29,21 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { title, description, budget, category } = parsed.data;
 
-  const prompt = AI_PROMPTS.jobQualityScore({ title, description, budget, category });
-
-  const { data, cached } = await callAIJSON<JobQualityScoreResponse>(prompt, {
-    feature: 'job-quality-score',
-    userId: session.user.id,
-    cacheKey: { title, description, budget, category },
-    cacheTTLHours: 12,
-    temperature: 0.3,
-    maxTokens: 600,
+  const prompt = jobQualityScore({
+    title,
+    description,
+    budgetMax: budget,
+    category,
+    hasLocation: false,
+    hasSchedule: false,
   });
+
+  const { data, cached } = await callAIJSON<JobQualityScoreResponse>(
+    session.user.id,
+    'job-quality-score',
+    prompt,
+    { cacheTTLHours: 12, temperature: 0.3, maxTokens: 600 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

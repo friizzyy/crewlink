@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, smartNotification } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -29,20 +29,26 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { eventType, eventData, recipientRole } = parsed.data;
 
-  const prompt = AI_PROMPTS.smartNotification({
+  const stringData: Record<string, string | number> = {};
+  for (const [key, value] of Object.entries(eventData)) {
+    if (typeof value === 'string' || typeof value === 'number') {
+      stringData[key] = value;
+    }
+  }
+
+  const prompt = smartNotification({
     eventType,
-    eventData,
     recipientRole,
+    recipientName: session.user.name ?? 'User',
+    data: stringData,
   });
 
-  const { data, cached } = await callAIJSON<SmartNotificationResponse>(prompt, {
-    feature: 'smart-notification',
-    userId: session.user.id,
-    cacheKey: { eventType, eventData, recipientRole },
-    cacheTTLHours: 24,
-    temperature: 0.6,
-    maxTokens: 300,
-  });
+  const { data, cached } = await callAIJSON<SmartNotificationResponse>(
+    session.user.id,
+    'smart-notification',
+    prompt,
+    { cacheTTLHours: 24, temperature: 0.6, maxTokens: 300 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

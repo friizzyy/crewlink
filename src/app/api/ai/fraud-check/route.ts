@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, fraudCheck } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -17,6 +17,12 @@ interface FraudCheckResponse {
   recommendation: string;
 }
 
+const CONTENT_TYPE_MAP: Record<string, 'job_posting' | 'bid_message' | 'review' | 'profile_bio'> = {
+  job: 'job_posting',
+  bid: 'bid_message',
+  review: 'review',
+};
+
 export const POST = withAIAuth(async (request: NextRequest, session) => {
   const body = await request.json();
   const parsed = FraudCheckInputSchema.safeParse(body);
@@ -29,13 +35,6 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
   }
 
   const { content, contentType } = parsed.data;
-
-  let userHistory: {
-    accountAge: number;
-    totalJobs: number;
-    totalReviews: number;
-    averageRating: number;
-  };
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
@@ -62,30 +61,19 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
     (Date.now() - user.createdAt.getTime()) / (1000 * 60 * 60 * 24)
   );
 
-  const avgRatingResult = await prisma.review.aggregate({
-    where: { subjectId: session.user.id },
-    _avg: { rating: true },
-  });
-
-  userHistory = {
-    accountAge: accountAgeDays,
-    totalJobs: user._count.jobs,
-    totalReviews: user._count.reviewsReceived,
-    averageRating: avgRatingResult._avg.rating ?? 0,
-  };
-
-  const prompt = AI_PROMPTS.fraudCheck({
+  const prompt = fraudCheck({
     content,
-    contentType,
-    userHistory,
+    contentType: CONTENT_TYPE_MAP[contentType] ?? 'job_posting',
+    userAccountAge: accountAgeDays,
+    userCompletedJobs: user._count.jobs,
   });
 
-  const { data, cached } = await callAIJSON<FraudCheckResponse>(prompt, {
-    feature: 'fraud-check',
-    userId: session.user.id,
-    temperature: 0.1,
-    maxTokens: 600,
-  });
+  const { data, cached } = await callAIJSON<FraudCheckResponse>(
+    session.user.id,
+    'fraud-check',
+    prompt,
+    { temperature: 0.1, maxTokens: 600 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

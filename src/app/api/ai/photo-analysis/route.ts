@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, photoAnalysis } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -25,16 +25,17 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const { jobDescription } = parsed.data;
 
-  const prompt = AI_PROMPTS.photoAnalysis({ jobDescription });
-
-  const { data, cached } = await callAIJSON<PhotoAnalysisResponse>(prompt, {
-    feature: 'photo-analysis',
-    userId: session.user.id,
-    cacheKey: { jobDescription },
-    cacheTTLHours: 48,
-    temperature: 0.3,
-    maxTokens: 600,
+  const prompt = photoAnalysis({
+    photoDescription: jobDescription,
+    context: 'job_completion',
   });
+
+  const { data, cached } = await callAIJSON<PhotoAnalysisResponse>(
+    session.user.id,
+    'photo-analysis',
+    prompt,
+    { cacheTTLHours: 48, temperature: 0.3, maxTokens: 600 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });

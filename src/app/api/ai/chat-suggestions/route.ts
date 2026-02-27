@@ -1,4 +1,4 @@
-import { callAIJSON, AI_PROMPTS } from '@/lib/ai';
+import { callAIJSON, chatSuggestions } from '@/lib/ai';
 import { withAIAuth } from '@/lib/ai/api-handler';
 import { prisma } from '@/lib/db';
 import { z } from 'zod';
@@ -86,23 +86,22 @@ export const POST = withAIAuth(async (request: NextRequest, session) => {
 
   const reversedMessages = [...messages].reverse();
 
-  const prompt = AI_PROMPTS.chatSuggestions({
-    messages: reversedMessages.map((m) => ({
-      content: m.content,
-      isCurrentUser: m.senderId === session.user.id,
+  const prompt = chatSuggestions({
+    userRole: session.user.role as 'hirer' | 'worker',
+    conversationHistory: reversedMessages.map((m) => ({
+      sender: m.senderId === session.user.id ? 'You' : 'Other',
+      message: m.content,
     })),
-    userRole: session.user.role,
-    jobContext: thread?.job
-      ? { title: thread.job.title, category: thread.job.category }
-      : undefined,
+    jobTitle: thread?.job?.title ?? 'a gig',
+    jobCategory: thread?.job?.category ?? 'general',
   });
 
-  const { data, cached } = await callAIJSON<ChatSuggestionsResponse>(prompt, {
-    feature: 'chat-suggestions',
-    userId: session.user.id,
-    temperature: 0.8,
-    maxTokens: 500,
-  });
+  const { data, cached } = await callAIJSON<ChatSuggestionsResponse>(
+    session.user.id,
+    'chat-suggestions',
+    prompt,
+    { temperature: 0.8, maxTokens: 500 }
+  );
 
   return NextResponse.json({ success: true, data, cached });
 });
