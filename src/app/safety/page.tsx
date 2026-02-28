@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // SAFETY PAGE - Premium Redesign v2
@@ -24,6 +25,7 @@ const trustPillars = [
     subtitle: 'Know who you\'re working with',
     icon: UserCheck,
     color: 'emerald',
+    gradient: 'emerald' as const,
     features: [
       {
         title: 'Government ID check',
@@ -49,6 +51,7 @@ const trustPillars = [
     subtitle: 'Your money is always safe',
     icon: CreditCard,
     color: 'cyan',
+    gradient: 'cyan' as const,
     features: [
       {
         title: 'Funds held in escrow',
@@ -74,6 +77,7 @@ const trustPillars = [
     subtitle: 'Honest ratings you can trust',
     icon: BadgeCheck,
     color: 'emerald',
+    gradient: 'purple' as const,
     features: [
       {
         title: 'Verified reviews only',
@@ -99,6 +103,7 @@ const trustPillars = [
     subtitle: 'Real help when you need it',
     icon: HeartHandshake,
     color: 'cyan',
+    gradient: 'amber' as const,
     features: [
       {
         title: '24/7 safety line',
@@ -134,12 +139,12 @@ const safetyTips = {
     { tip: 'Review job details and client ratings before accepting', icon: FileSearch },
     { tip: 'Keep all communication on-platform', icon: MessageCircle },
     { tip: 'Share your live location with a trusted contact', icon: Eye },
-    { tip: 'Trust your instincts—decline jobs that feel off', icon: Shield },
+    { tip: 'Trust your instincts -- decline jobs that feel off', icon: Shield },
   ],
   hirers: [
     { tip: 'Check worker ratings and reviews before booking', icon: BadgeCheck },
     { tip: 'Communicate job details clearly upfront', icon: MessageCircle },
-    { tip: 'Only pay through the platform—never cash', icon: Lock },
+    { tip: 'Only pay through the platform -- never cash', icon: Lock },
     { tip: 'Leave honest reviews to help the community', icon: Scale },
   ],
 }
@@ -180,11 +185,7 @@ function AudienceToggle({
   setMode: (mode: 'workers' | 'hirers') => void
 }) {
   return (
-    <div
-      className="inline-flex items-center bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1.5 border border-white/10"
-      role="tablist"
-      aria-label="Select safety tips view"
-    >
+    <GlassPanel variant="elevated" padding="none" border="glow" rounded="2xl" className="inline-flex items-center p-1.5" role="tablist" aria-label="Select safety tips view">
       <button
         role="tab"
         aria-selected={mode === 'hirers'}
@@ -211,7 +212,7 @@ function AudienceToggle({
         <Users className="w-4 h-4" />
         <span>For Workers</span>
       </button>
-    </div>
+    </GlassPanel>
   )
 }
 
@@ -284,9 +285,15 @@ function TrustPillarContent({
   const IconComponent = pillar.icon
 
   return (
-    <div className={`p-6 lg:p-8 bg-slate-900/40 backdrop-blur-sm rounded-3xl border ${
-      isEmerald ? 'border-emerald-500/20' : 'border-cyan-500/20'
-    } ${getRevealClasses(isVisible, 'up')}`}>
+    <GlassPanel
+      variant="elevated"
+      padding="lg"
+      border={isEmerald ? 'light' : 'glow'}
+      rounded="2xl"
+      className={`lg:p-8 ${
+        isEmerald ? 'border-emerald-500/20' : 'border-cyan-500/20'
+      } ${getRevealClasses(isVisible, 'up')}`}
+    >
       {/* Header */}
       <div className="flex items-start gap-4 mb-8 pb-6 border-b border-white/5">
         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
@@ -304,17 +311,22 @@ function TrustPillarContent({
 
       {/* Features grid */}
       <div className="grid sm:grid-cols-2 gap-4">
-        {pillar.features.map((feature, i) => (
-          <div
+        {pillar.features.map((feature) => (
+          <GlassPanel
             key={feature.title}
-            className="p-4 bg-slate-800/50 rounded-xl border border-white/5 hover:border-white/10 transition-colors"
+            variant="solid"
+            padding="md"
+            border="light"
+            rounded="lg"
+            hoverable
+            className="bg-slate-800/50"
           >
             <h4 className="font-semibold text-white mb-1">{feature.title}</h4>
             <p className="text-sm text-slate-400 leading-relaxed">{feature.description}</p>
-          </div>
+          </GlassPanel>
         ))}
       </div>
-    </div>
+    </GlassPanel>
   )
 }
 
@@ -329,9 +341,13 @@ function Accordion({ items }: { items: typeof faqs }) {
         const panelId = `faq-panel-${i}`
 
         return (
-          <div
+          <GlassPanel
             key={i}
-            className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/5 overflow-hidden"
+            variant="subtle"
+            padding="none"
+            border="light"
+            rounded="xl"
+            className="overflow-hidden"
           >
             <button
               id={headingId}
@@ -358,7 +374,7 @@ function Accordion({ items }: { items: typeof faqs }) {
             >
               <div className="px-5 pb-5 text-slate-400 leading-relaxed">{item.answer}</div>
             </div>
-          </div>
+          </GlassPanel>
         )
       })}
     </div>
@@ -382,14 +398,16 @@ function HeroSection() {
 
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center relative">
         {/* Badge */}
-        <div className={`inline-flex items-center gap-2.5 px-5 py-2.5 bg-emerald-500/10 backdrop-blur-xl rounded-full border border-emerald-500/20 mb-8 ${getRevealClasses(isVisible, 'up')}`}>
-          <Shield className="w-4 h-4 text-emerald-400" />
-          <span className="text-sm font-medium text-emerald-400 tracking-wide">Trust & Safety</span>
+        <div className={getRevealClasses(isVisible, 'up')}>
+          <Badge variant="success" size="md" className="mb-8">
+            <Shield className="w-4 h-4 mr-2" />
+            Trust & Safety
+          </Badge>
         </div>
 
         {/* Headline */}
-        <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
-          Your safety is{' '}
+        <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
+          <span className="text-white">Your safety is </span>
           <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
             built in
           </span>
@@ -403,19 +421,15 @@ function HeroSection() {
 
         {/* CTAs */}
         <div className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '240ms' }}>
-          <a
-            href="tel:1-800-CREWLINK"
-            className="group inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"
-          >
-            <Phone className="w-4 h-4" />
-            24/7 Safety Line
+          <a href="tel:1-800-CREWLINK">
+            <Button variant="success" size="lg" glow leftIcon={<Phone className="w-4 h-4" />}>
+              24/7 Safety Line
+            </Button>
           </a>
-          <Link
-            href="/help/trust"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3.5 border border-white/20 text-white font-medium rounded-xl hover:bg-white/5 transition-all"
-          >
-            <Flag className="w-4 h-4" />
-            Report an Issue
+          <Link href="/help/trust">
+            <Button variant="secondary" size="lg" leftIcon={<Flag className="w-4 h-4" />}>
+              Report an Issue
+            </Button>
           </Link>
         </div>
       </div>
@@ -431,16 +445,20 @@ function StatsSection() {
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {trustStats.map((stat, i) => (
-            <div
+            <GlassPanel
               key={stat.label}
-              className={`p-6 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/5 text-center ${getRevealClasses(isVisible, 'up')}`}
+              variant="subtle"
+              padding="lg"
+              border="light"
+              rounded="xl"
+              className={`text-center ${getRevealClasses(isVisible, 'up')}`}
               style={{ transitionDelay: `${i * 60}ms` }}
             >
-              <div className="font-display text-3xl sm:text-4xl font-bold text-white mb-1">
+              <div className="font-display text-3xl sm:text-4xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-1">
                 {stat.value}
               </div>
               <div className="text-sm text-slate-500">{stat.label}</div>
-            </div>
+            </GlassPanel>
           ))}
         </div>
       </div>
@@ -457,8 +475,10 @@ function TrustPillarsSection() {
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Section header */}
         <div className="text-center mb-10 sm:mb-14">
-          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
-            How we protect you
+          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              How we protect you
+            </span>
           </h2>
           <p className={`mt-4 text-lg text-slate-400 max-w-2xl mx-auto ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
             Safety is built into every layer of the platform
@@ -498,14 +518,18 @@ function TrustPillarsSection() {
             const IconComponent = pillar.icon
 
             return (
-              <div
+              <GlassPanel
                 key={pillar.id}
-                className={`rounded-2xl border overflow-hidden transition-all ${
+                variant={isActive ? 'elevated' : 'subtle'}
+                padding="none"
+                border={isActive ? 'glow' : 'light'}
+                rounded="xl"
+                className={`overflow-hidden transition-all ${
                   isActive
                     ? isEmerald
-                      ? 'bg-slate-900/60 border-emerald-500/30'
-                      : 'bg-slate-900/60 border-cyan-500/30'
-                    : 'bg-slate-900/40 border-white/5'
+                      ? 'border-emerald-500/30'
+                      : 'border-cyan-500/30'
+                    : ''
                 } ${getRevealClasses(isVisible, 'up')}`}
                 style={{ transitionDelay: `${160 + i * 60}ms` }}
               >
@@ -537,18 +561,22 @@ function TrustPillarsSection() {
                     <p className="text-sm text-slate-400 mb-4">{pillar.subtitle}</p>
                     <div className="space-y-3">
                       {pillar.features.map((feature) => (
-                        <div
+                        <GlassPanel
                           key={feature.title}
-                          className="p-3 bg-slate-800/50 rounded-xl"
+                          variant="solid"
+                          padding="sm"
+                          border="light"
+                          rounded="lg"
+                          className="bg-slate-800/50"
                         >
                           <h4 className="font-medium text-white text-sm mb-0.5">{feature.title}</h4>
                           <p className="text-xs text-slate-400">{feature.description}</p>
-                        </div>
+                        </GlassPanel>
                       ))}
                     </div>
                   </div>
                 )}
-              </div>
+              </GlassPanel>
             )
           })}
         </div>
@@ -579,8 +607,10 @@ function SafetyTipsSection() {
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
-            Stay safe on CrewLink
+          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Stay safe on CrewLink
+            </span>
           </h2>
           <p className={`mt-4 text-lg text-slate-400 ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
             Simple practices to protect yourself
@@ -602,24 +632,23 @@ function SafetyTipsSection() {
             {currentTips.map((item, i) => {
               const TipIcon = item.icon
               return (
-                <div
+                <FeatureCard
                   key={item.tip}
-                  className={`group flex items-start gap-4 p-5 rounded-2xl border transition-all ${
-                    isWorkers
-                      ? 'bg-emerald-500/5 border-emerald-500/10 hover:border-emerald-500/30'
-                      : 'bg-cyan-500/5 border-cyan-500/10 hover:border-cyan-500/30'
-                  } ${getRevealClasses(isVisible, 'up')}`}
+                  gradient={isWorkers ? 'emerald' : 'cyan'}
+                  className={getRevealClasses(isVisible, 'up')}
                   style={{ transitionDelay: `${240 + i * 60}ms` }}
                 >
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    isWorkers
-                      ? 'bg-emerald-500/10 border border-emerald-500/20'
-                      : 'bg-cyan-500/10 border border-cyan-500/20'
-                  }`}>
-                    <TipIcon className={`w-5 h-5 ${isWorkers ? 'text-emerald-400' : 'text-cyan-400'}`} />
+                  <div className="flex items-start gap-4">
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+                      isWorkers
+                        ? 'bg-emerald-500/10 border border-emerald-500/20'
+                        : 'bg-cyan-500/10 border border-cyan-500/20'
+                    }`}>
+                      <TipIcon className={`w-5 h-5 ${isWorkers ? 'text-emerald-400' : 'text-cyan-400'}`} />
+                    </div>
+                    <p className="text-slate-300 leading-relaxed">{item.tip}</p>
                   </div>
-                  <p className="text-slate-300 leading-relaxed">{item.tip}</p>
-                </div>
+                </FeatureCard>
               )
             })}
           </div>
@@ -636,8 +665,10 @@ function FAQSection() {
     <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-12">
-          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
-            Common questions
+          <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Common questions
+            </span>
           </h2>
         </div>
 
@@ -670,52 +701,36 @@ function SupportCTASection() {
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
           {/* Report card */}
-          <div className={`relative overflow-hidden p-8 bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800 rounded-3xl border border-amber-500/20 ${getRevealClasses(isVisible, 'up')}`}>
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-[60px]" />
+          <FeatureCard gradient="amber" shine className={getRevealClasses(isVisible, 'up')}>
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6">
+              <AlertTriangle className="w-7 h-7 text-amber-400" />
             </div>
-            <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mb-6">
-                <AlertTriangle className="w-7 h-7 text-amber-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Need to report something?</h3>
-              <p className="text-slate-400 mb-6 leading-relaxed">
-                If you&apos;ve experienced harassment, fraud, or any safety concern, let us know immediately.
-              </p>
-              <Link
-                href="/help/trust"
-                className="group inline-flex items-center gap-2 px-6 py-3 bg-amber-500/10 text-amber-400 font-medium rounded-xl border border-amber-500/20 hover:bg-amber-500/20 transition-colors"
-              >
-                <Flag className="w-4 h-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">Need to report something?</h3>
+            <p className="text-slate-400 mb-6 leading-relaxed">
+              If you&apos;ve experienced harassment, fraud, or any safety concern, let us know immediately.
+            </p>
+            <Link href="/help/trust">
+              <Button variant="ghost" rightIcon={<ArrowRight className="w-4 h-4" />} leftIcon={<Flag className="w-4 h-4" />} className="text-amber-400 hover:text-amber-300">
                 Report an issue
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          </div>
+              </Button>
+            </Link>
+          </FeatureCard>
 
           {/* Help card */}
-          <div className={`relative overflow-hidden p-8 bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-800 rounded-3xl border border-cyan-500/20 ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
-            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute -top-10 -right-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-[60px]" />
+          <FeatureCard gradient="cyan" shine className={getRevealClasses(isVisible, 'up')} style={{ transitionDelay: '80ms' }}>
+            <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6">
+              <HelpCircle className="w-7 h-7 text-cyan-400" />
             </div>
-            <div className="relative">
-              <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-6">
-                <HelpCircle className="w-7 h-7 text-cyan-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Have a question?</h3>
-              <p className="text-slate-400 mb-6 leading-relaxed">
-                Browse guides on payments, disputes, account security, and more.
-              </p>
-              <Link
-                href="/help"
-                className="group inline-flex items-center gap-2 px-6 py-3 bg-cyan-500/10 text-cyan-400 font-medium rounded-xl border border-cyan-500/20 hover:bg-cyan-500/20 transition-colors"
-              >
-                <HelpCircle className="w-4 h-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">Have a question?</h3>
+            <p className="text-slate-400 mb-6 leading-relaxed">
+              Browse guides on payments, disputes, account security, and more.
+            </p>
+            <Link href="/help">
+              <Button variant="ghost" rightIcon={<ArrowRight className="w-4 h-4" />} leftIcon={<HelpCircle className="w-4 h-4" />} className="text-cyan-400 hover:text-cyan-300">
                 Visit Help Center
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          </div>
+              </Button>
+            </Link>
+          </FeatureCard>
         </div>
       </div>
     </section>
@@ -728,7 +743,13 @@ function EmergencyCTASection() {
   return (
     <section ref={ref} className="py-10 sm:py-16">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`relative overflow-hidden p-8 sm:p-12 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 rounded-3xl border border-emerald-500/20 text-center ${getRevealClasses(isVisible, 'scale')}`}>
+        <GlassPanel
+          variant="elevated"
+          padding="none"
+          border="light"
+          rounded="2xl"
+          className={`relative overflow-hidden p-8 sm:p-12 text-center border-emerald-500/20 ${getRevealClasses(isVisible, 'scale')}`}
+        >
           {/* Background glows */}
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-20 -right-20 w-72 h-72 bg-emerald-500/10 rounded-full blur-[100px]" />
@@ -739,24 +760,24 @@ function EmergencyCTASection() {
             <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
               <Phone className="w-8 h-8 text-emerald-400" />
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              24/7 Safety Support
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                24/7 Safety Support
+              </span>
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto">
               If you&apos;re in an emergency or feel unsafe, call our safety line immediately. We&apos;re here around the clock.
             </p>
-            <a
-              href="tel:1-800-CREWLINK"
-              className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-2xl hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"
-            >
-              <Phone className="w-5 h-5" />
-              1-800-CREWLINK
+            <a href="tel:1-800-CREWLINK">
+              <Button variant="success" size="xl" glow leftIcon={<Phone className="w-5 h-5" />}>
+                1-800-CREWLINK
+              </Button>
             </a>
             <p className="mt-4 text-sm text-slate-500">
               For life-threatening emergencies, always call 911 first.
             </p>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

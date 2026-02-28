@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // PRICING PAGE - Premium Redesign
@@ -105,21 +106,25 @@ const valueProps = [
     icon: Shield,
     title: 'Payment protection',
     description: 'Funds held securely until work is complete and both parties are satisfied.',
+    gradient: 'cyan' as const,
   },
   {
     icon: BadgeCheck,
     title: 'Verified workers',
     description: 'Background checks and identity verification give you confidence in who you hire.',
+    gradient: 'purple' as const,
   },
   {
     icon: Zap,
     title: 'Fast payouts',
     description: 'Workers receive payment within 1-3 business days. Pro members get same-day.',
+    gradient: 'emerald' as const,
   },
   {
     icon: MessageCircle,
     title: 'Real support',
     description: 'Dispute resolution and customer support from actual humans, not chatbots.',
+    gradient: 'amber' as const,
   },
 ]
 
@@ -159,11 +164,7 @@ function AudienceToggle({
   setMode: (mode: 'hire' | 'work') => void
 }) {
   return (
-    <div
-      className="inline-flex items-center bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1.5 border border-white/10"
-      role="tablist"
-      aria-label="Select pricing view"
-    >
+    <GlassPanel variant="elevated" padding="none" border="glow" rounded="2xl" className="inline-flex items-center p-1.5" role="tablist" aria-label="Select pricing view">
       <button
         role="tab"
         aria-selected={mode === 'hire'}
@@ -194,7 +195,7 @@ function AudienceToggle({
         <Users className="w-4 h-4" />
         <span>Finding work</span>
       </button>
-    </div>
+    </GlassPanel>
   )
 }
 
@@ -211,50 +212,39 @@ function TierCard({
 }) {
   const isHire = mode === 'hire'
 
-  // Card border classes
-  const highlightedBorderClass = isHire
-    ? 'border-cyan-500/40 hover:border-cyan-500/60'
-    : 'border-emerald-500/40 hover:border-emerald-500/60'
-
-  // Glow classes
-  const glowClass1 = isHire ? 'bg-cyan-500/15' : 'bg-emerald-500/15'
-  const glowClass2 = isHire ? 'bg-cyan-500/10' : 'bg-emerald-500/10'
-
-  // Badge gradient
-  const badgeGradient = isHire
-    ? 'from-cyan-500 to-blue-600'
-    : 'from-emerald-500 to-teal-600'
-
   // Feature check classes
   const checkBgClass = isHire ? 'bg-cyan-500/20' : 'bg-emerald-500/20'
   const checkIconClass = isHire ? 'text-cyan-400' : 'text-emerald-400'
 
-  // CTA classes
-  const ctaHighlightedClass = isHire
-    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:opacity-90 shadow-lg shadow-cyan-500/20'
-    : 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:opacity-90 shadow-lg shadow-emerald-500/20'
-
   return (
-    <div
-      className={`relative p-8 lg:p-10 bg-slate-900/50 backdrop-blur-sm rounded-3xl border transition-all duration-500 flex flex-col h-full ${
-        tier.highlighted ? highlightedBorderClass : 'border-white/10 hover:border-white/20'
+    <GlassCard
+      interactive={false}
+      padding="none"
+      border={tier.highlighted ? 'glow' : 'light'}
+      rounded="2xl"
+      className={`relative p-8 lg:p-10 flex flex-col h-full ${
+        tier.highlighted
+          ? isHire
+            ? 'border-cyan-500/40 hover:border-cyan-500/60'
+            : 'border-emerald-500/40 hover:border-emerald-500/60'
+          : 'hover:border-white/20'
       } ${getRevealClasses(isVisible, 'up')}`}
       style={{ transitionDelay: `${index * 100}ms` }}
     >
       {/* Glow effect for highlighted */}
       {tier.highlighted && (
         <div className="absolute inset-0 pointer-events-none rounded-3xl">
-          <div className={`absolute top-0 right-0 w-48 h-48 ${glowClass1} rounded-full blur-[80px]`} />
-          <div className={`absolute bottom-0 left-0 w-32 h-32 ${glowClass2} rounded-full blur-[60px]`} />
+          <div className={`absolute top-0 right-0 w-48 h-48 ${isHire ? 'bg-cyan-500/15' : 'bg-emerald-500/15'} rounded-full blur-[80px]`} />
+          <div className={`absolute bottom-0 left-0 w-32 h-32 ${isHire ? 'bg-cyan-500/10' : 'bg-emerald-500/10'} rounded-full blur-[60px]`} />
         </div>
       )}
 
       {/* Badge */}
       {tier.badge && (
-        <div
-          className={`absolute -top-3 left-8 px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full bg-gradient-to-r ${badgeGradient} text-white`}
-        >
-          {tier.badge}
+        <div className="absolute -top-3 left-8">
+          <Badge variant={isHire ? 'brand' : 'success'} size="sm">
+            {tier.badge}
+          </Badge>
         </div>
       )}
 
@@ -268,7 +258,7 @@ function TierCard({
         {/* Price */}
         <div className="py-6 border-y border-white/5">
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-6xl font-bold text-white tracking-tight">
+            <span className="font-display text-6xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent tracking-tight">
               {tier.fee}
             </span>
             <span className="text-lg text-slate-400">{tier.feeLabel}</span>
@@ -294,17 +284,19 @@ function TierCard({
         </ul>
 
         {/* CTA - always at bottom */}
-        <Link
-          href={tier.href}
-          className={`group flex items-center justify-center gap-2.5 w-full py-4 font-semibold rounded-2xl transition-all mt-auto ${
-            tier.highlighted ? ctaHighlightedClass : 'border border-white/20 text-white hover:bg-white/5'
-          }`}
-        >
-          {tier.cta}
-          <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+        <Link href={tier.href} className="mt-auto">
+          <Button
+            variant={tier.highlighted ? (isHire ? 'primary' : 'success') : 'secondary'}
+            size="lg"
+            fullWidth
+            glow={tier.highlighted}
+            rightIcon={<ArrowRight className="w-5 h-5" />}
+          >
+            {tier.cta}
+          </Button>
         </Link>
       </div>
-    </div>
+    </GlassCard>
   )
 }
 
@@ -319,9 +311,13 @@ function Accordion({ items }: { items: typeof faqs }) {
         const panelId = `faq-panel-${i}`
 
         return (
-          <div
+          <GlassPanel
             key={i}
-            className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/5 overflow-hidden"
+            variant="subtle"
+            padding="none"
+            border="light"
+            rounded="xl"
+            className="overflow-hidden"
           >
             <button
               id={headingId}
@@ -348,7 +344,7 @@ function Accordion({ items }: { items: typeof faqs }) {
             >
               <div className="px-5 pb-5 text-slate-400 leading-relaxed">{item.answer}</div>
             </div>
-          </div>
+          </GlassPanel>
         )
       })}
     </div>
@@ -372,9 +368,9 @@ function HeroSection({ mode, setMode }: { mode: 'hire' | 'work'; setMode: (m: 'h
 
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center relative">
         <h1
-          className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`}
+          className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`}
         >
-          Simple pricing.{' '}
+          <span className="text-white">Simple pricing. </span>
           <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
             Real value.
           </span>
@@ -459,16 +455,22 @@ function TransparencySection({ mode }: { mode: 'hire' | 'work' }) {
           </div>
 
           <h2
-            className={`font-display text-2xl sm:text-3xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}
+            className={`font-display text-2xl sm:text-3xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}
             style={{ transitionDelay: '80ms' }}
           >
-            See exactly what you{mode === 'hire' ? ' pay' : "'ll earn"}
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              See exactly what you{mode === 'hire' ? ' pay' : "'ll earn"}
+            </span>
           </h2>
         </div>
 
         {/* Example breakdown */}
-        <div
-          className={`p-8 lg:p-10 bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-white/10 ${getRevealClasses(isVisible, 'up')}`}
+        <GlassPanel
+          variant="elevated"
+          padding="xl"
+          border="light"
+          rounded="2xl"
+          className={getRevealClasses(isVisible, 'up')}
           style={{ transitionDelay: '160ms' }}
         >
           {mode === 'hire' ? (
@@ -494,7 +496,7 @@ function TransparencySection({ mode }: { mode: 'hire' | 'work' }) {
                 </div>
                 <div className="flex justify-between items-center pt-2">
                   <span className="font-semibold text-white">You pay</span>
-                  <span className="font-display text-3xl font-bold text-cyan-400">
+                  <span className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
                     ${hirerExample.total}
                   </span>
                 </div>
@@ -525,14 +527,14 @@ function TransparencySection({ mode }: { mode: 'hire' | 'work' }) {
                 </div>
                 <div className="flex justify-between items-center pt-2">
                   <span className="font-semibold text-white">You receive</span>
-                  <span className="font-display text-3xl font-bold text-emerald-400">
+                  <span className="font-display text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                     ${workerExample.payout.toFixed(2)}
                   </span>
                 </div>
               </div>
             </div>
           )}
-        </div>
+        </GlassPanel>
 
         {/* Link to help */}
         <p
@@ -557,9 +559,11 @@ function ValueSection() {
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-14">
           <h2
-            className={`font-display text-2xl sm:text-3xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}
+            className={`font-display text-2xl sm:text-3xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}
           >
-            What you get for the fee
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              What you get for the fee
+            </span>
           </h2>
           <p
             className={`mt-3 text-slate-400 ${getRevealClasses(isVisible, 'up')}`}
@@ -571,9 +575,11 @@ function ValueSection() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {valueProps.map((prop, i) => (
-            <div
+            <FeatureCard
               key={prop.title}
-              className={`group p-6 bg-slate-900/30 backdrop-blur-sm rounded-2xl border border-white/5 hover:border-cyan-500/20 transition-all duration-300 ${getRevealClasses(isVisible, 'up')}`}
+              gradient={prop.gradient}
+              shine
+              className={getRevealClasses(isVisible, 'up')}
               style={{ transitionDelay: `${160 + i * 60}ms` }}
             >
               <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center mb-4 group-hover:scale-105 transition-transform">
@@ -581,7 +587,7 @@ function ValueSection() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{prop.title}</h3>
               <p className="text-sm text-slate-400 leading-relaxed">{prop.description}</p>
-            </div>
+            </FeatureCard>
           ))}
         </div>
       </div>
@@ -597,9 +603,11 @@ function FAQSection() {
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-12">
           <h2
-            className={`font-display text-2xl sm:text-3xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}
+            className={`font-display text-2xl sm:text-3xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}
           >
-            Common questions
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              Common questions
+            </span>
           </h2>
         </div>
 
@@ -638,8 +646,12 @@ function CTASection() {
   return (
     <section ref={ref} className="py-10 sm:py-16">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div
-          className={`relative overflow-hidden p-8 sm:p-12 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 rounded-3xl border border-cyan-500/20 text-center ${getRevealClasses(isVisible, 'scale')}`}
+        <GlassPanel
+          variant="elevated"
+          padding="none"
+          border="glow"
+          rounded="2xl"
+          className={`relative overflow-hidden p-8 sm:p-12 text-center ${getRevealClasses(isVisible, 'scale')}`}
         >
           {/* Background glows */}
           <div className="absolute inset-0 pointer-events-none">
@@ -648,29 +660,28 @@ function CTASection() {
           </div>
 
           <div className="relative">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              Ready to get started?
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Ready to get started?
+              </span>
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto">
               Create a free account in under a minute. No credit card required.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/create-account"
-                className="group inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-2xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 w-full sm:w-auto"
-              >
-                Create free account
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" />
+              <Link href="/create-account">
+                <Button variant="primary" size="lg" glow rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Create free account
+                </Button>
               </Link>
-              <Link
-                href="/how-it-works"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/5 transition-all w-full sm:w-auto"
-              >
-                See how it works
+              <Link href="/how-it-works">
+                <Button variant="secondary" size="lg">
+                  See how it works
+                </Button>
               </Link>
             </div>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

@@ -10,6 +10,9 @@ import {
 import { formatRelativeTime, formatCurrency } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/Card'
+import { GlassPanel, FeatureCard } from '@/components/ui/GlassPanel'
+import { Button } from '@/components/ui/Button'
+import { AmbientBackground } from '@/components/AmbientBackground'
 
 interface Transaction {
   id: string
@@ -162,15 +165,24 @@ export default function TransactionsPage() {
     return t.type.charAt(0).toUpperCase() + t.type.slice(1)
   }
 
+  const getAccentColor = (type: string, status: string): string => {
+    if (status === 'pending') return 'border-l-amber-500'
+    if (type === 'earning') return 'border-l-emerald-500'
+    if (type === 'payout') return 'border-l-red-500'
+    return 'border-l-slate-500'
+  }
+
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr)
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground intensity="low" />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-sm relative z-10">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/work/settings"
@@ -184,15 +196,18 @@ export default function TransactionsPage() {
               <h1 className="text-2xl font-bold text-white">Transactions</h1>
               <p className="text-slate-400 mt-1">View your earnings and payment history</p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-xl hover:bg-slate-700 transition-colors">
-              <Download className="w-4 h-4" />
+            <Button
+              variant="secondary"
+              size="sm"
+              leftIcon={<Download className="w-4 h-4" />}
+            >
               Export
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 relative z-10">
         {loading ? (
           <TransactionsSkeleton />
         ) : error ? (
@@ -202,30 +217,30 @@ export default function TransactionsPage() {
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Failed to load transactions</h2>
             <p className="text-slate-400 max-w-sm mx-auto mb-6">{error}</p>
-            <button
+            <Button
+              variant="success"
               onClick={() => fetchTransactions(false)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+              leftIcon={<RefreshCw className="w-4 h-4" />}
             >
-              <RefreshCw className="w-4 h-4" />
               Retry
-            </button>
+            </Button>
           </div>
         ) : (
           <>
             {/* Summary Cards */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 bg-slate-900 border border-white/5 rounded-xl">
+              <FeatureCard gradient="emerald" shine className="animate-card-enter" style={{ animationDelay: '0ms' }}>
                 <p className="text-sm text-slate-400 mb-1">Total Earnings</p>
                 <p className="text-2xl font-bold text-white">{formatCurrency(summary.totalEarnings)}</p>
-              </div>
-              <div className="p-4 bg-slate-900 border border-white/5 rounded-xl">
+              </FeatureCard>
+              <FeatureCard gradient="cyan" shine className="animate-card-enter" style={{ animationDelay: '100ms' }}>
                 <p className="text-sm text-slate-400 mb-1">Withdrawn</p>
                 <p className="text-2xl font-bold text-white">{formatCurrency(summary.totalWithdrawn)}</p>
-              </div>
-              <div className="p-4 bg-slate-900 border border-white/5 rounded-xl">
+              </FeatureCard>
+              <FeatureCard gradient="amber" shine className="animate-card-enter" style={{ animationDelay: '200ms' }}>
                 <p className="text-sm text-slate-400 mb-1">Available</p>
                 <p className="text-2xl font-bold text-emerald-400">{formatCurrency(summary.available)}</p>
-              </div>
+              </FeatureCard>
             </div>
 
             {/* Filters */}
@@ -237,32 +252,34 @@ export default function TransactionsPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search transactions..."
-                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all"
                 />
               </div>
-              <div className="flex gap-2">
+              <GlassPanel variant="subtle" padding="none" border="light" rounded="lg" className="flex gap-1 p-1">
                 {(['all', 'earnings', 'payouts'] as const).map((f) => (
-                  <button
+                  <Button
                     key={f}
+                    variant={filter === f ? 'success' : 'ghost'}
+                    size="sm"
                     onClick={() => setFilter(f)}
-                    className={`px-4 py-3 rounded-xl font-medium transition-all ${
-                      filter === f
-                        ? 'bg-emerald-500 text-white'
-                        : 'bg-slate-900 text-slate-400 hover:bg-slate-800'
-                    }`}
+                    className="capitalize"
                   >
-                    {f.charAt(0).toUpperCase() + f.slice(1)}
-                  </button>
+                    {f}
+                  </Button>
                 ))}
-              </div>
+              </GlassPanel>
             </div>
 
             {/* Transactions List */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden">
+            <GlassPanel variant="default" padding="none" border="light" rounded="xl" className="overflow-hidden">
               <div className="divide-y divide-white/5">
                 {filteredTransactions.length > 0 ? (
-                  filteredTransactions.map((transaction) => (
-                    <div key={transaction.id} className="p-5 flex items-center justify-between">
+                  filteredTransactions.map((transaction, index) => (
+                    <div
+                      key={transaction.id}
+                      className={`p-5 flex items-center justify-between border-l-4 ${getAccentColor(transaction.type, transaction.status)} hover:bg-white/5 transition-colors animate-card-enter`}
+                      style={{ animationDelay: `${index * 50}ms` }}
+                    >
                       <div className="flex items-center gap-4">
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
                           transaction.type === 'earning' ? 'bg-emerald-500/20' :
@@ -296,24 +313,19 @@ export default function TransactionsPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Load More */}
             {hasMore && (
-              <button
+              <Button
+                variant="ghost"
+                fullWidth
                 onClick={() => fetchTransactions(true)}
-                disabled={loadingMore}
-                className="w-full py-3 text-emerald-400 font-medium hover:text-emerald-300 transition-colors flex items-center justify-center gap-2"
+                isLoading={loadingMore}
+                className="text-emerald-400 hover:text-emerald-300"
               >
-                {loadingMore ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Loading...
-                  </>
-                ) : (
-                  'Load more transactions'
-                )}
-              </button>
+                Load more transactions
+              </Button>
             )}
           </>
         )}

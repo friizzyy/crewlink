@@ -6,6 +6,9 @@ import { ArrowLeft, CreditCard, CheckCircle, ExternalLink, Loader2, AlertCircle,
 import { useSession } from 'next-auth/react'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/Card'
+import { GlassPanel, FeatureCard } from '@/components/ui/GlassPanel'
+import { Button } from '@/components/ui/Button'
+import { AmbientBackground } from '@/components/AmbientBackground'
 
 export default function PaymentMethodsPage() {
   const { data: session, status } = useSession()
@@ -48,11 +51,10 @@ export default function PaymentMethodsPage() {
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Authentication Required</h2>
           <p className="text-slate-400 mb-6">Please sign in to manage payment methods.</p>
-          <Link
-            href="/sign-in"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl"
-          >
-            Sign In
+          <Link href="/sign-in">
+            <Button variant="primary" size="lg">
+              Sign In
+            </Button>
           </Link>
         </div>
       </div>
@@ -60,9 +62,11 @@ export default function PaymentMethodsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground intensity="low" />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-sm relative z-10">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <Link
             href="/hiring/settings"
@@ -76,69 +80,74 @@ export default function PaymentMethodsPage() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6 relative z-10">
         {/* Stripe Payment Management Card */}
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-2xl overflow-hidden">
-          <div className="p-6">
-            <div className="flex items-start gap-4 mb-6">
-              <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20 flex items-center justify-center shrink-0">
-                <CreditCard className="w-7 h-7 text-cyan-400" />
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold text-white mb-1">Payment via Stripe</h2>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  Your payment methods are securely managed through Stripe. Add, remove, or update your
-                  cards directly through the Stripe Customer Portal.
-                </p>
-              </div>
+        <FeatureCard gradient="cyan" shine>
+          <div className="flex items-start gap-4 mb-6">
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-500/20 flex items-center justify-center shrink-0">
+              <CreditCard className="w-7 h-7 text-cyan-400" />
             </div>
-
-            <div className="space-y-3 mb-6">
-              <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
-                <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm text-slate-300">PCI-compliant card storage</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
-                <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm text-slate-300">Support for Visa, Mastercard, Amex, and more</span>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-slate-800/50 rounded-xl">
-                <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-                <span className="text-sm text-slate-300">Automatic payment for accepted bids</span>
-              </div>
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-1">Payment via Stripe</h2>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Your payment methods are securely managed through Stripe. Add, remove, or update your
+                cards directly through the Stripe Customer Portal.
+              </p>
             </div>
-
-            <button
-              onClick={handleManagePayments}
-              disabled={isRedirecting}
-              className="w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isRedirecting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Connecting to Stripe...
-                </>
-              ) : (
-                <>
-                  <ExternalLink className="w-5 h-5" />
-                  Manage Payment Methods
-                </>
-              )}
-            </button>
           </div>
-        </div>
+
+          <div className="space-y-3 mb-6">
+            {[
+              'PCI-compliant card storage',
+              'Support for Visa, Mastercard, Amex, and more',
+              'Automatic payment for accepted bids',
+            ].map((feature) => (
+              <GlassPanel
+                key={feature}
+                variant="subtle"
+                padding="sm"
+                border="none"
+                rounded="lg"
+                className="flex items-center gap-3"
+              >
+                <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
+                <span className="text-sm text-slate-300">{feature}</span>
+              </GlassPanel>
+            ))}
+          </div>
+
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            onClick={handleManagePayments}
+            isLoading={isRedirecting}
+            leftIcon={!isRedirecting ? <ExternalLink className="w-5 h-5" /> : undefined}
+            glow
+          >
+            {isRedirecting ? 'Connecting to Stripe...' : 'Manage Payment Methods'}
+          </Button>
+        </FeatureCard>
 
         {/* Security Notice */}
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start gap-3">
-          <Shield className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="text-sm text-emerald-300 font-medium">Your payment info is secure</p>
-            <p className="text-xs text-slate-400 mt-1">
-              We never store your full card details. All payment processing is handled securely by Stripe
-              using industry-standard encryption.
-            </p>
+        <GlassPanel
+          variant="default"
+          padding="md"
+          border="none"
+          rounded="xl"
+          className="border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.08)]"
+        >
+          <div className="flex items-start gap-3">
+            <Shield className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm text-emerald-300 font-medium">Your payment info is secure</p>
+              <p className="text-xs text-slate-400 mt-1">
+                We never store your full card details. All payment processing is handled securely by Stripe
+                using industry-standard encryption.
+              </p>
+            </div>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </div>
   )

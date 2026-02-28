@@ -7,10 +7,13 @@ import {
   Plus, Search, MapPin, Clock, DollarSign, Users,
   MoreHorizontal, CheckCircle2, XCircle, Eye,
   MessageCircle, Edit, Star, Loader2, RefreshCw,
-  Sparkles, Package, Wrench, Leaf, Armchair, Truck, PartyPopper, ClipboardList
+  Sparkles, Package, Wrench, Leaf, Armchair, Truck, PartyPopper, ClipboardList,
+  Briefcase
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge, EmptyState } from '@/components/ui'
 
 // Category icons mapping
 const categoryIcons: Record<string, LucideIcon> = {
@@ -64,12 +67,12 @@ interface ApiResponse {
   }
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  posted: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
-  completed: { label: 'Completed', color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', icon: CheckCircle2 },
-  draft: { label: 'Draft', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', icon: Edit },
-  cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
+const statusConfig: Record<string, { label: string; color: string; borderColor: string; badgeVariant: 'brand' | 'success' | 'warning' | 'error' | 'neutral'; icon: React.ComponentType<{ className?: string }> }> = {
+  posted: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', borderColor: 'border-l-cyan-400', badgeVariant: 'brand', icon: CheckCircle2 },
+  in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', borderColor: 'border-l-blue-400', badgeVariant: 'brand', icon: Clock },
+  completed: { label: 'Completed', color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', borderColor: 'border-l-emerald-400', badgeVariant: 'success', icon: CheckCircle2 },
+  draft: { label: 'Draft', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', borderColor: 'border-l-amber-400', badgeVariant: 'warning', icon: Edit },
+  cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30', borderColor: 'border-l-red-400', badgeVariant: 'error', icon: XCircle },
 }
 
 // Format relative time
@@ -175,10 +178,12 @@ export default function HiringJobsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Success Banner */}
       {showNewJobBanner && (
-        <div className="bg-emerald-500/20 border-b border-emerald-500/30">
+        <div className="bg-emerald-500/20 border-b border-emerald-500/30 relative z-10">
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2 text-emerald-400">
               <CheckCircle2 className="w-5 h-5" />
@@ -195,82 +200,85 @@ export default function HiringJobsPage() {
       )}
 
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-white">My Jobs</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">My Jobs</h1>
               <p className="text-slate-400 mt-1">Manage your job postings</p>
             </div>
-            <Link
-              href="/hiring/new"
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25"
-            >
-              <Plus className="w-4 h-4" />
-              Post Job
+            <Link href="/hiring/new">
+              <Button variant="primary" leftIcon={<Plus className="w-4 h-4" />} glow>
+                Post Job
+              </Button>
             </Link>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5">
-              <div className="text-2xl font-bold text-white">{stats.active}</div>
-              <div className="text-sm text-slate-400">Active</div>
-            </div>
-            <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5">
-              <div className="text-2xl font-bold text-white">{stats.inProgress}</div>
-              <div className="text-sm text-slate-400">In Progress</div>
-            </div>
-            <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5">
-              <div className="text-2xl font-bold text-white">{stats.completed}</div>
-              <div className="text-sm text-slate-400">Completed</div>
-            </div>
-            <div className="p-4 bg-slate-800/50 rounded-xl border border-white/5">
-              <div className="text-2xl font-bold text-white">{stats.total}</div>
-              <div className="text-sm text-slate-400">Total</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filters */}
-      <div className="max-w-5xl mx-auto px-4 py-4">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search jobs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-            />
-          </div>
-          <div className="flex gap-2 overflow-x-auto">
-            {['all', 'active', 'in-progress', 'completed', 'draft'].map((status) => (
-              <button
-                key={status}
-                onClick={() => setFilter(status)}
-                className={cn(
-                  'px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors',
-                  filter === status
-                    ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                    : 'bg-slate-900 text-slate-400 border border-white/5 hover:text-white'
-                )}
+            {[
+              { label: 'Active', value: stats.active },
+              { label: 'In Progress', value: stats.inProgress },
+              { label: 'Completed', value: stats.completed },
+              { label: 'Total', value: stats.total },
+            ].map((stat, index) => (
+              <GlassPanel
+                key={stat.label}
+                variant="subtle"
+                padding="md"
+                border="light"
+                rounded="xl"
+                className="animate-card-enter"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                {status === 'all'
-                  ? 'All'
-                  : status === 'in-progress'
-                  ? 'In Progress'
-                  : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
+                <div className="text-2xl font-bold text-white">{stat.value}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
+              </GlassPanel>
             ))}
           </div>
         </div>
       </div>
 
+      {/* Filters */}
+      <div className="max-w-5xl mx-auto px-4 py-4 relative z-10">
+        <GlassPanel variant="default" padding="md" border="glow" rounded="xl">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search jobs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all"
+              />
+            </div>
+            <div className="flex gap-2 overflow-x-auto">
+              {['all', 'active', 'in-progress', 'completed', 'draft'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={cn(
+                    'px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
+                    filter === status
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]'
+                      : 'bg-slate-800/50 text-slate-400 border border-white/5 hover:text-white hover:border-white/10'
+                  )}
+                >
+                  {status === 'all'
+                    ? 'All'
+                    : status === 'in-progress'
+                    ? 'In Progress'
+                    : status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+          </div>
+        </GlassPanel>
+      </div>
+
       {/* Jobs List */}
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Loading State */}
         {isLoading && (
           <div className="flex items-center justify-center py-16">
@@ -286,30 +294,36 @@ export default function HiringJobsPage() {
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Something went wrong</h2>
             <p className="text-slate-400 mb-6">{error}</p>
-            <button
+            <Button
+              variant="secondary"
               onClick={fetchJobs}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-slate-800 text-white font-semibold rounded-xl hover:bg-slate-700 transition-colors"
+              leftIcon={<RefreshCw className="w-5 h-5" />}
             >
-              <RefreshCw className="w-5 h-5" />
               Try Again
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Jobs */}
         {!isLoading && !error && filteredJobs.length > 0 && (
           <div className="space-y-4">
-            {filteredJobs.map((job) => {
+            {filteredJobs.map((job, index) => {
               const statusInfo = statusConfig[job.status] || statusConfig.posted
               const StatusIcon = statusInfo.icon
               return (
-                <div
+                <GlassCard
                   key={job.id}
-                  className="bg-slate-900 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors"
+                  interactive={false}
+                  padding="lg"
+                  className={cn(
+                    'border-l-4 animate-card-enter',
+                    statusInfo.borderColor
+                  )}
+                  style={{ animationDelay: `${index * 80}ms` }}
                 >
                   <div className="flex gap-4">
                     {/* Category Icon */}
-                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0">
                       {(() => {
                         const CategoryIcon = categoryIcons[job.category] || ClipboardList
                         return <CategoryIcon className="w-7 h-7 text-cyan-400" />
@@ -336,15 +350,9 @@ export default function HiringJobsPage() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              'inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border',
-                              statusInfo.color
-                            )}
-                          >
-                            <StatusIcon className="w-3.5 h-3.5" />
+                          <Badge variant={statusInfo.badgeVariant} size="md" dot>
                             {statusInfo.label}
-                          </span>
+                          </Badge>
                           <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                             <MoreHorizontal className="w-5 h-5" />
                           </button>
@@ -377,44 +385,36 @@ export default function HiringJobsPage() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-3 mt-4">
-                        <Link
-                          href={`/hiring/job/${job.id}`}
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
-                        >
-                          <Eye className="w-4 h-4" />
-                          View Details
+                        <Link href={`/hiring/job/${job.id}`}>
+                          <Button variant="secondary" size="sm" leftIcon={<Eye className="w-4 h-4" />}>
+                            View Details
+                          </Button>
                         </Link>
                         {job.status === 'posted' && (
-                          <Link
-                            href={`/hiring/job/${job.id}#bids`}
-                            className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 text-cyan-400 text-sm font-medium rounded-xl hover:bg-cyan-500/20 transition-colors"
-                          >
-                            <Users className="w-4 h-4" />
-                            Review Bids ({job.bidCount})
+                          <Link href={`/hiring/job/${job.id}#bids`}>
+                            <Button variant="outline" size="sm" leftIcon={<Users className="w-4 h-4" />}>
+                              Review Bids ({job.bidCount})
+                            </Button>
                           </Link>
                         )}
                         {job.status === 'in_progress' && (
-                          <Link
-                            href="/hiring/messages"
-                            className="flex items-center gap-2 px-4 py-2 bg-cyan-500/10 text-cyan-400 text-sm font-medium rounded-xl hover:bg-cyan-500/20 transition-colors"
-                          >
-                            <MessageCircle className="w-4 h-4" />
-                            Message Worker
+                          <Link href="/hiring/messages">
+                            <Button variant="outline" size="sm" leftIcon={<MessageCircle className="w-4 h-4" />}>
+                              Message Worker
+                            </Button>
                           </Link>
                         )}
                         {job.status === 'draft' && (
-                          <Link
-                            href="/hiring/new"
-                            className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-400 text-sm font-medium rounded-xl hover:bg-amber-500/20 transition-colors"
-                          >
-                            <Edit className="w-4 h-4" />
-                            Continue Editing
+                          <Link href="/hiring/new">
+                            <Button variant="ghost" size="sm" leftIcon={<Edit className="w-4 h-4" />} className="text-amber-400 hover:text-amber-300">
+                              Continue Editing
+                            </Button>
                           </Link>
                         )}
                       </div>
                     </div>
                   </div>
-                </div>
+                </GlassCard>
               )
             })}
           </div>
@@ -422,22 +422,22 @@ export default function HiringJobsPage() {
 
         {/* Empty State */}
         {!isLoading && !error && filteredJobs.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Search className="w-10 h-10 text-slate-600" />
+          <FeatureCard gradient="cyan" shine className="mt-8">
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="w-10 h-10 text-cyan-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">No jobs found</h2>
+              <p className="text-slate-400 mb-6">
+                {filter === 'all' ? "You haven't posted any jobs yet. Create your first job to find great workers." : `No ${filter} jobs`}
+              </p>
+              <Link href="/hiring/new">
+                <Button variant="primary" leftIcon={<Plus className="w-5 h-5" />} glow>
+                  Post Your First Job
+                </Button>
+              </Link>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">No jobs found</h2>
-            <p className="text-slate-400 mb-6">
-              {filter === 'all' ? "You haven't posted any jobs yet" : `No ${filter} jobs`}
-            </p>
-            <Link
-              href="/hiring/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl"
-            >
-              <Plus className="w-5 h-5" />
-              Post Your First Job
-            </Link>
-          </div>
+          </FeatureCard>
         )}
       </div>
     </div>

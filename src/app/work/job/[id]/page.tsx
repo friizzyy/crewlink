@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button } from '@/components/ui'
 
 // Response type for the AI bid writer API
 interface AiBidWriterResponse {
@@ -158,55 +160,51 @@ export default function WorkJobDetailPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+              leftIcon={<ArrowLeft className="w-5 h-5" />}
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
+              Back
+            </Button>
             <div className="flex items-center gap-2">
-              <button
+              <Button
+                variant="ghost"
+                size="icon-sm"
                 onClick={handleToggleSave}
-                className={cn(
-                  'p-2 rounded-lg transition-colors',
-                  isSaved
-                    ? 'text-emerald-400 bg-emerald-500/10'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5'
-                )}
-                title={isSaved ? 'Remove from saved' : 'Save job'}
+                className={isSaved ? 'text-emerald-400 bg-emerald-500/10' : ''}
+                aria-label={isSaved ? 'Remove from saved' : 'Save job'}
               >
                 {isSaved ? (
                   <BookmarkCheck className="w-5 h-5" />
                 ) : (
                   <Bookmark className="w-5 h-5" />
                 )}
-              </button>
-              <button
-                onClick={handleShare}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Share job"
-              >
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleShare} aria-label="Share job">
                 <Share2 className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 relative z-10">
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Job Header */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-slate-800 flex items-center justify-center text-4xl shrink-0">
+                <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-4xl shrink-0">
                   {mockJob.categoryIcon}
                 </div>
                 <div className="flex-1">
@@ -239,7 +237,7 @@ export default function WorkJobDetailPage() {
 
               {/* Key Details */}
               <div className="grid sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
-                <div className="p-4 bg-slate-800/50 rounded-xl">
+                <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
                   <div className="flex items-center gap-2 text-emerald-400 mb-1">
                     <DollarSign className="w-4 h-4" />
                     <span className="text-sm">Budget</span>
@@ -247,46 +245,46 @@ export default function WorkJobDetailPage() {
                   <div className="text-xl font-bold text-white">
                     ${mockJob.budget.min} - ${mockJob.budget.max}
                   </div>
-                </div>
-                <div className="p-4 bg-slate-800/50 rounded-xl">
+                </GlassPanel>
+                <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
                   <div className="flex items-center gap-2 text-emerald-400 mb-1">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm">Duration</span>
                   </div>
                   <div className="text-xl font-bold text-white">{mockJob.duration}</div>
-                </div>
-                <div className="p-4 bg-slate-800/50 rounded-xl">
+                </GlassPanel>
+                <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
                   <div className="flex items-center gap-2 text-emerald-400 mb-1">
                     <Users className="w-4 h-4" />
                     <span className="text-sm">Bids</span>
                   </div>
                   <div className="text-xl font-bold text-white">{mockJob.bids} bids</div>
-                </div>
+                </GlassPanel>
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Description */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h2 className="text-lg font-semibold text-white mb-4">Job Description</h2>
               <div className="text-slate-300 whitespace-pre-line">{mockJob.description}</div>
-            </div>
+            </GlassPanel>
 
             {/* Location */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-emerald-400" />
                 Location
               </h2>
-              <div className="aspect-video bg-slate-800 rounded-xl mb-4 flex items-center justify-center">
+              <div className="aspect-video bg-slate-800/50 rounded-xl mb-4 flex items-center justify-center">
                 <MapPin className="w-10 h-10 text-slate-600" />
               </div>
               <p className="text-white font-medium">{mockJob.location}</p>
               <p className="text-sm text-slate-400 mt-1">{mockJob.address}</p>
-            </div>
+            </GlassPanel>
 
             {/* Bid Form */}
             {showBidForm && !bidSubmitted && (
-              <div className="bg-slate-900 border border-emerald-500/30 rounded-2xl p-6">
+              <GlassPanel variant="elevated" padding="lg" border="glow" rounded="xl" className="border-emerald-500/20 animate-card-enter">
                 <h2 className="text-lg font-semibold text-white mb-4">Submit Your Bid</h2>
 
                 <div className="space-y-4">
@@ -301,7 +299,7 @@ export default function WorkJobDetailPage() {
                         value={bidAmount}
                         onChange={(e) => setBidAmount(e.target.value)}
                         placeholder="Enter your price"
-                        className="w-full pl-12 pr-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                        className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] transition-all"
                       />
                     </div>
                     <p className="text-xs text-slate-500 mt-1">
@@ -318,7 +316,7 @@ export default function WorkJobDetailPage() {
                         type="button"
                         onClick={handleAiWriteBid}
                         disabled={isAiGenerating}
-                        className="bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isAiGenerating ? (
                           <Loader2 className="w-4 h-4 animate-spin" />
@@ -333,52 +331,52 @@ export default function WorkJobDetailPage() {
                       onChange={(e) => setBidMessage(e.target.value)}
                       placeholder="Introduce yourself and explain why you're the best fit for this job..."
                       rows={5}
-                      className="w-full px-4 py-3 bg-slate-800 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                      className="w-full px-4 py-3 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] resize-none transition-all"
                     />
                   </div>
 
                   <div className="flex items-center gap-3 pt-2">
-                    <button
+                    <Button
+                      variant="success"
+                      size="lg"
+                      fullWidth
+                      glow
                       onClick={handleSubmitBid}
-                      disabled={isSubmittingBid}
-                      className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      isLoading={isSubmittingBid}
+                      leftIcon={!isSubmittingBid ? <Send className="w-5 h-5" /> : undefined}
                     >
-                      {isSubmittingBid ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <Send className="w-5 h-5" />
-                      )}
                       {isSubmittingBid ? 'Submitting...' : 'Submit Bid'}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      size="lg"
                       onClick={() => setShowBidForm(false)}
-                      className="px-6 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
                     >
                       Cancel
-                    </button>
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </GlassPanel>
             )}
 
             {/* Bid Submitted Confirmation */}
             {bidSubmitted && (
-              <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-2xl p-6 text-center">
-                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              <FeatureCard gradient="emerald" shine className="animate-card-enter">
+                <div className="text-center py-4">
+                  <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+                  </div>
+                  <h2 className="text-xl font-semibold text-white mb-2">Bid Submitted!</h2>
+                  <p className="text-slate-400 mb-4">
+                    Your bid of ${bidAmount} has been submitted. The hirer will review your application and get back to you soon.
+                  </p>
+                  <Link href="/work/messages">
+                    <Button variant="secondary" leftIcon={<MessageCircle className="w-4 h-4" />}>
+                      Go to Messages
+                    </Button>
+                  </Link>
                 </div>
-                <h2 className="text-xl font-semibold text-white mb-2">Bid Submitted!</h2>
-                <p className="text-slate-400 mb-4">
-                  Your bid of ${bidAmount} has been submitted. The hirer will review your application and get back to you soon.
-                </p>
-                <Link
-                  href="/work/messages"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
-                >
-                  <MessageCircle className="w-4 h-4" />
-                  Go to Messages
-                </Link>
-              </div>
+              </FeatureCard>
             )}
           </div>
 
@@ -386,22 +384,24 @@ export default function WorkJobDetailPage() {
           <div className="space-y-6">
             {/* Apply Card */}
             {!bidSubmitted && (
-              <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+              <GlassPanel variant="elevated" padding="lg" border="glow" rounded="xl" className="border-emerald-500/20">
                 <div className="text-center mb-4">
-                  <div className="text-3xl font-bold text-emerald-400">
+                  <div className="text-3xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                     ${mockJob.budget.min} - ${mockJob.budget.max}
                   </div>
                   <p className="text-sm text-slate-400 mt-1">Budget Range</p>
                 </div>
 
                 {!showBidForm ? (
-                  <button
+                  <Button
+                    variant="success"
+                    fullWidth
+                    glow
                     onClick={() => setShowBidForm(true)}
-                    className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors"
+                    leftIcon={<Briefcase className="w-5 h-5" />}
                   >
-                    <Briefcase className="w-5 h-5" />
                     Apply for this Job
-                  </button>
+                  </Button>
                 ) : (
                   <p className="text-sm text-slate-400 text-center">
                     Complete the form below to submit your bid
@@ -414,16 +414,16 @@ export default function WorkJobDetailPage() {
                     {mockJob.bids} people have already applied
                   </span>
                 </div>
-              </div>
+              </GlassPanel>
             )}
 
             {/* Hirer Info */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+            <FeatureCard gradient="cyan" shine>
               <h3 className="font-semibold text-white mb-4">About the Hirer</h3>
 
               <div className="flex items-center gap-3 mb-4">
                 <div className="relative">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xl font-semibold">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xl font-semibold ring-2 ring-emerald-500/30">
                     {mockJob.hirer.avatar}
                   </div>
                   {mockJob.hirer.verified && (
@@ -470,36 +470,47 @@ export default function WorkJobDetailPage() {
 
               <Link
                 href={`/work/hirer/${mockJob.hirer.id}`}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors mt-4"
+                className="block mt-4"
               >
-                View Full Profile
-                <ChevronRight className="w-4 h-4" />
+                <Button variant="secondary" fullWidth rightIcon={<ChevronRight className="w-4 h-4" />}>
+                  View Full Profile
+                </Button>
               </Link>
-            </div>
+            </FeatureCard>
 
             {/* Similar Jobs */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h3 className="font-semibold text-white mb-4">Similar Jobs</h3>
               <div className="space-y-3">
                 {[
                   { id: '2', title: 'Apartment Cleaning', budget: '$80-100', location: 'Castro' },
                   { id: '3', title: 'Move-out Cleaning', budget: '$150-200', location: 'SOMA' },
                   { id: '4', title: 'Office Cleaning', budget: '$200-300', location: 'FiDi' },
-                ].map((job) => (
+                ].map((job, index) => (
                   <Link
                     key={job.id}
                     href={`/work/job/${job.id}`}
-                    className="block p-3 bg-slate-800/50 rounded-xl hover:bg-slate-800 transition-colors"
+                    className="block"
                   >
-                    <div className="font-medium text-white text-sm">{job.title}</div>
-                    <div className="flex items-center justify-between mt-1 text-xs">
-                      <span className="text-emerald-400">{job.budget}</span>
-                      <span className="text-slate-500">{job.location}</span>
-                    </div>
+                    <GlassPanel
+                      variant="subtle"
+                      padding="sm"
+                      border="none"
+                      rounded="lg"
+                      hoverable
+                      className="animate-card-enter"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <div className="font-medium text-white text-sm">{job.title}</div>
+                      <div className="flex items-center justify-between mt-1 text-xs">
+                        <span className="text-emerald-400">{job.budget}</span>
+                        <span className="text-slate-500">{job.location}</span>
+                      </div>
+                    </GlassPanel>
                   </Link>
                 ))}
               </div>
-            </div>
+            </GlassPanel>
           </div>
         </div>
       </div>

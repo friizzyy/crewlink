@@ -9,6 +9,8 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, FeatureCard, Button } from '@/components/ui'
 
 // Mock conversations data
 const mockConversations = [
@@ -214,27 +216,31 @@ export default function WorkMessagesPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] bg-slate-950 flex">
+    <div className="h-[calc(100vh-80px)] bg-slate-950 flex relative">
+      <AmbientBackground />
+
       {/* Conversations List */}
       <div
         className={cn(
-          'w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50',
+          'w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50 relative z-10',
           selectedConversation ? 'hidden md:flex' : 'flex'
         )}
       >
         {/* Header */}
         <div className="p-4 border-b border-white/5">
-          <h1 className="text-xl font-bold text-white mb-4">Messages</h1>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-            />
-          </div>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent mb-4">Messages</h1>
+          <GlassPanel variant="default" padding="none" border="glow" rounded="lg" className="border-emerald-500/20">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none"
+              />
+            </div>
+          </GlassPanel>
         </div>
 
         {/* Conversations */}
@@ -245,8 +251,8 @@ export default function WorkMessagesPage() {
                 key={conv.id}
                 onClick={() => setSelectedConversation(conv.id)}
                 className={cn(
-                  'w-full p-4 flex gap-3 hover:bg-white/5 transition-colors text-left border-b border-white/5',
-                  selectedConversation === conv.id && 'bg-emerald-500/10'
+                  'w-full p-4 flex gap-3 hover:bg-white/5 transition-all text-left border-b border-white/5',
+                  selectedConversation === conv.id && 'bg-emerald-500/10 border-l-2 border-l-emerald-400'
                 )}
               >
                 {/* Avatar */}
@@ -303,9 +309,9 @@ export default function WorkMessagesPage() {
 
       {/* Chat Area */}
       {selectedConversation && currentConversation ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-10">
           {/* Chat Header */}
-          <div className="p-4 border-b border-white/5 bg-slate-900/50 flex items-center justify-between">
+          <GlassPanel variant="default" padding="md" border="none" rounded="none" className="border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSelectedConversation(null)}
@@ -342,25 +348,17 @@ export default function WorkMessagesPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleCall}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Voice call"
-              >
+              <Button variant="ghost" size="icon-sm" onClick={handleCall} aria-label="Voice call">
                 <Phone className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleVideoCall}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Video call"
-              >
+              </Button>
+              <Button variant="ghost" size="icon-sm" onClick={handleVideoCall} aria-label="Video call">
                 <Video className="w-5 h-5" />
-              </button>
-              <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              </Button>
+              <Button variant="ghost" size="icon-sm">
                 <MoreHorizontal className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
-          </div>
+          </GlassPanel>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -373,15 +371,15 @@ export default function WorkMessagesPage() {
                   className={cn(
                     'max-w-[75%] px-4 py-2.5 rounded-2xl',
                     message.isFromMe
-                      ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
-                      : 'bg-slate-800 text-white'
+                      ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-white border border-emerald-500/10'
+                      : 'bg-slate-800/80 backdrop-blur-sm text-white border border-white/5'
                   )}
                 >
                   <p className="text-sm">{message.text}</p>
                   <div
                     className={cn(
                       'flex items-center justify-end gap-1 mt-1',
-                      message.isFromMe ? 'text-white/70' : 'text-slate-500'
+                      message.isFromMe ? 'text-emerald-400/70' : 'text-slate-500'
                     )}
                   >
                     <span className="text-xs">{message.time}</span>
@@ -399,7 +397,7 @@ export default function WorkMessagesPage() {
           </div>
 
           {/* Message Input */}
-          <div className="p-4 border-t border-white/5 bg-slate-900/50">
+          <GlassPanel variant="default" padding="md" border="glow" rounded="none" className="border-t border-white/5 border-emerald-500/20">
             {/* AI Suggestions */}
             {showSuggestions && (
               <div className="mb-3">
@@ -415,7 +413,7 @@ export default function WorkMessagesPage() {
                         <button
                           key={index}
                           onClick={() => handleSelectSuggestion(suggestion)}
-                          className="bg-slate-800 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 rounded-lg px-3 py-1.5 text-sm transition-colors cursor-pointer"
+                          className="bg-slate-800/50 hover:bg-emerald-500/20 text-slate-300 hover:text-emerald-400 rounded-lg px-3 py-1.5 text-sm transition-colors cursor-pointer border border-white/5 hover:border-emerald-500/20"
                         >
                           {suggestion}
                         </button>
@@ -428,20 +426,12 @@ export default function WorkMessagesPage() {
 
             <div className="flex items-end gap-3">
               <div className="flex gap-2">
-                <button
-                  onClick={handleAttachment}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                  title="Attach file"
-                >
+                <Button variant="ghost" size="icon-sm" onClick={handleAttachment} aria-label="Attach file">
                   <Paperclip className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleImageUpload}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                  title="Send image"
-                >
+                </Button>
+                <Button variant="ghost" size="icon-sm" onClick={handleImageUpload} aria-label="Send image">
                   <ImageIcon className="w-5 h-5" />
-                </button>
+                </Button>
               </div>
               <div className="flex-1 relative">
                 <textarea
@@ -455,12 +445,12 @@ export default function WorkMessagesPage() {
                   }}
                   placeholder="Type a message..."
                   rows={1}
-                  className="w-full px-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 resize-none"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:shadow-[0_0_20px_rgba(16,185,129,0.15)] resize-none transition-all"
                 />
               </div>
-              <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <Button variant="ghost" size="icon-sm">
                 <Smile className="w-5 h-5" />
-              </button>
+              </Button>
               <button
                 onClick={handleFetchSuggestions}
                 disabled={isLoadingSuggestions}
@@ -478,32 +468,31 @@ export default function WorkMessagesPage() {
                   <Sparkles className="w-5 h-5" />
                 )}
               </button>
-              <button
+              <Button
+                variant="success"
+                size="icon-sm"
                 onClick={handleSendMessage}
                 disabled={!messageText.trim()}
-                className={cn(
-                  'p-2.5 rounded-xl transition-colors',
-                  messageText.trim()
-                    ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white'
-                    : 'bg-slate-800 text-slate-500'
-                )}
+                className={!messageText.trim() ? 'opacity-50' : ''}
               >
                 <Send className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
-          </div>
+          </GlassPanel>
         </div>
       ) : (
-        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-10 h-10 text-slate-600" />
+        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950 relative z-10">
+          <FeatureCard gradient="emerald" shine className="max-w-sm mx-4">
+            <div className="text-center py-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-10 h-10 text-emerald-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">Your Messages</h2>
+              <p className="text-slate-400">
+                Select a conversation to start messaging with hirers about their jobs.
+              </p>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">Your Messages</h2>
-            <p className="text-slate-400 max-w-sm">
-              Select a conversation to start messaging with hirers about their jobs.
-            </p>
-          </div>
+          </FeatureCard>
         </div>
       )}
     </div>

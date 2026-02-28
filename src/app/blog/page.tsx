@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { BookOpen, ArrowRight, Clock, User, Sparkles } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // BLOG PAGE - Premium Content Hub
@@ -96,10 +97,10 @@ function HeroSection() {
 
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center relative">
         <div className={getRevealClasses(isVisible, 'up')} style={{ transitionDelay: '0ms' }}>
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-purple-500/10 backdrop-blur-xl rounded-full border border-purple-500/20 mb-10">
-            <BookOpen className="w-4 h-4 text-purple-400" />
-            <span className="text-sm font-medium text-purple-400 tracking-wide">Our blog</span>
-          </div>
+          <Badge variant="accent" size="md" className="mb-10 bg-purple-500/10 border-purple-500/20 text-purple-400">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Our blog
+          </Badge>
         </div>
 
         <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
@@ -125,25 +126,17 @@ function FeaturedPost() {
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <Link
           href={`/blog/${featuredPost.id}`}
-          className={`group relative block p-8 lg:p-10 bg-gradient-to-br from-slate-900/80 to-slate-900/40 backdrop-blur-xl rounded-3xl border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-purple-500/10 ${getRevealClasses(isVisible, 'scale')}`}
+          className={`group block ${getRevealClasses(isVisible, 'scale')}`}
         >
-          {/* Shine effect */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-          </div>
-
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-          <div className="relative">
+          <FeatureCard gradient="purple" shine className="p-8 lg:p-10">
             <div className="flex items-center gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium bg-purple-500/20 text-purple-400 rounded-full">
-                <Sparkles className="w-3 h-3" />
+              <Badge variant="accent" size="sm" className="bg-purple-500/20 text-purple-400">
+                <Sparkles className="w-3 h-3 mr-1" />
                 Featured
-              </span>
-              <span className="px-3 py-1 text-xs font-medium bg-slate-800/80 text-slate-400 rounded-full">
+              </Badge>
+              <Badge variant="neutral" size="sm">
                 {featuredPost.category}
-              </span>
+              </Badge>
             </div>
 
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4 group-hover:text-purple-400 transition-colors">
@@ -173,7 +166,7 @@ function FeaturedPost() {
                 <ArrowRight className="w-5 h-5 text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
               </div>
             </div>
-          </div>
+          </FeatureCard>
         </Link>
       </div>
     </section>
@@ -215,21 +208,13 @@ function PostsGrid() {
             <Link
               key={post.id}
               href={`/blog/${post.id}`}
-              className={`group relative p-6 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/5 hover:border-purple-500/30 hover:bg-slate-900/70 transition-all duration-300 overflow-hidden hover:shadow-xl hover:shadow-purple-500/5 ${getRevealClasses(isVisible, 'up')}`}
+              className={`group block ${getRevealClasses(isVisible, 'up')}`}
               style={{ transitionDelay: `${80 + i * 60}ms` }}
             >
-              {/* Shine effect */}
-              <div className="absolute inset-0 overflow-hidden">
-                <div className="absolute w-full h-full bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              </div>
-
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-              <div className="relative">
-                <span className="inline-block px-2.5 py-1 text-xs font-medium bg-slate-800/80 text-slate-400 rounded-full mb-4">
+              <GlassCard interactive padding="lg" rounded="xl" className="hover:translate-y-[-2px] hover:border-purple-500/30 h-full">
+                <Badge variant="neutral" size="sm" className="mb-4">
                   {post.category}
-                </span>
+                </Badge>
 
                 <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-purple-400 transition-colors line-clamp-2">
                   {post.title}
@@ -252,7 +237,7 @@ function PostsGrid() {
                     </span>
                   </span>
                 </div>
-              </div>
+              </GlassCard>
             </Link>
           ))}
         </div>
@@ -262,13 +247,9 @@ function PostsGrid() {
           {allLoaded ? (
             <p className="text-sm text-slate-500">You&apos;ve reached the end</p>
           ) : (
-            <button
-              onClick={() => setAllLoaded(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium border border-white/20 text-white rounded-xl hover:bg-white/5 hover:border-white/30 transition-all active:scale-[0.98]"
-            >
+            <Button variant="secondary" onClick={() => setAllLoaded(true)} rightIcon={<ArrowRight className="w-4 h-4" />}>
               Load more posts
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -283,7 +264,13 @@ function NewsletterSection() {
   return (
     <section ref={ref} className="py-20 sm:py-28 border-t border-white/5">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`relative overflow-hidden p-10 sm:p-14 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 rounded-3xl border border-purple-500/20 text-center ${getRevealClasses(isVisible, 'scale')}`}>
+        <GlassPanel
+          variant="elevated"
+          padding="none"
+          border="light"
+          rounded="2xl"
+          className={`relative overflow-hidden p-10 sm:p-14 text-center border-purple-500/20 ${getRevealClasses(isVisible, 'scale')}`}
+        >
           {/* Animated background glows */}
           <div className="absolute inset-0 pointer-events-none">
             <div
@@ -297,8 +284,10 @@ function NewsletterSection() {
           </div>
 
           <div className="relative">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              Stay in the loop
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Stay in the loop
+              </span>
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto">
               Get the latest posts delivered to your inbox. No spam, just good content.
@@ -319,15 +308,12 @@ function NewsletterSection() {
                   className="relative w-full px-4 py-3.5 bg-slate-800 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-purple-500/50 transition-all"
                 />
               </div>
-              <button
-                type="submit"
-                className="px-6 py-3.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-xl hover:from-purple-400 hover:to-pink-400 transition-all shadow-lg shadow-purple-500/20 hover:shadow-xl hover:shadow-purple-500/30 active:scale-[0.98]"
-              >
+              <Button type="submit" variant="accent" size="lg">
                 Subscribe
-              </button>
+              </Button>
             </form>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

@@ -4,6 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Check, Briefcase, Users, Sparkles, Camera, MapPin, MessageCircle, CreditCard, Star, Clock, Shield } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
+import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 
 // Compact step data
 const hireSteps = [
@@ -17,6 +19,7 @@ const hireSteps = [
     ],
     chips: ['AI Scope', 'Photo Upload', 'Location Pin'],
     icon: Camera,
+    gradient: 'cyan' as const,
   },
   {
     number: '2',
@@ -28,6 +31,7 @@ const hireSteps = [
     ],
     chips: ['Map View', 'Background Checks', 'Reviews'],
     icon: MapPin,
+    gradient: 'purple' as const,
   },
   {
     number: '3',
@@ -39,6 +43,7 @@ const hireSteps = [
     ],
     chips: ['In-App Chat', 'Scheduling', 'Instant Book'],
     icon: MessageCircle,
+    gradient: 'emerald' as const,
   },
   {
     number: '4',
@@ -50,6 +55,7 @@ const hireSteps = [
     ],
     chips: ['Live Tracking', 'Secure Pay', 'Reviews'],
     icon: CreditCard,
+    gradient: 'amber' as const,
   },
 ]
 
@@ -64,6 +70,7 @@ const workSteps = [
     ],
     chips: ['Skills', 'Pricing', 'Portfolio'],
     icon: Users,
+    gradient: 'cyan' as const,
   },
   {
     number: '2',
@@ -75,6 +82,7 @@ const workSteps = [
     ],
     chips: ['Map Discovery', 'Smart Filters', 'Alerts'],
     icon: MapPin,
+    gradient: 'purple' as const,
   },
   {
     number: '3',
@@ -86,6 +94,7 @@ const workSteps = [
     ],
     chips: ['Bidding', 'Instant Accept', 'Messaging'],
     icon: MessageCircle,
+    gradient: 'emerald' as const,
   },
   {
     number: '4',
@@ -97,12 +106,16 @@ const workSteps = [
     ],
     chips: ['Fast Payout', '24hr Transfer', 'Reviews'],
     icon: CreditCard,
+    gradient: 'amber' as const,
   },
 ]
 
 export default function HowItWorksPage() {
   const [activeMode, setActiveMode] = useState<'hire' | 'work'>('hire')
   const [activeStep, setActiveStep] = useState(0)
+  const heroReveal = useScrollReveal<HTMLDivElement>()
+  const contentReveal = useScrollReveal<HTMLDivElement>()
+  const ctaReveal = useScrollReveal<HTMLDivElement>()
 
   const steps = activeMode === 'hire' ? hireSteps : workSteps
   const currentStep = steps[activeStep]
@@ -111,7 +124,7 @@ export default function HowItWorksPage() {
     <MarketingLayout>
 
       {/* Hero - Compact */}
-      <section className="pt-28 pb-8 sm:pt-36 sm:pb-12 relative overflow-hidden">
+      <section ref={heroReveal.ref} className="pt-28 pb-8 sm:pt-36 sm:pb-12 relative overflow-hidden">
         {/* Background effects */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-20 left-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-[100px]" />
@@ -119,26 +132,31 @@ export default function HowItWorksPage() {
         </div>
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 rounded-full border border-cyan-500/20 mb-4">
-            <Sparkles className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm font-medium text-cyan-400">Simple, secure, fast</span>
+          <div className={getRevealClasses(heroReveal.isVisible, 'up')}>
+            <Badge variant="brand" size="md" className="mb-4">
+              <Sparkles className="w-4 h-4 mr-2" />
+              Simple, secure, fast
+            </Badge>
           </div>
 
-          <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight">
-            How CrewLink Works
+          <h1 className={`font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight ${getRevealClasses(heroReveal.isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
+            <span className="text-white">How </span>
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              CrewLink Works
+            </span>
           </h1>
-          <p className="mt-4 text-base sm:text-lg text-slate-400 max-w-xl mx-auto">
+          <p className={`mt-4 text-base sm:text-lg text-slate-400 max-w-xl mx-auto ${getRevealClasses(heroReveal.isVisible, 'up')}`} style={{ transitionDelay: '160ms' }}>
             Whether you&apos;re hiring or working, get started in minutes with our streamlined process.
           </p>
         </div>
       </section>
 
       {/* Main Content - Two Column Desktop */}
-      <section className="py-8 sm:py-12">
+      <section ref={contentReveal.ref} className="py-8 sm:py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mode Toggle */}
-          <div className="flex justify-center mb-8">
-            <div className="inline-flex items-center bg-slate-900/80 backdrop-blur-xl rounded-2xl p-1.5 border border-cyan-500/10">
+          <div className={`flex justify-center mb-8 ${getRevealClasses(contentReveal.isVisible, 'up')}`}>
+            <GlassPanel variant="elevated" padding="none" border="glow" rounded="2xl" className="inline-flex items-center p-1.5">
               <button
                 onClick={() => { setActiveMode('hire'); setActiveStep(0) }}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-all ${
@@ -161,14 +179,14 @@ export default function HowItWorksPage() {
                 <Users className="w-4 h-4" />
                 For Working
               </button>
-            </div>
+            </GlassPanel>
           </div>
 
           {/* Two Column Layout - Desktop */}
           <div className="hidden lg:grid lg:grid-cols-[280px_1fr] gap-8">
             {/* Left - Step Navigator (Sticky) */}
             <div className="sticky top-28 h-fit">
-              <div className="bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/10 p-4">
+              <GlassPanel variant="elevated" padding="md" border="light" rounded="2xl">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-4 px-2">
                   Steps
                 </h3>
@@ -187,9 +205,7 @@ export default function HowItWorksPage() {
                     >
                       <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
                         activeStep === index
-                          ? activeMode === 'hire'
-                            ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
-                            : 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
+                          ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white'
                           : 'bg-slate-800 text-slate-400'
                       }`}>
                         {step.number}
@@ -204,22 +220,22 @@ export default function HowItWorksPage() {
                     </button>
                   ))}
                 </nav>
-              </div>
+              </GlassPanel>
 
               {/* Trust badges */}
               <div className="mt-6 space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-slate-900/30 rounded-xl border border-white/5">
+                <GlassPanel variant="subtle" padding="sm" border="light" rounded="lg" className="flex items-center gap-3">
                   <Shield className="w-5 h-5 text-cyan-400" />
                   <span className="text-sm text-slate-400">Background-checked workers</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-900/30 rounded-xl border border-white/5">
+                </GlassPanel>
+                <GlassPanel variant="subtle" padding="sm" border="light" rounded="lg" className="flex items-center gap-3">
                   <Clock className="w-5 h-5 text-emerald-400" />
                   <span className="text-sm text-slate-400">15 min avg response time</span>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-slate-900/30 rounded-xl border border-white/5">
+                </GlassPanel>
+                <GlassPanel variant="subtle" padding="sm" border="light" rounded="lg" className="flex items-center gap-3">
                   <Star className="w-5 h-5 text-amber-400" />
                   <span className="text-sm text-slate-400">4.8 average rating</span>
-                </div>
+                </GlassPanel>
               </div>
             </div>
 
@@ -229,11 +245,7 @@ export default function HowItWorksPage() {
                 key={`${activeMode}-${activeStep}`}
                 className="animate-fadeIn"
               >
-                <div className={`p-8 rounded-3xl border ${
-                  activeMode === 'hire'
-                    ? 'bg-gradient-to-br from-slate-900/80 to-slate-900/40 border-cyan-500/20'
-                    : 'bg-gradient-to-br from-slate-900/80 to-slate-900/40 border-emerald-500/20'
-                }`}>
+                <FeatureCard gradient={currentStep.gradient} shine>
                   {/* Step header */}
                   <div className="flex items-start gap-4 mb-6">
                     <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
@@ -278,19 +290,16 @@ export default function HowItWorksPage() {
                   {/* Feature chips */}
                   <div className="flex flex-wrap gap-2">
                     {currentStep.chips.map((chip) => (
-                      <span
+                      <Badge
                         key={chip}
-                        className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-full border ${
-                          activeMode === 'hire'
-                            ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                        }`}
+                        variant={activeMode === 'hire' ? 'brand' : 'success'}
+                        size="sm"
                       >
                         {chip}
-                      </span>
+                      </Badge>
                     ))}
                   </div>
-                </div>
+                </FeatureCard>
 
                 {/* Navigation arrows */}
                 <div className="flex items-center justify-between mt-6">
@@ -329,14 +338,18 @@ export default function HowItWorksPage() {
           {/* Mobile Layout - Accordion Style */}
           <div className="lg:hidden space-y-3">
             {steps.map((step, index) => (
-              <div
+              <GlassPanel
                 key={step.number}
-                className={`rounded-2xl border overflow-hidden transition-all ${
+                variant={activeStep === index ? 'elevated' : 'subtle'}
+                padding="none"
+                border={activeStep === index ? 'glow' : 'light'}
+                rounded="xl"
+                className={`overflow-hidden transition-all ${
                   activeStep === index
                     ? activeMode === 'hire'
-                      ? 'bg-slate-900/80 border-cyan-500/30'
-                      : 'bg-slate-900/80 border-emerald-500/30'
-                    : 'bg-slate-900/50 border-white/10'
+                      ? 'border-cyan-500/30'
+                      : 'border-emerald-500/30'
+                    : ''
                 }`}
               >
                 <button
@@ -345,9 +358,7 @@ export default function HowItWorksPage() {
                 >
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0 ${
                     activeStep === index
-                      ? activeMode === 'hire'
-                        ? 'bg-gradient-to-br from-cyan-500 to-blue-600 text-white'
-                        : 'bg-gradient-to-br from-emerald-500 to-teal-600 text-white'
+                      ? 'bg-gradient-to-br from-cyan-400 to-blue-500 text-white'
                       : 'bg-slate-800 text-slate-400'
                   }`}>
                     {step.number}
@@ -375,30 +386,33 @@ export default function HowItWorksPage() {
                     </ul>
                     <div className="flex flex-wrap gap-2">
                       {step.chips.map((chip) => (
-                        <span
+                        <Badge
                           key={chip}
-                          className={`text-xs px-2.5 py-1 rounded-full border ${
-                            activeMode === 'hire'
-                              ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
-                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                          }`}
+                          variant={activeMode === 'hire' ? 'brand' : 'success'}
+                          size="sm"
                         >
                           {chip}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   </div>
                 )}
-              </div>
+              </GlassPanel>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA - Compact */}
-      <section className="py-12 pb-20">
+      <section ref={ctaReveal.ref} className="py-12 pb-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-cyan-500/20 p-6 sm:p-10">
+          <GlassPanel
+            variant="elevated"
+            padding="none"
+            border="glow"
+            rounded="2xl"
+            className={`relative overflow-hidden p-6 sm:p-10 ${getRevealClasses(ctaReveal.isVisible, 'scale')}`}
+          >
             {/* Background glows */}
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-[80px]" />
@@ -406,30 +420,28 @@ export default function HowItWorksPage() {
             </div>
 
             <div className="relative text-center">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-3">
-                Ready to get started?
+              <h2 className="font-display text-2xl sm:text-3xl font-bold mb-3">
+                <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  Ready to get started?
+                </span>
               </h2>
               <p className="text-slate-400 mb-6 max-w-md mx-auto">
                 Create your free account in under a minute. No credit card required.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
-                  href="/create-account?mode=hire"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25"
-                >
-                  <Briefcase className="w-4 h-4" />
-                  Start Hiring
+                <Link href="/create-account?mode=hire">
+                  <Button variant="primary" size="lg" glow leftIcon={<Briefcase className="w-4 h-4" />}>
+                    Start Hiring
+                  </Button>
                 </Link>
-                <Link
-                  href="/create-account?mode=work"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/25"
-                >
-                  <Users className="w-4 h-4" />
-                  Start Working
+                <Link href="/create-account?mode=work">
+                  <Button variant="success" size="lg" leftIcon={<Users className="w-4 h-4" />}>
+                    Start Working
+                  </Button>
                 </Link>
               </div>
             </div>
-          </div>
+          </GlassPanel>
         </div>
       </section>
 

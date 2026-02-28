@@ -11,6 +11,8 @@ import toast from 'react-hot-toast'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { Skeleton, SkeletonJobCard } from '@/components/ui/Skeleton'
 import { CATEGORIES, ALL_CATEGORY, getCategoryIcon } from '@/lib/categories'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button } from '@/components/ui'
 
 // ============================================
 // TYPES
@@ -165,7 +167,7 @@ function JobListSkeleton({ count = 5 }: { count?: number }) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className="bg-slate-900 border border-white/5 rounded-2xl p-5"
+          className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-2xl p-5"
         >
           <div className="flex gap-4">
             {/* Category icon skeleton */}
@@ -498,13 +500,15 @@ export default function WorkJobsPage() {
   const showingCount = jobs.length
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-white">Find Jobs</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Find Jobs</h1>
               <p className="text-slate-400 mt-1">
                 {isLoading
                   ? 'Loading jobs...'
@@ -521,23 +525,29 @@ export default function WorkJobsPage() {
           </div>
 
           {/* Search */}
-          <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search for jobs... (try 'cleaning in San Francisco under $200')"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full pl-12 pr-12 py-3 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              aria-label="Search for jobs"
-            />
-            {isAISearching && (
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 text-emerald-400">
-                <Sparkles className="w-4 h-4 animate-pulse" />
-                <span className="text-xs font-medium">AI</span>
+          <GlassPanel variant="default" padding="none" border="glow" rounded="xl" className="border-emerald-500/20">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search for jobs... (try 'cleaning in San Francisco under $200')"
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="w-full pl-12 pr-12 py-3 bg-transparent text-white placeholder-slate-500 focus:outline-none"
+                aria-label="Search for jobs"
+              />
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
+                {isAISearching ? (
+                  <div className="flex items-center gap-1.5 text-emerald-400">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    <span className="text-xs font-medium">AI</span>
+                  </div>
+                ) : (
+                  <Sparkles className="w-4 h-4 text-emerald-400/40 animate-pulse" />
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          </GlassPanel>
 
           {/* AI filter indicator */}
           {aiFilters && (
@@ -575,10 +585,10 @@ export default function WorkJobsPage() {
                 key={cat.id}
                 onClick={() => handleCategoryChange(cat.id)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors',
+                  'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
                   selectedCategory === cat.id
-                    ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                    : 'bg-slate-800 text-slate-400 hover:text-white'
+                    ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                    : 'bg-slate-800/50 text-slate-400 hover:text-white border border-transparent'
                 )}
                 aria-pressed={selectedCategory === cat.id}
               >
@@ -591,17 +601,17 @@ export default function WorkJobsPage() {
       </div>
 
       {/* Filters Bar */}
-      <div className="max-w-5xl mx-auto px-4 py-4">
+      <div className="max-w-5xl mx-auto px-4 py-4 relative z-10">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 px-3 py-2 bg-slate-900 border border-white/5 rounded-xl text-sm text-slate-400 hover:text-white transition-colors">
+            <button className="flex items-center gap-2 px-3 py-2 bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-xl text-sm text-slate-400 hover:text-white transition-colors">
               <Filter className="w-4 h-4" />
               Filters
             </button>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-3 py-2 bg-slate-900 border border-white/5 rounded-xl text-sm text-slate-400 focus:outline-none cursor-pointer"
+              className="px-3 py-2 bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-xl text-sm text-slate-400 focus:outline-none cursor-pointer"
               aria-label="Sort jobs"
             >
               <option value="relevance">Sort: Relevance</option>
@@ -621,7 +631,7 @@ export default function WorkJobsPage() {
       </div>
 
       {/* Jobs List */}
-      <div className="max-w-5xl mx-auto px-4">
+      <div className="max-w-5xl mx-auto px-4 relative z-10">
         {/* Loading State */}
         {isLoading && <JobListSkeleton count={5} />}
 
@@ -635,40 +645,36 @@ export default function WorkJobsPage() {
               Failed to load jobs
             </h2>
             <p className="text-slate-400 mb-6">{error}</p>
-            <button
-              onClick={() => fetchJobs(0)}
-              className="px-6 py-3 bg-emerald-500/10 text-emerald-400 font-medium rounded-xl hover:bg-emerald-500/20 transition-colors"
-            >
+            <Button variant="success" onClick={() => fetchJobs(0)}>
               Try Again
-            </button>
+            </Button>
           </div>
         )}
 
         {/* Empty State */}
         {!isLoading && !error && sortedJobs.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Search className="w-10 h-10 text-slate-600" />
+          <FeatureCard gradient="emerald" shine className="mt-8">
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Search className="w-10 h-10 text-emerald-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">
+                No jobs found
+              </h2>
+              <p className="text-slate-400 mb-6">
+                Try adjusting your filters or search query
+              </p>
+              <Button variant="secondary" onClick={clearFilters}>
+                Clear Filters
+              </Button>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
-              No jobs found
-            </h2>
-            <p className="text-slate-400 mb-6">
-              Try adjusting your filters or search query
-            </p>
-            <button
-              onClick={clearFilters}
-              className="px-6 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
+          </FeatureCard>
         )}
 
         {/* Job Cards */}
         {!isLoading && !error && sortedJobs.length > 0 && (
           <div className="space-y-4">
-            {sortedJobs.map((job) => {
+            {sortedJobs.map((job, index) => {
               const urgency = deriveUrgency(job)
               const urgencyInfo = urgencyConfig[urgency]
               const UrgencyIcon = urgencyInfo.icon
@@ -680,13 +686,16 @@ export default function WorkJobsPage() {
               const hirerRating = job.poster.hirerProfile?.averageRating ?? 0
 
               return (
-                <div
+                <GlassCard
                   key={job.id}
-                  className="bg-slate-900 border border-white/5 rounded-2xl p-5 hover:border-white/10 transition-colors"
+                  interactive={false}
+                  padding="lg"
+                  className="animate-card-enter"
+                  style={{ animationDelay: `${index * 80}ms` }}
                 >
                   <div className="flex gap-4">
                     {/* Category Icon */}
-                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center text-3xl shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-3xl shrink-0">
                       {categoryIcon}
                     </div>
 
@@ -766,10 +775,10 @@ export default function WorkJobsPage() {
                             <img
                               src={posterAvatar}
                               alt={posterName}
-                              className="w-6 h-6 rounded-full object-cover"
+                              className="w-6 h-6 rounded-full object-cover ring-2 ring-emerald-500/20"
                             />
                           ) : (
-                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xs font-semibold">
+                            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-white text-xs font-semibold ring-2 ring-emerald-500/20">
                               {posterInitial}
                             </div>
                           )}
@@ -790,54 +799,42 @@ export default function WorkJobsPage() {
 
                       {/* Actions */}
                       <div className="flex items-center gap-3 mt-4">
-                        <Link
-                          href={`/work/job/${job.id}`}
-                          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-semibold rounded-xl hover:from-emerald-400 hover:to-teal-500 transition-colors"
-                        >
-                          <Briefcase className="w-4 h-4" />
-                          Apply Now
+                        <Link href={`/work/job/${job.id}`}>
+                          <Button variant="success" size="sm" leftIcon={<Briefcase className="w-4 h-4" />}>
+                            Apply Now
+                          </Button>
                         </Link>
-                        <Link
-                          href={`/work/job/${job.id}`}
-                          className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
-                        >
-                          View Details
+                        <Link href={`/work/job/${job.id}`}>
+                          <Button variant="secondary" size="sm">
+                            View Details
+                          </Button>
                         </Link>
                       </div>
                     </div>
                   </div>
-                </div>
+                </GlassCard>
               )
             })}
 
             {/* Load More Button */}
             {pagination?.hasMore && (
               <div className="flex justify-center pt-6 pb-4">
-                <button
+                <Button
+                  variant="secondary"
                   onClick={handleLoadMore}
                   disabled={isLoadingMore}
-                  className={cn(
-                    'flex items-center gap-2 px-8 py-3 bg-slate-900 border border-white/10 text-white font-medium rounded-xl transition-colors',
-                    isLoadingMore
-                      ? 'opacity-60 cursor-not-allowed'
-                      : 'hover:bg-slate-800 hover:border-white/20'
-                  )}
+                  isLoading={isLoadingMore}
+                  leftIcon={!isLoadingMore ? <ChevronDown className="w-4 h-4" /> : undefined}
                 >
-                  {isLoadingMore ? (
+                  {isLoadingMore ? 'Loading more...' : (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Loading more...
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="w-4 h-4" />
                       Load More Jobs
                       <span className="text-slate-500 text-sm ml-1">
                         ({totalCount - showingCount} remaining)
                       </span>
                     </>
                   )}
-                </button>
+                </Button>
               </div>
             )}
           </div>

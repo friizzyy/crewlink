@@ -11,7 +11,11 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
-import { Skeleton } from '@/components/ui/Card'
+import { Skeleton, Rating } from '@/components/ui/Card'
+import { GlassPanel, GlassCard, FeatureCard } from '@/components/ui/GlassPanel'
+import { Button } from '@/components/ui/Button'
+import { Badge } from '@/components/ui/Card'
+import { AmbientBackground } from '@/components/AmbientBackground'
 
 interface WorkerProfileInfo {
   headline: string | null
@@ -130,18 +134,12 @@ export default function WorkerProfilePage() {
           </p>
           <p className="text-slate-400">{error}</p>
           <div className="flex gap-3 justify-center">
-            <button
-              onClick={() => router.back()}
-              className="px-6 py-2.5 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
-            >
+            <Button variant="secondary" onClick={() => router.back()}>
               Go Back
-            </button>
-            <button
-              onClick={fetchUser}
-              className="px-6 py-2.5 bg-cyan-500 text-white font-medium rounded-xl hover:bg-cyan-400 transition-colors"
-            >
+            </Button>
+            <Button variant="primary" onClick={fetchUser}>
               Try Again
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -155,9 +153,11 @@ export default function WorkerProfilePage() {
   const memberSince = new Date(user.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground intensity="low" />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-sm relative z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <button
             onClick={() => router.back()}
@@ -169,13 +169,14 @@ export default function WorkerProfilePage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 relative z-10">
         {/* Profile Header */}
-        <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 mb-6">
+        <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl" className="mb-6">
           <div className="flex flex-col sm:flex-row gap-6">
-            {/* Avatar */}
+            {/* Avatar with gradient ring */}
             <div className="relative shrink-0 mx-auto sm:mx-0">
-              <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold">
+              <div className="absolute -inset-3 bg-cyan-500/10 blur-3xl rounded-full" />
+              <div className="relative w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold ring-2 ring-cyan-500/30 ring-offset-2 ring-offset-slate-950">
                 {user.avatarUrl ? (
                   <Image src={user.avatarUrl} alt={displayName} width={96} height={96} className="w-24 h-24 rounded-2xl object-cover" />
                 ) : (
@@ -183,7 +184,7 @@ export default function WorkerProfilePage() {
                 )}
               </div>
               {wp?.isVerified && (
-                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-cyan-500 rounded-full flex items-center justify-center border-2 border-slate-900">
+                <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-cyan-500 rounded-full flex items-center justify-center border-2 border-slate-900 z-10">
                   <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
               )}
@@ -194,10 +195,10 @@ export default function WorkerProfilePage() {
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                 <h1 className="text-2xl font-bold text-white">{displayName}</h1>
                 {wp?.isVerified && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full mx-auto sm:mx-0">
-                    <BadgeCheck className="w-3 h-3" />
+                  <Badge variant="brand" size="sm" className="mx-auto sm:mx-0 w-fit">
+                    <BadgeCheck className="w-3 h-3 mr-1" />
                     Verified
-                  </span>
+                  </Badge>
                 )}
               </div>
 
@@ -207,8 +208,8 @@ export default function WorkerProfilePage() {
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-slate-400">
                 <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <span className="text-white font-semibold">{wp?.averageRating?.toFixed(1) || '0.0'}</span>
+                  <Rating value={wp?.averageRating ?? 0} size="sm" showValue={false} />
+                  <span className="text-white font-semibold ml-1">{wp?.averageRating?.toFixed(1) || '0.0'}</span>
                   <span>({user.reviewCount} reviews)</span>
                 </div>
                 <div className="flex items-center gap-1">
@@ -225,61 +226,65 @@ export default function WorkerProfilePage() {
               {/* Badges */}
               <div className="flex gap-2 mt-4 justify-center sm:justify-start flex-wrap">
                 {wp?.isVerified && (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                  <GlassPanel variant="subtle" padding="none" rounded="2xl" border="light" className="flex items-center gap-1.5 px-2.5 py-1">
                     <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
                     <span className="text-xs text-slate-300">Verified</span>
-                  </div>
+                  </GlassPanel>
                 )}
                 {(wp?.averageRating ?? 0) >= 4.5 && (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                  <GlassPanel variant="subtle" padding="none" rounded="2xl" border="light" className="flex items-center gap-1.5 px-2.5 py-1">
                     <Star className="w-3.5 h-3.5 text-amber-400" />
                     <span className="text-xs text-slate-300">Top Rated</span>
-                  </div>
+                  </GlassPanel>
                 )}
                 {(wp?.completedJobs ?? 0) >= 200 && (
-                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                  <GlassPanel variant="subtle" padding="none" rounded="2xl" border="light" className="flex items-center gap-1.5 px-2.5 py-1">
                     <Award className="w-3.5 h-3.5 text-purple-400" />
                     <span className="text-xs text-slate-300">{wp?.completedJobs}+ Jobs</span>
-                  </div>
+                  </GlassPanel>
                 )}
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex flex-col gap-2 sm:w-auto w-full">
-              <button
+              <Button
+                variant="primary"
+                size="lg"
                 onClick={handleHire}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-colors"
+                leftIcon={<Briefcase className="w-4 h-4" />}
+                fullWidth
               >
-                <Briefcase className="w-4 h-4" />
                 Hire Now
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="secondary"
+                size="lg"
                 onClick={handleMessage}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
+                leftIcon={<MessageCircle className="w-4 h-4" />}
+                fullWidth
               >
-                <MessageCircle className="w-4 h-4" />
                 Message
-              </button>
+              </Button>
             </div>
           </div>
-        </div>
+        </GlassPanel>
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
           {(['about', 'reviews'] as const).map((tab) => (
-            <button
+            <Button
               key={tab}
+              variant={activeTab === tab ? 'outline' : 'ghost'}
+              size="sm"
               onClick={() => setActiveTab(tab)}
               className={cn(
-                'px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-colors capitalize',
-                activeTab === tab
-                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                  : 'bg-slate-900 text-slate-400 border border-white/5 hover:text-white'
+                'capitalize',
+                activeTab === tab && 'bg-cyan-500/10'
               )}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -287,55 +292,65 @@ export default function WorkerProfilePage() {
         {activeTab === 'about' && (
           <div className="space-y-6">
             {/* Bio */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
               <h2 className="text-lg font-semibold text-white mb-4">About</h2>
               <p className="text-slate-300 leading-relaxed">
                 {wp?.bio || 'This worker has not added a bio yet.'}
               </p>
-            </div>
+            </GlassPanel>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{wp?.completedJobs ?? 0}</div>
-                <div className="text-sm text-slate-400 mt-1">Jobs Done</div>
-              </div>
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{user.reviewCount}</div>
-                <div className="text-sm text-slate-400 mt-1">Reviews</div>
-              </div>
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{wp?.serviceRadius ?? 25} mi</div>
-                <div className="text-sm text-slate-400 mt-1">Service Radius</div>
-              </div>
-              <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="flex items-center justify-center gap-1">
-                  <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                  <span className="text-2xl font-bold text-white">{wp?.averageRating?.toFixed(1) || '0.0'}</span>
-                </div>
-                <div className="text-sm text-slate-400 mt-1">Rating</div>
-              </div>
+              {[
+                { label: 'Jobs Done', value: wp?.completedJobs ?? 0, color: 'cyan' },
+                { label: 'Reviews', value: user.reviewCount, color: 'purple' },
+                { label: 'Service Radius', value: `${wp?.serviceRadius ?? 25} mi`, color: 'emerald' },
+                { label: 'Rating', value: wp?.averageRating?.toFixed(1) || '0.0', color: 'amber', showStar: true },
+              ].map((stat, index) => (
+                <GlassPanel
+                  key={stat.label}
+                  variant="subtle"
+                  padding="md"
+                  border="light"
+                  rounded="xl"
+                  className="text-center animate-card-enter"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <div className={cn(
+                    'flex items-center justify-center gap-1',
+                    stat.showStar && 'mb-0'
+                  )}>
+                    {stat.showStar && <Star className="w-5 h-5 text-amber-400 fill-amber-400" />}
+                    <span className="text-2xl font-bold text-white">{stat.value}</span>
+                  </div>
+                  <div className="text-sm text-slate-400 mt-1">{stat.label}</div>
+                </GlassPanel>
+              ))}
             </div>
 
             {/* Skills */}
             {(wp?.skills ?? []).length > 0 && (
-              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+              <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
                 <h2 className="text-lg font-semibold text-white mb-4">Skills</h2>
                 <div className="flex flex-wrap gap-2">
                   {wp?.skills.map((skill: string) => (
-                    <span
+                    <GlassPanel
                       key={skill}
-                      className="px-3 py-1.5 bg-slate-800 text-slate-300 text-sm rounded-lg"
+                      variant="subtle"
+                      padding="none"
+                      rounded="lg"
+                      border="light"
+                      className="px-3 py-1.5 text-slate-300 text-sm hover:shadow-[0_0_12px_rgba(6,182,212,0.2)] hover:border-cyan-500/20 transition-all cursor-default"
                     >
                       {skill}
-                    </span>
+                    </GlassPanel>
                   ))}
                 </div>
-              </div>
+              </GlassPanel>
             )}
 
             {/* Member Info */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
               <h2 className="text-lg font-semibold text-white mb-4">Details</h2>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
@@ -362,25 +377,25 @@ export default function WorkerProfilePage() {
                   </span>
                 </div>
               </div>
-            </div>
+            </GlassPanel>
           </div>
         )}
 
         {activeTab === 'reviews' && (
           <div className="space-y-4">
             {user.reviewCount > 0 ? (
-              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 text-center">
+              <GlassCard interactive={false} className="text-center">
                 <p className="text-slate-400">
                   {user.reviewCount} review{user.reviewCount !== 1 ? 's' : ''} available.
                 </p>
                 <p className="text-sm text-slate-500 mt-2">
                   Detailed review listing coming soon.
                 </p>
-              </div>
+              </GlassCard>
             ) : (
-              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 text-center">
+              <GlassCard interactive={false} className="text-center">
                 <p className="text-slate-400">No reviews yet</p>
-              </div>
+              </GlassCard>
             )}
           </div>
         )}

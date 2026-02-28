@@ -6,6 +6,7 @@ import { Briefcase, MapPin, Clock, ArrowRight, Heart, Zap, Globe, ChevronDown, M
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 import { JOB_ROLES, getAllDepartments, getAllLocations, filterRoles } from '@/lib/careers'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // CAREERS PAGE - Job listings and company culture
@@ -13,10 +14,10 @@ import { JOB_ROLES, getAllDepartments, getAllLocations, filterRoles } from '@/li
 // ============================================
 
 const benefits = [
-  { icon: Heart, title: 'Health & wellness', description: 'Full medical, dental, and vision coverage for you and your family' },
-  { icon: Clock, title: 'Flexible schedule', description: 'Work when you\'re most productive. We trust you to manage your time' },
-  { icon: Globe, title: 'Remote-first', description: 'Work from anywhere. Our team spans multiple time zones' },
-  { icon: Zap, title: 'Growth budget', description: '$2,000 annual stipend for learning, conferences, and courses' },
+  { icon: Heart, title: 'Health & wellness', description: 'Full medical, dental, and vision coverage for you and your family', gradient: 'cyan' as const },
+  { icon: Clock, title: 'Flexible schedule', description: 'Work when you\'re most productive. We trust you to manage your time', gradient: 'purple' as const },
+  { icon: Globe, title: 'Remote-first', description: 'Work from anywhere. Our team spans multiple time zones', gradient: 'emerald' as const },
+  { icon: Zap, title: 'Growth budget', description: '$2,000 annual stipend for learning, conferences, and courses', gradient: 'amber' as const },
 ]
 
 function HeroSection() {
@@ -31,14 +32,15 @@ function HeroSection() {
 
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center relative">
         <div className={getRevealClasses(isVisible, 'up')} style={{ transitionDelay: '0ms' }}>
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-emerald-500/10 backdrop-blur-xl rounded-full border border-emerald-500/20 mb-10">
-            <Briefcase className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm font-medium text-emerald-400 tracking-wide">We&apos;re hiring</span>
-          </div>
+          <Badge variant="success" size="md" className="mb-10">
+            <Briefcase className="w-4 h-4 mr-2" />
+            We&apos;re hiring
+          </Badge>
         </div>
 
-        <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
-          Build something that matters
+        <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
+          <span className="text-white">Build something that </span>
+          <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">matters</span>
         </h1>
 
         <p className={`mt-8 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '160ms' }}>
@@ -46,19 +48,15 @@ function HeroSection() {
         </p>
 
         <div className={`mt-10 flex flex-col sm:flex-row gap-4 justify-center ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '240ms' }}>
-          <a
-            href="#openings"
-            className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-semibold rounded-2xl hover:from-emerald-400 hover:to-teal-500 transition-all shadow-lg shadow-emerald-500/20"
-          >
-            View open positions
-            <ArrowRight className="w-5 h-5" />
+          <a href="#openings">
+            <Button variant="success" size="lg" glow rightIcon={<ArrowRight className="w-5 h-5" />}>
+              View open positions
+            </Button>
           </a>
-          <a
-            href="mailto:careers@crewlink.com?subject=General%20Inquiry"
-            className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/5 transition-all"
-          >
-            <Mail className="w-5 h-5" />
-            Contact recruiting
+          <a href="mailto:careers@crewlink.com?subject=General%20Inquiry">
+            <Button variant="secondary" size="lg" leftIcon={<Mail className="w-5 h-5" />}>
+              Contact recruiting
+            </Button>
           </a>
         </div>
       </div>
@@ -73,8 +71,10 @@ function BenefitsSection() {
     <section ref={ref} className="py-20 sm:py-28 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-16">
-          <h2 className={`font-display text-3xl sm:text-4xl font-bold text-white tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
-            Why join CrewLink
+          <h2 className={`font-display text-3xl sm:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
+            <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+              Why join CrewLink
+            </span>
           </h2>
           <p className={`mt-4 text-lg text-slate-500 max-w-xl mx-auto ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
             We take care of our team so they can take care of our users
@@ -83,9 +83,11 @@ function BenefitsSection() {
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {benefits.map((benefit, i) => (
-            <div
+            <FeatureCard
               key={benefit.title}
-              className={`p-6 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/5 hover:border-emerald-500/20 transition-all duration-300 ${getRevealClasses(isVisible, 'up')}`}
+              gradient={benefit.gradient}
+              shine
+              className={getRevealClasses(isVisible, 'up')}
               style={{ transitionDelay: `${160 + i * 80}ms` }}
             >
               <div className="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4">
@@ -93,7 +95,7 @@ function BenefitsSection() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{benefit.title}</h3>
               <p className="text-sm text-slate-400 leading-relaxed">{benefit.description}</p>
-            </div>
+            </FeatureCard>
           ))}
         </div>
       </div>
@@ -217,9 +219,10 @@ function OpeningsSection() {
               <Link
                 key={job.slug}
                 href={`/careers/${job.slug}`}
-                className={`group block p-6 bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/5 hover:border-emerald-500/30 hover:bg-slate-900/60 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 ${getRevealClasses(isVisible, 'up')}`}
+                className={`group block ${getRevealClasses(isVisible, 'up')}`}
                 style={{ transitionDelay: `${160 + i * 60}ms` }}
               >
+              <GlassCard interactive padding="lg" rounded="xl" className="hover:translate-y-[-2px] hover:border-emerald-500/30">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div>
                     <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400 transition-colors">
@@ -242,6 +245,7 @@ function OpeningsSection() {
                   </div>
                   <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all shrink-0" />
                 </div>
+              </GlassCard>
               </Link>
             ))
           )}
@@ -257,28 +261,34 @@ function CTASection() {
   return (
     <section ref={ref} className="py-20 sm:py-28">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`relative overflow-hidden p-10 sm:p-14 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 rounded-3xl border border-emerald-500/20 text-center ${getRevealClasses(isVisible, 'scale')}`}>
+        <GlassPanel
+          variant="elevated"
+          padding="none"
+          border="light"
+          rounded="2xl"
+          className={`relative overflow-hidden p-10 sm:p-14 text-center border-emerald-500/20 ${getRevealClasses(isVisible, 'scale')}`}
+        >
           <div className="absolute inset-0 pointer-events-none">
             <div className="absolute -top-20 -right-20 w-80 h-80 bg-emerald-500/10 rounded-full blur-[100px]" />
             <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px]" />
           </div>
 
           <div className="relative">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              Don&apos;t see the right role?
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                Don&apos;t see the right role?
+              </span>
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto">
               We&apos;re always looking for talented people. Send us your resume and we&apos;ll reach out when we have a match.
             </p>
-            <a
-              href="mailto:careers@crewlink.com?subject=General%20Application&body=Hi%20CrewLink%20team%2C%0A%0AI'm%20interested%20in%20opportunities%20at%20CrewLink.%0A%0A[Please%20attach%20your%20resume%20and%20share%20a%20bit%20about%20yourself]"
-              className="inline-flex items-center justify-center gap-2.5 px-8 py-4 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/5 transition-all focus:outline-none focus:ring-2 focus:ring-white/30"
-            >
-              <Mail className="w-5 h-5" />
-              Get in touch
+            <a href="mailto:careers@crewlink.com?subject=General%20Application&body=Hi%20CrewLink%20team%2C%0A%0AI'm%20interested%20in%20opportunities%20at%20CrewLink.%0A%0A[Please%20attach%20your%20resume%20and%20share%20a%20bit%20about%20yourself]">
+              <Button variant="secondary" size="lg" leftIcon={<Mail className="w-5 h-5" />}>
+                Get in touch
+              </Button>
             </a>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

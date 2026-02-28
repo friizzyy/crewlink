@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 import { CATEGORIES, saveCategory } from '@/lib/categories'
+import { GlassPanel, GlassCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // CATEGORIES PAGE - Premium Job Category Browser
@@ -115,11 +116,11 @@ function CategoriesGrid({ searchQuery }: { searchQuery: string }) {
     return (
       <section className="py-12">
         <div className="max-w-lg mx-auto px-6 text-center">
-          <div className="p-12 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/10">
+          <GlassPanel variant="elevated" padding="xl" border="light" rounded="xl">
             <Search className="w-12 h-12 text-slate-600 mx-auto mb-4" />
             <p className="text-white font-medium text-lg">No categories found</p>
             <p className="text-slate-500 mt-2">Try a different search term</p>
-          </div>
+          </GlassPanel>
         </div>
       </section>
     )
@@ -163,10 +164,10 @@ function CategoriesGrid({ searchQuery }: { searchQuery: string }) {
                         {cat.label}
                       </h3>
                       {cat.popular && (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-cyan-400">
-                          <TrendingUp className="w-3 h-3" />
+                        <Badge variant="accent" size="sm">
+                          <TrendingUp className="w-3 h-3 mr-1" />
                           Popular
-                        </span>
+                        </Badge>
                       )}
                     </div>
                   </div>
@@ -198,7 +199,13 @@ function CTASection() {
   return (
     <section ref={ref} className="py-20 sm:py-28">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`relative overflow-hidden p-10 sm:p-14 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-800 rounded-3xl border border-cyan-500/20 text-center ${getRevealClasses(isVisible, 'scale')}`}>
+        <GlassPanel
+          variant="elevated"
+          padding="none"
+          border="glow"
+          rounded="2xl"
+          className={`relative overflow-hidden p-10 sm:p-14 text-center ${getRevealClasses(isVisible, 'scale')}`}
+        >
           {/* Animated background glows */}
           <div className="absolute inset-0 pointer-events-none">
             <div
@@ -212,29 +219,28 @@ function CTASection() {
           </div>
 
           <div className="relative">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
-              Ready to get started?
+            <h2 className="font-display text-2xl sm:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Ready to get started?
+              </span>
             </h2>
             <p className="text-slate-400 mb-8 max-w-lg mx-auto">
               Post a job in any category and get matched with qualified workers in minutes.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/create-account?mode=hire"
-                className="inline-flex items-center justify-center gap-2.5 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-2xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30 w-full sm:w-auto active:scale-[0.98]"
-              >
-                Post a Job
-                <ArrowRight className="w-5 h-5" />
+              <Link href="/create-account?mode=hire">
+                <Button variant="primary" size="lg" glow rightIcon={<ArrowRight className="w-5 h-5" />} className="w-full sm:w-auto">
+                  Post a Job
+                </Button>
               </Link>
-              <Link
-                href="/create-account?mode=work"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/5 hover:border-white/30 transition-all w-full sm:w-auto active:scale-[0.98]"
-              >
-                Start Earning
+              <Link href="/create-account?mode=work">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto">
+                  Start Earning
+                </Button>
               </Link>
             </div>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { GlassPanel, GlassCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // HELP CENTER - Premium Support Experience
@@ -184,10 +185,10 @@ export default function HelpPage() {
           className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center ${getRevealClasses(heroRef.isVisible, 'up')}`}
         >
           {/* Icon Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
-            <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm text-cyan-400 font-medium">Help Center</span>
-          </div>
+          <Badge variant="brand" size="md" className="mb-8">
+            <BookOpen className="w-4 h-4 mr-2" />
+            Help Center
+          </Badge>
 
           <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight">
             How can we{' '}
@@ -262,8 +263,10 @@ export default function HelpPage() {
             <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-cyan-400" />
             </div>
-            <h2 className="font-display text-2xl font-bold text-white">
-              Browse by category
+            <h2 className="font-display text-2xl font-bold">
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                Browse by category
+              </span>
             </h2>
           </div>
 
@@ -362,46 +365,36 @@ export default function HelpPage() {
 
           <div className="grid sm:grid-cols-2 gap-6">
             {/* Chat Card */}
-            <div className="group relative p-8 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/5 hover:border-cyan-500/30 transition-all duration-300 text-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-                  <MessageCircle className="w-7 h-7 text-cyan-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Chat with us</h3>
-                <p className="text-slate-400 text-sm mb-6">
-                  Get instant answers from our support team
-                </p>
-                <button
-                  onClick={() => setShowChatModal(true)}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20 hover:shadow-xl hover:shadow-cyan-500/30 active:scale-[0.98]"
-                >
-                  Start chat
-                </button>
-                <p className="text-xs text-slate-500 mt-4">Average response time: &lt;2 minutes</p>
+            <GlassCard interactive={false} padding="xl" rounded="xl" className="text-center group">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+                <MessageCircle className="w-7 h-7 text-cyan-400" />
               </div>
-            </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Chat with us</h3>
+              <p className="text-slate-400 text-sm mb-6">
+                Get instant answers from our support team
+              </p>
+              <Button variant="primary" size="lg" fullWidth glow onClick={() => setShowChatModal(true)}>
+                Start chat
+              </Button>
+              <p className="text-xs text-slate-500 mt-4">Average response time: &lt;2 minutes</p>
+            </GlassCard>
 
             {/* Email Card */}
-            <div className="group relative p-8 bg-slate-900/50 backdrop-blur-xl rounded-2xl border border-white/5 hover:border-purple-500/30 transition-all duration-300 text-center">
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative">
-                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
-                  <Mail className="w-7 h-7 text-purple-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-2">Email support</h3>
-                <p className="text-slate-400 text-sm mb-6">
-                  We typically respond within 24 hours
-                </p>
-                <a
-                  href="mailto:support@crewlink.com"
-                  className="block w-full px-6 py-4 border border-white/10 text-white font-semibold rounded-xl hover:bg-white/5 hover:border-white/20 transition-all active:scale-[0.98]"
-                >
-                  Send email
-                </a>
-                <p className="text-xs text-slate-500 mt-4">support@crewlink.com</p>
+            <GlassCard interactive={false} padding="xl" rounded="xl" className="text-center group">
+              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center mx-auto mb-5 group-hover:scale-110 transition-transform">
+                <Mail className="w-7 h-7 text-purple-400" />
               </div>
-            </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Email support</h3>
+              <p className="text-slate-400 text-sm mb-6">
+                We typically respond within 24 hours
+              </p>
+              <a href="mailto:support@crewlink.com">
+                <Button variant="secondary" size="lg" fullWidth>
+                  Send email
+                </Button>
+              </a>
+              <p className="text-xs text-slate-500 mt-4">support@crewlink.com</p>
+            </GlassCard>
           </div>
         </div>
       </section>

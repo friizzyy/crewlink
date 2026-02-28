@@ -25,6 +25,8 @@ import {
   Zap,
 } from 'lucide-react'
 import { useAuthStore } from '@/store'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button, LiveDot } from '@/components/ui'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -51,7 +53,7 @@ interface ActivityItem {
 }
 
 // ---------------------------------------------------------------------------
-// Skeleton components (imported from @/components/ui/Skeleton when available)
+// Skeleton components
 // ---------------------------------------------------------------------------
 
 function SkeletonPulse({ className = '' }: { className?: string }) {
@@ -181,27 +183,42 @@ const quickActions = [
     label: 'Post New Job',
     href: '/hiring/post',
     icon: Plus,
-    gradient: 'from-cyan-500 to-blue-600',
+    gradient: 'from-cyan-500/20 to-blue-500/20',
+    iconGradient: 'from-cyan-500 to-blue-600',
   },
   {
     label: 'View All Bids',
     href: '/hiring/jobs',
     icon: Eye,
-    gradient: 'from-violet-500 to-purple-600',
+    gradient: 'from-violet-500/20 to-purple-500/20',
+    iconGradient: 'from-violet-500 to-purple-600',
   },
   {
     label: 'Messages',
     href: '/hiring/messages',
     icon: MessageCircle,
-    gradient: 'from-blue-500 to-indigo-600',
+    gradient: 'from-blue-500/20 to-indigo-500/20',
+    iconGradient: 'from-blue-500 to-indigo-600',
   },
   {
     label: 'Settings',
     href: '/hiring/settings',
     icon: Settings,
-    gradient: 'from-slate-400 to-slate-500',
+    gradient: 'from-slate-400/20 to-slate-500/20',
+    iconGradient: 'from-slate-400 to-slate-500',
   },
 ] as const
+
+// ---------------------------------------------------------------------------
+// Time-of-day greeting
+// ---------------------------------------------------------------------------
+
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
+}
 
 // ---------------------------------------------------------------------------
 // Stat Card
@@ -233,16 +250,13 @@ function StatCard({
   const isPositive = change >= 0
 
   return (
-    <motion.div
-      variants={itemVariants}
-      className="group relative overflow-hidden rounded-2xl border border-white/5 bg-slate-900/80 p-6 backdrop-blur-md transition-all duration-300 hover:border-white/10 hover:shadow-lg"
+    <FeatureCard
+      shine
+      gradient={index === 0 ? 'cyan' : index === 1 ? 'emerald' : index === 2 ? 'purple' : 'amber'}
+      className="animate-card-enter"
+      style={{ animationDelay: `${index * 100}ms` }}
     >
-      {/* Subtle gradient glow on hover */}
-      <div
-        className={`absolute -right-8 -top-8 h-24 w-24 rounded-full bg-gradient-to-br ${accentFrom} ${accentTo} opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-20`}
-      />
-
-      <div className="relative flex items-start justify-between">
+      <div className="flex items-start justify-between">
         <div className="space-y-1">
           <p className="text-sm font-medium text-slate-400">{label}</p>
           <p className="text-3xl font-bold tracking-tight text-white">
@@ -266,12 +280,12 @@ function StatCard({
         </div>
 
         <div
-          className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${accentFrom} ${accentTo} shadow-[0_4px_14px_-2px_${glowColor}]`}
+          className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${accentFrom} ${accentTo} shadow-lg`}
         >
           <Icon className="h-5 w-5 text-white" />
         </div>
       </div>
-    </motion.div>
+    </FeatureCard>
   )
 }
 
@@ -384,16 +398,13 @@ export default function HiringDashboardPage() {
   // Date display
   const today = format(new Date(), 'EEEE, MMMM d, yyyy')
   const firstName = user?.name?.split(' ')[0] || 'there'
+  const greeting = getGreeting()
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Ambient background gradient */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-1/4 -top-1/4 h-[600px] w-[600px] rounded-full bg-cyan-500/[0.03] blur-[120px]" />
-        <div className="absolute -bottom-1/4 -right-1/4 h-[500px] w-[500px] rounded-full bg-blue-600/[0.03] blur-[120px]" />
-      </div>
+      <AmbientBackground intensity="low" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -405,7 +416,10 @@ export default function HiringDashboardPage() {
           {/* ----------------------------------------------------------------- */}
           <motion.header variants={headerVariants} className="space-y-1">
             <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Welcome back, {firstName}
+              {greeting},{' '}
+              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                {firstName}
+              </span>
             </h1>
             <p className="text-base text-slate-400">{today}</p>
           </motion.header>
@@ -433,10 +447,7 @@ export default function HiringDashboardPage() {
               </button>
             </motion.div>
           ) : stats ? (
-            <motion.div
-              variants={containerVariants}
-              className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
-            >
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
               <StatCard
                 label="Active Jobs"
                 value={String(stats.activeJobs)}
@@ -481,7 +492,7 @@ export default function HiringDashboardPage() {
                 glowColor="rgba(245,158,11,0.4)"
                 index={3}
               />
-            </motion.div>
+            </div>
           ) : null}
 
           {/* ----------------------------------------------------------------- */}
@@ -490,7 +501,13 @@ export default function HiringDashboardPage() {
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
             {/* Left: Recent Activity (3/5 width) */}
             <motion.div variants={itemVariants} className="lg:col-span-3">
-              <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/80 backdrop-blur-md">
+              <GlassPanel
+                variant="elevated"
+                padding="none"
+                border="light"
+                rounded="xl"
+                className="overflow-hidden"
+              >
                 <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
                   <h2 className="text-lg font-semibold text-white">
                     Recent Activity
@@ -520,33 +537,41 @@ export default function HiringDashboardPage() {
                       </button>
                     </div>
                   ) : activity.length === 0 ? (
-                    <div className="flex flex-col items-center gap-3 px-3 py-12 text-center">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-800/80">
-                        <Bell className="h-5 w-5 text-slate-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-300">
-                          No recent activity
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          Post a job to get started and see activity here.
-                        </p>
-                      </div>
-                      <Link
-                        href="/hiring/post"
-                        className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_14px_-2px_rgba(6,182,212,0.4)] transition-shadow hover:shadow-[0_4px_20px_-2px_rgba(6,182,212,0.5)]"
-                      >
-                        <Plus className="h-3.5 w-3.5" />
-                        Post Your First Job
-                      </Link>
+                    <div className="px-3 py-8">
+                      <FeatureCard gradient="cyan" className="text-center">
+                        <div className="flex flex-col items-center gap-3 py-4">
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
+                            <Bell className="h-5 w-5 text-cyan-400" />
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-300">
+                              No recent activity
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">
+                              Post a job to get started and see activity here.
+                            </p>
+                          </div>
+                          <Link href="/hiring/post">
+                            <Button
+                              variant="primary"
+                              size="sm"
+                              leftIcon={<Plus className="h-3.5 w-3.5" />}
+                              glow
+                            >
+                              Post Your First Job
+                            </Button>
+                          </Link>
+                        </div>
+                      </FeatureCard>
                     </div>
                   ) : (
-                    activity.map((item) => {
+                    activity.map((item, idx) => {
                       const { icon: ItemIcon, color, bg } = getActivityIcon(item.type)
                       return (
                         <div
                           key={item.id}
-                          className="group/item flex items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-white/[0.02]"
+                          className="group/item flex items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-white/[0.02] animate-stagger-fade"
+                          style={{ animationDelay: `${idx * 80}ms` }}
                         >
                           <div
                             className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${bg}`}
@@ -574,85 +599,97 @@ export default function HiringDashboardPage() {
                     })
                   )}
                 </div>
-              </div>
+              </GlassPanel>
             </motion.div>
 
             {/* Right column (2/5 width) */}
             <div className="space-y-6 lg:col-span-2">
               {/* Quick Actions */}
               <motion.div variants={itemVariants}>
-                <div className="overflow-hidden rounded-2xl border border-white/5 bg-slate-900/80 backdrop-blur-md">
+                <GlassPanel
+                  variant="elevated"
+                  padding="none"
+                  border="light"
+                  rounded="xl"
+                  className="overflow-hidden"
+                >
                   <div className="border-b border-white/5 px-6 py-4">
                     <h2 className="text-lg font-semibold text-white">
                       Quick Actions
                     </h2>
                   </div>
-                  <div className="grid grid-cols-2 gap-3 p-4">
-                    {quickActions.map((action) => (
+                  <div className="flex gap-3 overflow-x-auto p-4 scrollbar-none">
+                    {quickActions.map((action, idx) => (
                       <Link
                         key={action.label}
                         href={action.href}
-                        className="group/action relative flex flex-col items-center gap-2.5 rounded-xl border border-transparent bg-white/[0.02] px-4 py-5 text-center transition-all duration-200 hover:border-white/10 hover:bg-white/[0.04]"
+                        className="flex-shrink-0"
                       >
-                        {/* Hover gradient border effect */}
-                        <div
-                          className={`absolute inset-0 rounded-xl bg-gradient-to-br ${action.gradient} opacity-0 transition-opacity duration-300 group-hover/action:opacity-[0.06]`}
-                        />
-                        <div
-                          className={`relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient} shadow-sm`}
+                        <GlassCard
+                          interactive
+                          padding="md"
+                          className="flex w-[120px] flex-col items-center gap-2.5 text-center animate-card-enter"
+                          style={{ animationDelay: `${idx * 80}ms` }}
                         >
-                          <action.icon className="h-4.5 w-4.5 text-white" />
-                        </div>
-                        <span className="relative text-xs font-semibold text-slate-300 transition-colors group-hover/action:text-white">
-                          {action.label}
-                        </span>
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.gradient}`}
+                          >
+                            <div
+                              className={`flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br ${action.iconGradient}`}
+                            >
+                              <action.icon className="h-4.5 w-4.5 text-white" />
+                            </div>
+                          </div>
+                          <span className="text-xs font-semibold text-slate-300">
+                            {action.label}
+                          </span>
+                        </GlassCard>
                       </Link>
                     ))}
                   </div>
-                </div>
+                </GlassPanel>
               </motion.div>
 
               {/* AI Insight Card */}
               <motion.div variants={itemVariants}>
-                <div className="relative overflow-hidden rounded-2xl border border-white/5 bg-slate-900/80 backdrop-blur-md">
-                  {/* Ambient glow */}
-                  <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br from-orange-500/20 to-amber-500/10 blur-2xl" />
-
-                  <div className="relative p-6">
-                    <div className="mb-4 flex items-center gap-2.5">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)]">
-                        <Sparkles className="h-4 w-4 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-white">
-                          AI Insight
-                        </h3>
-                        <p className="text-[10px] font-medium uppercase tracking-wider text-orange-400/70">
-                          Market trend
-                        </p>
-                      </div>
+                <FeatureCard gradient="amber" shine>
+                  <div className="mb-4 flex items-center gap-2.5">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)]">
+                      <Sparkles className="h-4 w-4 text-white" />
                     </div>
-
-                    <p className="text-sm leading-relaxed text-slate-300">
-                      Cleaning jobs are trending in your area &mdash;{' '}
-                      <span className="font-semibold text-orange-300">
-                        40% more posted
-                      </span>{' '}
-                      this week compared to last. Consider posting now to attract
-                      top-rated workers before demand peaks.
-                    </p>
-
-                    <div className="mt-4 flex items-center gap-2">
-                      <Link
-                        href="/hiring/post"
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_14px_-2px_rgba(249,115,22,0.35)] transition-all hover:shadow-[0_4px_20px_-2px_rgba(249,115,22,0.5)]"
-                      >
-                        <Zap className="h-3.5 w-3.5" />
-                        Post a Cleaning Job
-                      </Link>
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">
+                        AI Insight
+                      </h3>
+                      <p className="text-[10px] font-medium uppercase tracking-wider text-orange-400/70">
+                        Market trend
+                      </p>
                     </div>
+                    <LiveDot variant="amber" size="sm" pulse className="ml-auto" />
                   </div>
-                </div>
+
+                  <p className="text-sm leading-relaxed text-slate-300">
+                    Cleaning jobs are trending in your area &mdash;{' '}
+                    <span className="font-semibold text-orange-300">
+                      40% more posted
+                    </span>{' '}
+                    this week compared to last. Consider posting now to attract
+                    top-rated workers before demand peaks.
+                  </p>
+
+                  <div className="mt-4 flex items-center gap-2">
+                    <Link href="/hiring/post">
+                      <Button
+                        variant="accent"
+                        size="sm"
+                        leftIcon={<Zap className="h-3.5 w-3.5" />}
+                        className="bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 shadow-[0_4px_14px_-2px_rgba(249,115,22,0.35)]"
+                      >
+                        Post a Cleaning Job
+                      </Button>
+                    </Link>
+                  </div>
+                </FeatureCard>
               </motion.div>
             </div>
           </div>

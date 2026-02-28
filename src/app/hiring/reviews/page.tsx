@@ -8,7 +8,10 @@ import {
 } from 'lucide-react'
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
-import { Skeleton } from '@/components/ui/Card'
+import { Skeleton, Rating } from '@/components/ui/Card'
+import { GlassPanel, GlassCard, FeatureCard } from '@/components/ui/GlassPanel'
+import { Button } from '@/components/ui/Button'
+import { AmbientBackground } from '@/components/AmbientBackground'
 
 interface ReviewAuthor {
   id: string
@@ -144,9 +147,11 @@ export default function HiringReviewsPage() {
     : reviews.filter(r => r.rating === parseInt(filter))
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground intensity="low" />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 backdrop-blur-sm relative z-10">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/hiring/profile"
@@ -160,7 +165,7 @@ export default function HiringReviewsPage() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6 relative z-10">
         {loading ? (
           <ReviewsSkeleton />
         ) : error ? (
@@ -170,37 +175,27 @@ export default function HiringReviewsPage() {
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Failed to load reviews</h2>
             <p className="text-slate-400 max-w-sm mx-auto mb-6">{error}</p>
-            <button
+            <Button
+              variant="primary"
               onClick={fetchReviews}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors"
+              leftIcon={<RefreshCw className="w-4 h-4" />}
             >
-              <RefreshCw className="w-4 h-4" />
               Retry
-            </button>
+            </Button>
           </div>
         ) : (
           <>
             {/* Stats Overview */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <div className="flex flex-col sm:flex-row gap-6">
                 {/* Rating Summary */}
                 <div className="text-center sm:text-left">
                   <div className="flex items-center gap-2 justify-center sm:justify-start">
-                    <span className="text-5xl font-bold text-white">{stats.avgRating || '0.0'}</span>
+                    <span className="text-5xl font-bold bg-gradient-to-r from-amber-400 to-orange-400 bg-clip-text text-transparent">
+                      {stats.avgRating || '0.0'}
+                    </span>
                     <div className="flex flex-col">
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={cn(
-                              'w-4 h-4',
-                              i < Math.round(stats.avgRating)
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-600'
-                            )}
-                          />
-                        ))}
-                      </div>
+                      <Rating value={stats.avgRating} size="sm" showValue={false} />
                       <span className="text-sm text-slate-400">{stats.totalReviews} reviews</span>
                     </div>
                   </div>
@@ -216,7 +211,7 @@ export default function HiringReviewsPage() {
                         <span className="text-sm text-slate-400 w-8">{rating} star</span>
                         <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-amber-400 rounded-full"
+                            className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
@@ -226,38 +221,37 @@ export default function HiringReviewsPage() {
                   })}
                 </div>
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Filter */}
-            <div className="flex items-center gap-2 overflow-x-auto">
+            <GlassPanel variant="subtle" padding="none" border="light" rounded="lg" className="flex items-center gap-1 p-1 overflow-x-auto">
               {(['all', '5', '4', '3', '2', '1'] as const).map((f) => (
-                <button
+                <Button
                   key={f}
+                  variant={filter === f ? 'primary' : 'ghost'}
+                  size="sm"
                   onClick={() => setFilter(f)}
-                  className={cn(
-                    'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors',
-                    filter === f
-                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                      : 'bg-slate-900 text-slate-400 border border-white/5 hover:text-white'
-                  )}
+                  className="whitespace-nowrap"
                 >
                   {f === 'all' ? 'All Reviews' : `${f} Stars`}
-                </button>
+                </Button>
               ))}
-            </div>
+            </GlassPanel>
 
             {/* Reviews List */}
             <div className="space-y-4">
               {filteredReviews.length > 0 ? (
-                filteredReviews.map((review) => {
+                filteredReviews.map((review, index) => {
                   const authorName = review.author?.name || 'Anonymous'
                   const avatarInitial = authorName.charAt(0).toUpperCase()
                   const jobTitle = review.booking?.job?.title || 'Job'
 
                   return (
-                    <div
+                    <GlassCard
                       key={review.id}
-                      className="bg-slate-900 border border-white/5 rounded-2xl p-5"
+                      interactive={false}
+                      className="animate-card-enter"
+                      style={{ animationDelay: `${index * 80}ms` }}
                     >
                       <div className="flex items-start gap-4">
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-semibold shrink-0">
@@ -274,19 +268,7 @@ export default function HiringReviewsPage() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
                             <span className="font-semibold text-white">{authorName}</span>
-                            <div className="flex items-center gap-0.5">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={cn(
-                                    'w-3.5 h-3.5',
-                                    i < review.rating
-                                      ? 'text-amber-400 fill-amber-400'
-                                      : 'text-slate-600'
-                                  )}
-                                />
-                              ))}
-                            </div>
+                            <Rating value={review.rating} size="sm" showValue={false} />
                           </div>
                           {review.title && (
                             <p className="text-white font-medium mt-1">{review.title}</p>
@@ -305,7 +287,7 @@ export default function HiringReviewsPage() {
                           )}
                         </div>
                       </div>
-                    </div>
+                    </GlassCard>
                   )
                 })
               ) : (

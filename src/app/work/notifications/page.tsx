@@ -13,6 +13,8 @@ import { cn } from '@/lib/utils'
 import { formatRelativeTime } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/Card'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button } from '@/components/ui'
 
 interface Notification {
   id: string
@@ -55,7 +57,7 @@ function NotificationSkeleton() {
   return (
     <div className="space-y-2">
       {[1, 2, 3, 4, 5].map((i) => (
-        <div key={i} className="bg-slate-900 border border-white/5 rounded-xl p-4 flex gap-4">
+        <div key={i} className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-xl p-4 flex gap-4">
           <Skeleton variant="rectangular" width={40} height={40} className="shrink-0 !rounded-xl" />
           <div className="flex-1 space-y-2">
             <Skeleton variant="text" width="40%" height={16} />
@@ -146,34 +148,37 @@ export default function WorkNotificationsPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold text-white">Notifications</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Notifications</h1>
               {unreadCount > 0 && (
-                <span className="px-2.5 py-0.5 bg-emerald-500 text-white text-sm font-semibold rounded-full">
+                <span className="px-2.5 py-0.5 bg-emerald-500 text-white text-sm font-semibold rounded-full animate-glow-pulse">
                   {unreadCount} new
                 </span>
               )}
             </div>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && (
-                <button
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={markAllAsRead}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                  leftIcon={<CheckCheck className="w-4 h-4" />}
+                  className="text-emerald-400"
                 >
-                  <CheckCheck className="w-4 h-4" />
                   Mark all read
-                </button>
+                </Button>
               )}
-              <Link
-                href="/work/settings"
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-              >
-                <Settings className="w-5 h-5" />
+              <Link href="/work/settings">
+                <Button variant="ghost" size="icon-sm">
+                  <Settings className="w-5 h-5" />
+                </Button>
               </Link>
             </div>
           </div>
@@ -183,10 +188,10 @@ export default function WorkNotificationsPage() {
             <button
               onClick={() => setFilter('all')}
               className={cn(
-                'px-4 py-2 rounded-xl text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-xl text-sm font-medium transition-all',
                 filter === 'all'
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                  : 'bg-slate-800/50 text-slate-400 hover:text-white'
               )}
             >
               All
@@ -194,10 +199,10 @@ export default function WorkNotificationsPage() {
             <button
               onClick={() => setFilter('unread')}
               className={cn(
-                'px-4 py-2 rounded-xl text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-xl text-sm font-medium transition-all',
                 filter === 'unread'
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-slate-800 text-slate-400 hover:text-white'
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                  : 'bg-slate-800/50 text-slate-400 hover:text-white'
               )}
             >
               Unread ({unreadCount})
@@ -207,7 +212,7 @@ export default function WorkNotificationsPage() {
       </div>
 
       {/* Notifications List */}
-      <div className="max-w-3xl mx-auto px-4 py-4">
+      <div className="max-w-3xl mx-auto px-4 py-4 relative z-10">
         {loading ? (
           <NotificationSkeleton />
         ) : error ? (
@@ -217,27 +222,24 @@ export default function WorkNotificationsPage() {
             </div>
             <h2 className="text-xl font-semibold text-white mb-2">Failed to load notifications</h2>
             <p className="text-slate-400 max-w-sm mx-auto mb-6">{error}</p>
-            <button
-              onClick={fetchNotifications}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
-            >
-              <RefreshCw className="w-4 h-4" />
+            <Button variant="success" onClick={fetchNotifications} leftIcon={<RefreshCw className="w-4 h-4" />}>
               Retry
-            </button>
+            </Button>
           </div>
         ) : filteredNotifications.length > 0 ? (
           <div className="space-y-2">
-            {filteredNotifications.map((notification) => {
+            {filteredNotifications.map((notification, index) => {
               const { icon: Icon, iconColor } = getNotificationIcon(notification.type)
               return (
-                <div
+                <GlassCard
                   key={notification.id}
+                  interactive={false}
+                  padding="md"
                   className={cn(
-                    'relative group bg-slate-900 border rounded-xl p-4 transition-colors',
-                    notification.isRead
-                      ? 'border-white/5 hover:border-white/10'
-                      : 'border-emerald-500/30 bg-emerald-500/5'
+                    'group animate-card-enter',
+                    !notification.isRead && 'border-l-4 border-l-emerald-400 bg-emerald-500/5'
                   )}
+                  style={{ animationDelay: `${index * 60}ms` }}
                 >
                   <Link
                     href={notification.actionUrl || '/work/notifications'}
@@ -273,7 +275,7 @@ export default function WorkNotificationsPage() {
                           </p>
                         </div>
                         {!notification.isRead && (
-                          <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shrink-0 mt-1.5" />
+                          <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shrink-0 mt-1.5 animate-pulse" />
                         )}
                       </div>
                       <span className="text-xs text-slate-500 mt-2 block">
@@ -301,24 +303,26 @@ export default function WorkNotificationsPage() {
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
+                </GlassCard>
               )
             })}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Bell className="w-10 h-10 text-slate-600" />
+          <FeatureCard gradient="emerald" shine className="mt-8">
+            <div className="text-center py-8">
+              <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Bell className="w-10 h-10 text-emerald-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">
+                {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+              </h2>
+              <p className="text-slate-400 max-w-sm mx-auto">
+                {filter === 'unread'
+                  ? "You're all caught up!"
+                  : "When hirers respond to your bids or new jobs match your skills, you'll see them here."}
+              </p>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">
-              {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
-            </h2>
-            <p className="text-slate-400 max-w-sm mx-auto">
-              {filter === 'unread'
-                ? "You're all caught up!"
-                : "When hirers respond to your bids or new jobs match your skills, you'll see them here."}
-            </p>
-          </div>
+          </FeatureCard>
         )}
       </div>
     </div>

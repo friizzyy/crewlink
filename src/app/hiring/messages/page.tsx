@@ -11,6 +11,8 @@ import {
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/Card'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, FeatureCard, Button } from '@/components/ui'
 
 // --- Types matching API response shapes ---
 
@@ -245,8 +247,9 @@ export default function HiringMessagesPage() {
   // --- Loading skeleton for conversations ---
   if (conversationsLoading) {
     return (
-      <div className="h-[calc(100vh-80px)] bg-slate-950 flex">
-        <div className="w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50">
+      <div className="h-[calc(100vh-80px)] bg-slate-950 flex relative">
+        <AmbientBackground />
+        <div className="w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50 relative z-10">
           <div className="p-4 border-b border-white/5">
             <h1 className="text-xl font-bold text-white mb-4">Messages</h1>
             <Skeleton variant="rectangular" height={42} className="rounded-xl" />
@@ -264,7 +267,7 @@ export default function HiringMessagesPage() {
             ))}
           </div>
         </div>
-        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950">
+        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950 relative z-10">
           <div className="text-center">
             <Loader2 className="w-10 h-10 text-slate-600 mx-auto mb-3 animate-spin" />
             <p className="text-slate-400">Loading conversations...</p>
@@ -277,45 +280,46 @@ export default function HiringMessagesPage() {
   // --- Error state for conversations ---
   if (conversationsError) {
     return (
-      <div className="h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center">
-        <div className="text-center">
+      <div className="h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center relative">
+        <AmbientBackground />
+        <div className="text-center relative z-10">
           <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-white mb-2">Failed to load conversations</h2>
           <p className="text-slate-400 mb-4">{conversationsError}</p>
-          <button
-            onClick={fetchConversations}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
-          >
-            <RefreshCw className="w-4 h-4" />
+          <Button variant="primary" onClick={fetchConversations} leftIcon={<RefreshCw className="w-4 h-4" />}>
             Retry
-          </button>
+          </Button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="h-[calc(100vh-80px)] bg-slate-950 flex">
+    <div className="h-[calc(100vh-80px)] bg-slate-950 flex relative">
+      <AmbientBackground />
+
       {/* Conversations List */}
       <div
         className={cn(
-          'w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50',
+          'w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50 relative z-10',
           selectedConversation ? 'hidden md:flex' : 'flex'
         )}
       >
         {/* Header */}
         <div className="p-4 border-b border-white/5">
-          <h1 className="text-xl font-bold text-white mb-4">Messages</h1>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-            <input
-              type="text"
-              placeholder="Search conversations..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50"
-            />
-          </div>
+          <h1 className="text-xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-4">Messages</h1>
+          <GlassPanel variant="default" padding="none" border="glow" rounded="lg">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-transparent text-white placeholder-slate-500 text-sm focus:outline-none"
+              />
+            </div>
+          </GlassPanel>
         </div>
 
         {/* Conversations */}
@@ -326,8 +330,8 @@ export default function HiringMessagesPage() {
                 key={conv.id}
                 onClick={() => setSelectedConversation(conv.id)}
                 className={cn(
-                  'w-full p-4 flex gap-3 hover:bg-white/5 transition-colors text-left border-b border-white/5',
-                  selectedConversation === conv.id && 'bg-cyan-500/10'
+                  'w-full p-4 flex gap-3 hover:bg-white/5 transition-all text-left border-b border-white/5',
+                  selectedConversation === conv.id && 'bg-cyan-500/10 border-l-2 border-l-cyan-400'
                 )}
               >
                 {/* Avatar */}
@@ -379,9 +383,9 @@ export default function HiringMessagesPage() {
 
       {/* Chat Area */}
       {selectedConversation && currentConversation ? (
-        <div className="flex-1 flex flex-col">
+        <div className="flex-1 flex flex-col relative z-10">
           {/* Chat Header */}
-          <div className="p-4 border-b border-white/5 bg-slate-900/50 flex items-center justify-between">
+          <GlassPanel variant="default" padding="md" border="none" rounded="none" className="border-b border-white/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSelectedConversation(null)}
@@ -411,11 +415,11 @@ export default function HiringMessagesPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <Button variant="ghost" size="icon-sm">
                 <MoreHorizontal className="w-5 h-5" />
-              </button>
+              </Button>
             </div>
-          </div>
+          </GlassPanel>
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -439,13 +443,9 @@ export default function HiringMessagesPage() {
                 <div className="text-center">
                   <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
                   <p className="text-slate-400 mb-3">{messagesError}</p>
-                  <button
-                    onClick={() => fetchMessages(selectedConversation)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-white text-sm rounded-lg hover:bg-cyan-600 transition-colors"
-                  >
-                    <RefreshCw className="w-3.5 h-3.5" />
+                  <Button variant="primary" size="sm" onClick={() => fetchMessages(selectedConversation)} leftIcon={<RefreshCw className="w-3.5 h-3.5" />}>
                     Retry
-                  </button>
+                  </Button>
                 </div>
               </div>
             ) : messages.length === 0 ? (
@@ -468,15 +468,15 @@ export default function HiringMessagesPage() {
                         className={cn(
                           'max-w-[75%] px-4 py-2.5 rounded-2xl',
                           isFromMe
-                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                            : 'bg-slate-800 text-white'
+                            ? 'bg-gradient-to-r from-cyan-500/20 to-blue-500/20 text-white border border-cyan-500/10'
+                            : 'bg-slate-800/80 backdrop-blur-sm text-white border border-white/5'
                         )}
                       >
                         <p className="text-sm">{message.content}</p>
                         <div
                           className={cn(
                             'flex items-center justify-end gap-1 mt-1',
-                            isFromMe ? 'text-white/70' : 'text-slate-500'
+                            isFromMe ? 'text-cyan-400/70' : 'text-slate-500'
                           )}
                         >
                           <span className="text-xs">{formatMessageTime(message.createdAt)}</span>
@@ -494,7 +494,7 @@ export default function HiringMessagesPage() {
           </div>
 
           {/* Message Input */}
-          <div className="p-4 border-t border-white/5 bg-slate-900/50">
+          <GlassPanel variant="default" padding="md" border="glow" rounded="none" className="border-t border-white/5">
             <div className="flex items-end gap-3">
               <div className="flex-1 relative">
                 <textarea
@@ -510,46 +510,39 @@ export default function HiringMessagesPage() {
                   placeholder="Type a message..."
                   rows={1}
                   disabled={isSending}
-                  className="w-full px-4 py-2.5 bg-slate-800 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 resize-none min-h-[42px] max-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] resize-none min-h-[42px] max-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   style={{ overflow: 'hidden' }}
                 />
               </div>
-              <button
-                disabled={isSending}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
-              >
+              <Button variant="ghost" size="icon-sm" disabled={isSending}>
                 <Smile className="w-5 h-5" />
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="primary"
+                size="icon-sm"
                 onClick={handleSendMessage}
                 disabled={!messageText.trim() || isSending}
-                className={cn(
-                  'p-2.5 rounded-xl transition-colors disabled:cursor-not-allowed',
-                  messageText.trim() && !isSending
-                    ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:opacity-90'
-                    : 'bg-slate-800 text-slate-500'
-                )}
+                isLoading={isSending}
+                className={!messageText.trim() && !isSending ? 'opacity-50' : ''}
               >
-                {isSending ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                ) : (
-                  <Send className="w-5 h-5" />
-                )}
-              </button>
+                <Send className="w-5 h-5" />
+              </Button>
             </div>
-          </div>
+          </GlassPanel>
         </div>
       ) : (
-        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <MessageCircle className="w-10 h-10 text-slate-600" />
+        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950 relative z-10">
+          <FeatureCard gradient="cyan" shine className="max-w-sm mx-4">
+            <div className="text-center py-4">
+              <div className="w-20 h-20 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="w-10 h-10 text-cyan-400" />
+              </div>
+              <h2 className="text-xl font-semibold text-white mb-2">Your Messages</h2>
+              <p className="text-slate-400">
+                Select a conversation to start messaging with workers about your jobs.
+              </p>
             </div>
-            <h2 className="text-xl font-semibold text-white mb-2">Your Messages</h2>
-            <p className="text-slate-400 max-w-sm">
-              Select a conversation to start messaging with workers about your jobs.
-            </p>
-          </div>
+          </FeatureCard>
         </div>
       )}
     </div>

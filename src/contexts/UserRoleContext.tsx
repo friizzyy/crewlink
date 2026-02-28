@@ -135,9 +135,8 @@ export function UserRoleProvider({ children }: UserRoleProviderProps) {
     setStorageItem(ROLE_STORAGE_KEY, newRole)
     persistRoleToServer(newRole)
 
-    // Navigate to the appropriate home after role selection
-    const homeRoute = newRole === 'HIRER' ? '/hiring/map' : '/work/map'
-    router.push(homeRoute)
+    // Navigate to onboarding wizard after role selection
+    router.push('/onboarding')
   }, [router, persistRoleToServer])
 
   // Switch to the other role

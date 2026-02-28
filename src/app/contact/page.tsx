@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { Mail, MessageCircle, Phone, MapPin, ArrowRight, HelpCircle, Briefcase, Shield } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 
 // ============================================
 // CONTACT PAGE - Contact form and support options
@@ -55,10 +56,10 @@ function HeroSection() {
 
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12 text-center relative">
         <div className={getRevealClasses(isVisible, 'up')} style={{ transitionDelay: '0ms' }}>
-          <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-cyan-500/10 backdrop-blur-xl rounded-full border border-cyan-500/20 mb-10">
-            <Mail className="w-4 h-4 text-cyan-400" />
-            <span className="text-sm font-medium text-cyan-400 tracking-wide">Get in touch</span>
-          </div>
+          <Badge variant="brand" size="md" className="mb-10">
+            <Mail className="w-4 h-4 mr-2" />
+            Get in touch
+          </Badge>
         </div>
 
         <h1 className={`font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-tight leading-[1.1] ${getRevealClasses(isVisible, 'up')}`} style={{ transitionDelay: '80ms' }}>
@@ -103,22 +104,30 @@ function ContactOptions() {
         <div className="grid md:grid-cols-3 gap-6">
           {contactOptions.map((option, i) => {
             const colors = colorMap[option.color as keyof typeof colorMap]
+            const gradientMap: Record<string, 'cyan' | 'emerald' | 'purple'> = {
+              cyan: 'cyan',
+              emerald: 'emerald',
+              purple: 'purple',
+            }
             return (
-              <a
-                key={option.title}
-                href={option.href}
-                className={`group p-6 bg-slate-900/40 backdrop-blur-sm rounded-2xl border ${colors.border} ${colors.hover} transition-all duration-300 ${getRevealClasses(isVisible, 'up')}`}
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className={`w-12 h-12 rounded-xl ${colors.bg} ${colors.border} border flex items-center justify-center mb-4`}>
-                  <option.icon className={`w-6 h-6 ${colors.text}`} />
-                </div>
-                <h3 className="text-lg font-semibold text-white mb-2">{option.title}</h3>
-                <p className="text-sm text-slate-400 leading-relaxed mb-4">{option.description}</p>
-                <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${colors.text}`}>
-                  {option.action}
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </span>
+              <a key={option.title} href={option.href}>
+                <GlassCard
+                  interactive
+                  padding="lg"
+                  rounded="xl"
+                  className={`group ${getRevealClasses(isVisible, 'up')}`}
+                  style={{ transitionDelay: `${i * 80}ms` }}
+                >
+                  <div className={`w-12 h-12 rounded-xl ${colors.bg} ${colors.border} border flex items-center justify-center mb-4`}>
+                    <option.icon className={`w-6 h-6 ${colors.text}`} />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">{option.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed mb-4">{option.description}</p>
+                  <span className={`inline-flex items-center gap-1.5 text-sm font-medium ${colors.text}`}>
+                    {option.action}
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </span>
+                </GlassCard>
               </a>
             )
           })}
@@ -134,8 +143,18 @@ function ContactForm() {
   return (
     <section ref={ref} className="py-16 sm:py-20">
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`p-8 lg:p-10 bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-white/10 ${getRevealClasses(isVisible, 'up')}`}>
-          <h2 className="font-display text-2xl font-bold text-white mb-2">Send us a message</h2>
+        <GlassPanel
+          variant="elevated"
+          padding="xl"
+          border="glow"
+          rounded="2xl"
+          className={getRevealClasses(isVisible, 'up')}
+        >
+          <h2 className="font-display text-2xl font-bold mb-2">
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              Send us a message
+            </span>
+          </h2>
           <p className="text-slate-400 mb-8">Fill out the form below and we&apos;ll get back to you as soon as possible.</p>
 
           <form className="space-y-6">
@@ -186,14 +205,11 @@ function ContactForm() {
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/20"
-            >
+            <Button type="submit" variant="primary" size="lg" glow>
               Send message
-            </button>
+            </Button>
           </form>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )
@@ -205,8 +221,10 @@ function QuickLinks() {
   return (
     <section ref={ref} className="py-16 sm:py-20 border-t border-white/5">
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
-        <h2 className={`font-display text-2xl font-bold text-white mb-8 text-center ${getRevealClasses(isVisible, 'up')}`}>
-          Looking for something else?
+        <h2 className={`font-display text-2xl font-bold mb-8 text-center ${getRevealClasses(isVisible, 'up')}`}>
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            Looking for something else?
+          </span>
         </h2>
 
         <div className="grid sm:grid-cols-3 gap-4">
@@ -238,7 +256,13 @@ function OfficeSection() {
   return (
     <section ref={ref} className="py-16 sm:py-20 border-t border-white/5">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className={`p-8 lg:p-10 bg-slate-900/40 backdrop-blur-sm rounded-3xl border border-white/5 ${getRevealClasses(isVisible, 'up')}`}>
+        <GlassPanel
+          variant="elevated"
+          padding="xl"
+          border="light"
+          rounded="2xl"
+          className={getRevealClasses(isVisible, 'up')}
+        >
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center">
               <MapPin className="w-6 h-6 text-cyan-400" />
@@ -252,7 +276,7 @@ function OfficeSection() {
               </p>
             </div>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

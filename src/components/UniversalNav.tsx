@@ -233,6 +233,18 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
     (ENABLE_ROLE_TOGGLE ? mode : (userRole === 'worker' ? 'work' : 'hire'))
   const navItems = getNavItems(effectiveMode, routePrefix)
 
+  // App variant state (must be declared before early return for hooks rules)
+  const isMapPage = pathname.includes('/map')
+  const [appMounted, setAppMounted] = useState(false)
+  const [centerBounced, setCenterBounced] = useState(false)
+
+  useEffect(() => {
+    if (variant !== 'app') return
+    setAppMounted(true)
+    const timer = setTimeout(() => setCenterBounced(true), 2000)
+    return () => clearTimeout(timer)
+  }, [variant])
+
   // ============================================
   // SHARED LOGO - With glow effect
   // ============================================
@@ -408,32 +420,82 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
   }
 
   // ============================================
-  // APP VARIANT - Floating Corner Elements (Concept B)
-  // Desktop: Logo top-left, actions top-right (no center nav - in sidebar)
-  // Mobile: Same bottom nav as before
+  // APP VARIANT - Top Bar with inline nav links (non-map pages)
+  // Falls back to floating elements on map pages
+  // Desktop: Full top bar with logo, section links, actions
+  // Mobile: Bottom nav with gradient active pill
   // ============================================
+
+  // Desktop section links based on mode
+  const desktopSectionLinks = effectiveMode === 'hire'
+    ? [
+        { name: 'Dashboard', href: `${routePrefix}/map` },
+        { name: 'My Jobs', href: `${routePrefix}/jobs` },
+        { name: 'Messages', href: `${routePrefix}/messages` },
+      ]
+    : [
+        { name: 'Dashboard', href: `${routePrefix}/map` },
+        { name: 'Find Jobs', href: `${routePrefix}/jobs` },
+        { name: 'Messages', href: `${routePrefix}/messages` },
+        { name: 'Earnings', href: `${routePrefix}/earnings` },
+      ]
+
+  const isActiveLink = (href: string) => {
+    if (href.endsWith('/map') && pathname === `${routePrefix}/map`) return true
+    if (href.endsWith('/jobs') && (pathname === `${routePrefix}/jobs` || pathname.startsWith(`${routePrefix}/jobs/`))) return true
+    if (href.endsWith('/messages') && (pathname === `${routePrefix}/messages` || pathname.startsWith(`${routePrefix}/messages/`))) return true
+    if (href.endsWith('/earnings') && (pathname === `${routePrefix}/earnings` || pathname.startsWith(`${routePrefix}/earnings/`))) return true
+    return false
+  }
+
   return (
     <>
-      {/* ===== DESKTOP: Floating Logo (Top Left) ===== */}
-      <div className="hidden md:block fixed top-4 left-6 z-50">
-        <Link href={getHomeRoute()} className="flex items-center gap-3 group" data-qa="nav-logo">
-          <div className="relative">
-            <div className={`absolute inset-0 rounded-xl blur-md opacity-40 group-hover:opacity-70 transition-opacity ${
-              effectiveMode === 'work' ? 'bg-emerald-500' : 'bg-cyan-500'
-            }`} />
-            <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center border shadow-lg ${
-              effectiveMode === 'work'
-                ? 'bg-gradient-to-br from-emerald-400 to-teal-600 border-emerald-400/30'
-                : 'bg-gradient-to-br from-cyan-400 to-blue-600 border-cyan-400/30'
-            }`}>
-              <Users className="w-5 h-5 text-white" />
-            </div>
-          </div>
-        </Link>
-      </div>
+      {/* ===== DESKTOP: Full Top Bar (non-map pages) OR Floating (map pages) ===== */}
+      {!isMapPage ? (
+        <header
+          className="hidden md:block fixed top-0 left-0 right-0 z-50 animate-in slide-in-from-top duration-300"
+          data-qa="desktop-nav-bar"
+        >
+          <div className="bg-slate-950/90 backdrop-blur-xl border-b border-white/[0.06]">
+            <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+              {/* Left: Logo + Section Links */}
+              <div className="flex items-center gap-8">
+                {Logo}
 
-      {/* ===== DESKTOP: Floating Actions (Top Right) ===== */}
-      <div className="hidden md:flex fixed top-4 right-6 z-50 items-center gap-2">
+                {/* Section Links with active gradient underline */}
+                <nav className="flex items-center gap-1">
+                  {desktopSectionLinks.map((link) => {
+                    const active = isActiveLink(link.href)
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        className={`relative px-4 py-2 text-sm font-medium transition-colors ${
+                          active
+                            ? 'text-white'
+                            : 'text-slate-400 hover:text-white'
+                        }`}
+                        data-qa={`nav-${link.name.toLowerCase().replace(/\s/g, '-')}`}
+                      >
+                        {link.name}
+                        {/* Gradient underline indicator */}
+                        {active && (
+                          <span
+                            className={`absolute bottom-0 left-2 right-2 h-0.5 rounded-full bg-gradient-to-r ${
+                              effectiveMode === 'work'
+                                ? 'from-emerald-400 to-teal-400'
+                                : 'from-cyan-400 to-blue-400'
+                            }`}
+                          />
+                        )}
+                      </Link>
+                    )
+                  })}
+                </nav>
+              </div>
+
+              {/* Right: Actions */}
+              <div className="flex items-center gap-2">
         {/* Notifications */}
         <div className="relative" ref={notificationsRef}>
           <button
@@ -750,10 +812,161 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
             </div>
           )}
         </div>
-      </div>
+              </div>
+            </div>
+          </div>
+        </header>
+      ) : (
+        /* ===== DESKTOP: Floating elements for map pages ===== */
+        <>
+          <div className="hidden md:block fixed top-4 left-6 z-50">
+            <Link href={getHomeRoute()} className="flex items-center gap-3 group" data-qa="nav-logo">
+              <div className="relative">
+                <div className={`absolute inset-0 rounded-xl blur-md opacity-40 group-hover:opacity-70 transition-opacity ${
+                  effectiveMode === 'work' ? 'bg-emerald-500' : 'bg-cyan-500'
+                }`} />
+                <div className={`relative w-11 h-11 rounded-xl flex items-center justify-center border shadow-lg ${
+                  effectiveMode === 'work'
+                    ? 'bg-gradient-to-br from-emerald-400 to-teal-600 border-emerald-400/30'
+                    : 'bg-gradient-to-br from-cyan-400 to-blue-600 border-cyan-400/30'
+                }`}>
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+              </div>
+            </Link>
+          </div>
 
-      {/* ===== MOBILE: Keep existing bottom nav ===== */}
-      {/* Mobile Bottom Navigation - Symmetric 5-item layout with centered action button */}
+          <div className="hidden md:flex fixed top-4 right-6 z-50 items-center gap-2">
+            {/* Notifications */}
+            <div className="relative" ref={notificationsRef}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setNotificationsOpen(!notificationsOpen)
+                  setMessagesOpen(false)
+                  setUserMenuOpen(false)
+                }}
+                className={`relative p-3 rounded-xl backdrop-blur-xl border transition-all ${
+                  notificationsOpen
+                    ? 'bg-slate-900/95 border-white/20 text-white'
+                    : 'bg-slate-900/95 border-white/[0.06] text-slate-400 hover:text-white hover:border-white/20'
+                }`}
+                aria-label="Notifications"
+                aria-expanded={notificationsOpen}
+                aria-haspopup="true"
+                data-qa="nav-notifications-floating"
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.filter(n => n.unread).length > 0 && (
+                  <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ring-2 ring-slate-950 ${
+                    effectiveMode === 'work' ? 'bg-emerald-500' : 'bg-cyan-500'
+                  }`} />
+                )}
+              </button>
+            </div>
+
+            {/* Messages */}
+            <div className="relative" ref={messagesRef}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setMessagesOpen(!messagesOpen)
+                  setNotificationsOpen(false)
+                  setUserMenuOpen(false)
+                }}
+                className={`relative p-3 rounded-xl backdrop-blur-xl border transition-all ${
+                  messagesOpen
+                    ? 'bg-slate-900/95 border-white/20 text-white'
+                    : 'bg-slate-900/95 border-white/[0.06] text-slate-400 hover:text-white hover:border-white/20'
+                }`}
+                aria-label="Messages"
+                aria-expanded={messagesOpen}
+                aria-haspopup="true"
+                data-qa="nav-messages-floating"
+              >
+                <MessageSquare className="w-5 h-5" />
+                {messages.filter(m => m.unread).length > 0 && (
+                  <span className={`absolute top-2 right-2 w-2.5 h-2.5 rounded-full ring-2 ring-slate-950 ${
+                    effectiveMode === 'work' ? 'bg-emerald-500' : 'bg-cyan-500'
+                  }`} />
+                )}
+              </button>
+            </div>
+
+            {/* User Menu */}
+            <div className="relative" ref={userMenuRef}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setUserMenuOpen(!userMenuOpen)
+                  setNotificationsOpen(false)
+                  setMessagesOpen(false)
+                }}
+                className={`p-1.5 rounded-xl backdrop-blur-xl border transition-all ${
+                  userMenuOpen
+                    ? 'bg-slate-900/95 border-white/20'
+                    : 'bg-slate-900/95 border-white/[0.06] hover:border-white/20'
+                }`}
+                aria-label="User menu"
+                aria-expanded={userMenuOpen}
+                aria-haspopup="true"
+                data-qa="nav-user-menu-floating"
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-semibold bg-gradient-to-br ${
+                  effectiveMode === 'work' ? 'from-emerald-400 to-teal-600' : 'from-cyan-400 to-blue-600'
+                }`}>
+                  {userInitials}
+                </div>
+              </button>
+
+              {userMenuOpen && (
+                <div
+                  className="absolute right-0 mt-3 w-56 bg-slate-900/95 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="p-4 border-b border-white/10">
+                    <p className="font-semibold text-white">{userName}</p>
+                    <p className="text-sm text-slate-400">{userEmail}</p>
+                  </div>
+                  <div className="py-2">
+                    <Link
+                      href={`${routePrefix}/profile`}
+                      className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                        effectiveMode === 'work' ? 'text-slate-300 hover:bg-white/5 hover:text-emerald-400' : 'text-slate-300 hover:bg-white/5 hover:text-cyan-400'
+                      }`}
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <User className="w-4 h-4 text-slate-500" />
+                      My Profile
+                    </Link>
+                    <Link
+                      href={`${routePrefix}/settings`}
+                      className={`flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
+                        effectiveMode === 'work' ? 'text-slate-300 hover:bg-white/5 hover:text-emerald-400' : 'text-slate-300 hover:bg-white/5 hover:text-cyan-400'
+                      }`}
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <Settings className="w-4 h-4 text-slate-500" />
+                      Settings
+                    </Link>
+                  </div>
+                  <div className="border-t border-white/10 py-2">
+                    <button
+                      onClick={handleSignOut}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 w-full transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* ===== MOBILE: Enhanced Bottom Nav with gradient active pills ===== */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-xl border-t border-white/10 px-2 pb-safe z-40">
         <div className="flex items-center justify-between py-2">
           {/* Left side - 2 items */}
@@ -762,9 +975,9 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
               <>
                 <Link
                   href={`${routePrefix}/map`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${
                     pathname === `${routePrefix}/map` || pathname.startsWith(`${routePrefix}/map/`)
-                      ? 'text-cyan-400'
+                      ? 'text-cyan-400 bg-gradient-to-r from-cyan-500/20 to-blue-500/20'
                       : 'text-slate-500'
                   }`}
                 >
@@ -773,9 +986,9 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                 </Link>
                 <Link
                   href={`${routePrefix}/jobs`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${
                     pathname === `${routePrefix}/jobs` || pathname.startsWith(`${routePrefix}/jobs/`)
-                      ? 'text-cyan-400'
+                      ? 'text-cyan-400 bg-gradient-to-r from-cyan-500/20 to-blue-500/20'
                       : 'text-slate-500'
                   }`}
                 >
@@ -787,9 +1000,9 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
               <>
                 <Link
                   href={`${routePrefix}/jobs`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${
                     pathname === `${routePrefix}/jobs` || pathname.startsWith(`${routePrefix}/jobs/`) || pathname.startsWith(`${routePrefix}/job/`) || pathname === `${routePrefix}/map` || pathname.startsWith(`${routePrefix}/map/`)
-                      ? 'text-emerald-400'
+                      ? 'text-emerald-400 bg-gradient-to-r from-emerald-500/20 to-teal-500/20'
                       : 'text-slate-500'
                   }`}
                 >
@@ -798,9 +1011,9 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                 </Link>
                 <Link
                   href={`${routePrefix}/earnings`}
-                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+                  className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${
                     pathname === `${routePrefix}/earnings` || pathname.startsWith(`${routePrefix}/earnings/`) || pathname === `${routePrefix}/transactions` || pathname.startsWith(`${routePrefix}/transactions/`)
-                      ? 'text-emerald-400'
+                      ? 'text-emerald-400 bg-gradient-to-r from-emerald-500/20 to-teal-500/20'
                       : 'text-slate-500'
                   }`}
                 >
@@ -811,11 +1024,13 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
             )}
           </div>
 
-          {/* Center - Action Button (Post Job for hire, Find Work for work) */}
+          {/* Center - Action Button with gentle bounce on first load */}
           <div className="flex items-center justify-center px-2">
             <Link
               href={effectiveMode === 'hire' ? `${routePrefix}/post` : `${routePrefix}/map`}
-              className="flex flex-col items-center -mt-4"
+              className={`flex flex-col items-center -mt-4 active:scale-95 transition-transform ${
+                appMounted && !centerBounced ? 'animate-bounce' : ''
+              }`}
             >
               <div className="relative">
                 <div className={`absolute inset-0 rounded-full blur-md opacity-50 ${
@@ -836,16 +1051,18 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
           <div className="flex items-center flex-1 justify-around">
             <Link
               href={`${routePrefix}/messages`}
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors relative ${
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 relative ${
                 pathname === `${routePrefix}/messages` || pathname.startsWith(`${routePrefix}/messages/`)
-                  ? effectiveMode === 'work' ? 'text-emerald-400' : 'text-cyan-400'
+                  ? effectiveMode === 'work'
+                    ? 'text-emerald-400 bg-gradient-to-r from-emerald-500/20 to-teal-500/20'
+                    : 'text-cyan-400 bg-gradient-to-r from-cyan-500/20 to-blue-500/20'
                   : 'text-slate-500'
               }`}
             >
               <div className="relative">
                 <MessageSquare className="w-5 h-5" />
                 {messages.filter(m => m.unread).length > 0 && (
-                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full ${
+                  <span className={`absolute -top-1 -right-1 w-2 h-2 rounded-full animate-in zoom-in duration-300 ${
                     effectiveMode === 'work' ? 'bg-emerald-500' : 'bg-cyan-500'
                   }`} />
                 )}
@@ -854,9 +1071,11 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
             </Link>
             <Link
               href={`${routePrefix}/profile`}
-              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors ${
+              className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all duration-200 active:scale-95 ${
                 pathname === `${routePrefix}/profile` || pathname.startsWith(`${routePrefix}/profile/`) || pathname === `${routePrefix}/settings` || pathname.startsWith(`${routePrefix}/settings/`)
-                  ? effectiveMode === 'work' ? 'text-emerald-400' : 'text-cyan-400'
+                  ? effectiveMode === 'work'
+                    ? 'text-emerald-400 bg-gradient-to-r from-emerald-500/20 to-teal-500/20'
+                    : 'text-cyan-400 bg-gradient-to-r from-cyan-500/20 to-blue-500/20'
                   : 'text-slate-500'
               }`}
             >

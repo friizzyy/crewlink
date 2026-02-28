@@ -9,6 +9,7 @@ import MarketingLayout from '@/components/MarketingLayout'
 import { useUserRole } from '@/contexts/UserRoleContext'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 import { cn } from '@/lib/utils'
+import { GlassPanel, GlassCard, Button, Badge } from '@/components/ui'
 import {
   getCaliforniaCities,
   getTahoeCities,
@@ -55,27 +56,23 @@ function CityCard({
 
   if (isFeatured) {
     return (
-      <Link
-        href={getDestination()}
-        className="group relative p-6 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 hover:border-cyan-500/30 transition-all hover:scale-[1.02]"
-      >
-        <div className="absolute top-4 right-4">
-          <span className="flex items-center gap-1.5 text-xs font-medium text-emerald-400 px-2.5 py-1 bg-emerald-500/10 rounded-full">
-            <CheckCircle2 className="w-3 h-3" />
-            Live
-          </span>
-        </div>
-        <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center mb-4">
-          <MapPin className="w-6 h-6 text-cyan-400" />
-        </div>
-        <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors mb-1">
-          {city.name}
-        </h3>
-        <p className="text-sm text-slate-400 mb-4">{city.state}</p>
-        <div className="flex items-center gap-2 text-sm text-cyan-400 font-medium">
-          <span>Explore</span>
-          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-        </div>
+      <Link href={getDestination()}>
+        <GlassCard interactive padding="lg" rounded="xl" className="relative hover:translate-y-[-2px] transition-all group">
+          <div className="absolute top-4 right-4">
+            <Badge variant="success" size="sm" dot>Live</Badge>
+          </div>
+          <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+            <MapPin className="w-6 h-6 text-cyan-400" />
+          </div>
+          <h3 className="text-xl font-bold text-white group-hover:text-cyan-400 transition-colors mb-1">
+            {city.name}
+          </h3>
+          <p className="text-sm text-slate-400 mb-4">{city.state}</p>
+          <div className="flex items-center gap-2 text-sm text-cyan-400 font-medium">
+            <span>Explore</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </div>
+        </GlassCard>
       </Link>
     )
   }
@@ -122,10 +119,10 @@ function HeroSection({ searchQuery, setSearchQuery }: { searchQuery: string; set
         )}
       >
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-8">
-          <Globe className="w-4 h-4 text-cyan-400" />
-          <span className="text-sm font-medium text-cyan-400">Locations</span>
-        </div>
+        <Badge variant="brand" size="md" className="mb-8">
+          <Globe className="w-4 h-4 mr-2" />
+          Locations
+        </Badge>
 
         {/* Headline */}
         <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
@@ -142,14 +139,16 @@ function HeroSection({ searchQuery, setSearchQuery }: { searchQuery: string; set
 
         {/* Search */}
         <div className="max-w-md mx-auto relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-          <input
-            type="text"
-            placeholder="Search cities..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-2xl text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 transition-all"
-          />
+          <GlassPanel variant="elevated" padding="none" border="glow" rounded="xl" className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+            <input
+              type="text"
+              placeholder="Search cities..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-12 pr-4 py-4 bg-transparent text-white placeholder:text-slate-500 focus:outline-none transition-all"
+            />
+          </GlassPanel>
         </div>
       </div>
     </section>
@@ -183,16 +182,26 @@ function StatsSection() {
             const Icon = stat.icon
             const colors = getColorClasses(stat.color)
             return (
-              <div
+              <GlassPanel
                 key={stat.label}
-                className="p-5 bg-slate-900/50 backdrop-blur-sm rounded-2xl border border-white/5 text-center hover:border-white/10 transition-colors"
+                variant="subtle"
+                padding="lg"
+                border="light"
+                rounded="xl"
+                hoverable
+                className="text-center p-5"
               >
                 <div className={cn('w-10 h-10 rounded-xl flex items-center justify-center mx-auto mb-3', colors.bg)}>
                   <Icon className={cn('w-5 h-5', colors.icon)} />
                 </div>
-                <div className={cn('text-2xl font-bold mb-1', colors.text)}>{stat.value}</div>
+                <div className={cn('text-2xl font-bold mb-1 bg-gradient-to-r bg-clip-text text-transparent', {
+                  'from-cyan-400 to-blue-400': stat.color === 'cyan',
+                  'from-emerald-400 to-teal-400': stat.color === 'emerald',
+                  'from-purple-400 to-pink-400': stat.color === 'purple',
+                  'from-amber-400 to-orange-400': stat.color === 'amber',
+                })}>{stat.value}</div>
                 <div className="text-sm text-slate-400">{stat.label}</div>
-              </div>
+              </GlassPanel>
             )
           })}
         </div>
@@ -325,36 +334,34 @@ function CTASection() {
           getRevealClasses(isVisible)
         )}
       >
-        <div className="relative p-8 md:p-12 bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-3xl border border-cyan-500/20 overflow-hidden text-center">
+        <GlassPanel variant="elevated" padding="none" border="glow" rounded="2xl" className="relative p-8 md:p-12 overflow-hidden text-center">
           {/* Background glow */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px]" />
 
           <div className="relative">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Don&apos;t See Your City?
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                Don&apos;t See Your City?
+              </span>
             </h2>
             <p className="text-slate-300 max-w-xl mx-auto mb-8">
               We&apos;re expanding rapidly. Let us know where you&apos;d like to see CrewLink next, and be the first to know when we launch in your area.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/create-account"
-                className="group flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-cyan-500/25 transition-all"
-              >
-                Get Started
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link href="/create-account">
+                <Button variant="primary" size="lg" glow rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Get Started
+                </Button>
               </Link>
-              <Link
-                href="/help"
-                className="group flex items-center gap-2 px-8 py-4 bg-slate-800 text-white font-semibold rounded-xl border border-white/10 hover:bg-slate-700 transition-colors"
-              >
-                Request a City
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <Link href="/help">
+                <Button variant="secondary" size="lg" rightIcon={<ArrowRight className="w-5 h-5" />}>
+                  Request a City
+                </Button>
               </Link>
             </div>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     </section>
   )

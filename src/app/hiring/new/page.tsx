@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { AddressAutocomplete, type AddressResult } from '@/components/ui/AddressAutocomplete'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button } from '@/components/ui'
 
 const categories: { id: string; name: string; Icon: LucideIcon; description: string }[] = [
   { id: 'cleaning', name: 'Cleaning', Icon: Sparkles, description: 'Home, office, deep clean' },
@@ -174,31 +176,35 @@ export default function NewJobPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-64px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Header */}
       <div className="sticky top-16 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between mb-4">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => step > 1 ? setStep(step - 1) : router.back()}
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+              leftIcon={<ArrowLeft className="w-5 h-5" />}
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="text-sm font-medium">Back</span>
-            </button>
+              Back
+            </Button>
             <span className="text-sm text-slate-500">Step {step} of 4</span>
-            <button
+            <Button
+              variant="ghost"
+              size="icon-sm"
               onClick={() => router.back()}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
 
           {/* Progress Bar */}
-          <div className="h-1 bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-500 ease-out"
+              className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all duration-500 ease-out rounded-full shadow-[0_0_8px_rgba(6,182,212,0.5)]"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -206,36 +212,41 @@ export default function NewJobPage() {
       </div>
 
       {/* Content */}
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-2xl mx-auto px-4 py-8 relative z-10">
 
         {/* Step 1: Category Selection */}
         {step === 1 && (
-          <div className="animate-fade-in">
+          <div className="animate-card-enter">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">What do you need help with?</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">What do you need help with?</h1>
               <p className="text-slate-400">Select a category to get started</p>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {categories.map((cat) => (
-                <button
+              {categories.map((cat, index) => (
+                <GlassCard
                   key={cat.id}
-                  onClick={() => handleCategorySelect(cat.id)}
-                  className={`relative p-4 rounded-2xl border transition-all text-left group hover:scale-[1.02] ${
+                  interactive
+                  padding="md"
+                  className={`text-left animate-card-enter cursor-pointer ${
                     formData.category === cat.id
-                      ? 'bg-cyan-500/10 border-cyan-500/50'
-                      : 'bg-slate-900 border-white/5 hover:border-white/20'
+                      ? 'border-cyan-500/50 bg-cyan-500/10'
+                      : ''
                   }`}
+                  style={{ animationDelay: `${index * 60}ms` }}
+                  onClick={() => handleCategorySelect(cat.id)}
                 >
-                  <cat.Icon className="w-8 h-8 text-cyan-400 mb-2" />
-                  <span className="font-semibold text-white block">{cat.name}</span>
+                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center mb-2">
+                    <cat.Icon className="w-5 h-5 text-cyan-400" />
+                  </div>
+                  <span className="font-semibold text-white block text-sm">{cat.name}</span>
                   <span className="text-xs text-slate-500 block mt-0.5">{cat.description}</span>
                   {formData.category === cat.id && (
                     <div className="absolute top-3 right-3">
                       <CheckCircle2 className="w-5 h-5 text-cyan-400" />
                     </div>
                   )}
-                </button>
+                </GlassCard>
               ))}
             </div>
           </div>
@@ -243,9 +254,9 @@ export default function NewJobPage() {
 
         {/* Step 2: Job Details */}
         {step === 2 && (
-          <div className="animate-fade-in">
+          <GlassPanel variant="elevated" padding="xl" border="light" rounded="2xl" className="animate-card-enter">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Describe your job</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">Describe your job</h1>
               <p className="text-slate-400">Be specific to get better matches</p>
             </div>
 
@@ -259,7 +270,7 @@ export default function NewJobPage() {
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     placeholder="e.g., Deep Clean 2BR Apartment"
-                    className="w-full px-4 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                    className="w-full px-4 py-3.5 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all"
                   />
                   {aiSuggestions?.title && formData.title !== aiSuggestions.title && (
                     <button
@@ -283,7 +294,7 @@ export default function NewJobPage() {
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe what you need done in detail. Include any specific requirements, tools needed, or access instructions."
                   rows={5}
-                  className="w-full px-4 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 resize-none"
+                  className="w-full px-4 py-3.5 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] resize-none transition-all"
                 />
                 {aiSuggestions?.description && formData.description !== aiSuggestions.description && (
                   <button
@@ -299,24 +310,24 @@ export default function NewJobPage() {
               {/* Photos (optional) */}
               <div>
                 <label className="block text-sm font-medium text-slate-300 mb-2">Photos (optional)</label>
-                <button className="w-full p-6 border-2 border-dashed border-white/10 rounded-xl hover:border-white/20 transition-colors group">
+                <button className="w-full p-6 border-2 border-dashed border-white/10 rounded-xl hover:border-cyan-500/30 transition-colors group">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
-                      <Camera className="w-6 h-6 text-slate-400" />
+                    <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center group-hover:bg-cyan-500/10 transition-colors">
+                      <Camera className="w-6 h-6 text-slate-400 group-hover:text-cyan-400 transition-colors" />
                     </div>
                     <span className="text-sm text-slate-400">Add photos to help workers understand the job</span>
                   </div>
                 </button>
               </div>
             </div>
-          </div>
+          </GlassPanel>
         )}
 
         {/* Step 3: Location & Timing */}
         {step === 3 && (
-          <div className="animate-fade-in">
+          <GlassPanel variant="elevated" padding="xl" border="light" rounded="2xl" className="animate-card-enter">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">When and where?</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">When and where?</h1>
               <p className="text-slate-400">Set the location and timing</p>
             </div>
 
@@ -350,14 +361,16 @@ export default function NewJobPage() {
                 <label className="block text-sm font-medium text-slate-300 mb-3">When do you need this done?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {urgencyOptions.map((option) => (
-                    <button
+                    <GlassCard
                       key={option.id}
-                      onClick={() => setFormData(prev => ({ ...prev, urgency: option.id }))}
-                      className={`relative p-4 rounded-xl border transition-all text-left ${
+                      interactive
+                      padding="md"
+                      className={`text-left cursor-pointer ${
                         formData.urgency === option.id
-                          ? 'bg-cyan-500/10 border-cyan-500/50'
-                          : 'bg-slate-900 border-white/5 hover:border-white/20'
+                          ? 'border-cyan-500/50 bg-cyan-500/10'
+                          : ''
                       }`}
+                      onClick={() => setFormData(prev => ({ ...prev, urgency: option.id }))}
                     >
                       <option.icon className={`w-5 h-5 mb-2 ${
                         formData.urgency === option.id ? 'text-cyan-400' : 'text-slate-500'
@@ -369,7 +382,7 @@ export default function NewJobPage() {
                           <CheckCircle2 className="w-4 h-4 text-cyan-400" />
                         </div>
                       )}
-                    </button>
+                    </GlassCard>
                   ))}
                 </div>
               </div>
@@ -382,7 +395,7 @@ export default function NewJobPage() {
                   <select
                     value={formData.duration}
                     onChange={(e) => setFormData(prev => ({ ...prev, duration: e.target.value }))}
-                    className="w-full pl-12 pr-10 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                    className="w-full pl-12 pr-10 py-3.5 bg-slate-800/50 border border-white/10 rounded-xl text-white appearance-none focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all"
                   >
                     <option value="">Select duration</option>
                     <option value="1">About 1 hour</option>
@@ -395,14 +408,14 @@ export default function NewJobPage() {
                 </div>
               </div>
             </div>
-          </div>
+          </GlassPanel>
         )}
 
         {/* Step 4: Budget */}
         {step === 4 && (
-          <div className="animate-fade-in">
+          <GlassPanel variant="elevated" padding="xl" border="light" rounded="2xl" className="animate-card-enter">
             <div className="text-center mb-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Set your budget</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent mb-2">Set your budget</h1>
               <p className="text-slate-400">Workers will bid within this range</p>
             </div>
 
@@ -418,7 +431,7 @@ export default function NewJobPage() {
                       value={formData.budgetMin}
                       onChange={(e) => setFormData(prev => ({ ...prev, budgetMin: e.target.value }))}
                       placeholder="Min"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                      className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all"
                     />
                   </div>
                   <span className="text-slate-500">to</span>
@@ -429,14 +442,14 @@ export default function NewJobPage() {
                       value={formData.budgetMax}
                       onChange={(e) => setFormData(prev => ({ ...prev, budgetMax: e.target.value }))}
                       placeholder="Max"
-                      className="w-full pl-12 pr-4 py-3.5 bg-slate-900 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50"
+                      className="w-full pl-12 pr-4 py-3.5 bg-slate-800/50 border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] transition-all"
                     />
                   </div>
                 </div>
 
                 {/* AI Budget Suggestion */}
                 {aiSuggestions?.budget && (
-                  <div className="mt-4 p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-xl">
+                  <FeatureCard gradient="cyan" shine className="mt-4">
                     <div className="flex items-start gap-3">
                       <Sparkles className="w-5 h-5 text-cyan-400 shrink-0 mt-0.5" />
                       <div>
@@ -450,16 +463,16 @@ export default function NewJobPage() {
                           }))}
                           className="mt-2 text-xs text-cyan-400 font-medium hover:text-cyan-300"
                         >
-                          Apply suggestion →
+                          Apply suggestion
                         </button>
                       </div>
                     </div>
-                  </div>
+                  </FeatureCard>
                 )}
               </div>
 
               {/* Summary */}
-              <div className="p-5 bg-slate-900 border border-white/5 rounded-2xl">
+              <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
                 <h3 className="font-semibold text-white mb-4">Job Summary</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
@@ -500,9 +513,9 @@ export default function NewJobPage() {
                     </span>
                   </div>
                 </div>
-              </div>
+              </GlassPanel>
             </div>
-          </div>
+          </GlassPanel>
         )}
       </div>
 
@@ -511,53 +524,45 @@ export default function NewJobPage() {
         <div className="max-w-2xl mx-auto lg:mt-8">
           {/* Error Message */}
           {submitError && (
-            <div className="mb-4 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm text-red-400 font-medium">Error</p>
-                <p className="text-sm text-red-300 mt-0.5">{submitError}</p>
+            <GlassPanel variant="default" padding="md" border="light" rounded="xl" className="mb-4 border-red-500/20 bg-red-500/5">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-red-400 font-medium">Error</p>
+                  <p className="text-sm text-red-300 mt-0.5">{submitError}</p>
+                </div>
               </div>
-            </div>
+            </GlassPanel>
           )}
 
           {step < 4 ? (
-            <button
+            <Button
+              variant="primary"
+              size="xl"
+              fullWidth
+              glow
               onClick={() => setStep(step + 1)}
               disabled={!canProceed()}
-              className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              rightIcon={<ArrowRight className="w-5 h-5" />}
             >
               Continue
-              <ArrowRight className="w-5 h-5" />
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
+              variant="primary"
+              size="xl"
+              fullWidth
+              glow
               onClick={handleSubmit}
               disabled={!canProceed() || isSubmitting}
-              className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-lg shadow-cyan-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              isLoading={isSubmitting}
+              rightIcon={!isSubmitting ? <CheckCircle2 className="w-5 h-5" /> : undefined}
             >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Posting...
-                </>
-              ) : (
-                <>
-                  Post Job
-                  <CheckCircle2 className="w-5 h-5" />
-                </>
-              )}
-            </button>
+              {isSubmitting ? 'Posting...' : 'Post Job'}
+            </Button>
           )}
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fade-in 0.3s ease-out forwards; }
-      `}</style>
     </div>
   )
 }

@@ -13,6 +13,8 @@ import {
 import { cn, formatRelativeTime } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
 import { Skeleton } from '@/components/ui/Card'
+import { AmbientBackground } from '@/components/AmbientBackground'
+import { GlassPanel, GlassCard, FeatureCard, Button, Badge } from '@/components/ui'
 import type { Job, JobStatus } from '@/types'
 
 // Shape returned by GET /api/jobs/[id]
@@ -86,14 +88,24 @@ const categoryIcons: Record<string, string> = {
   general: '💼',
 }
 
-const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
-  draft: { label: 'Draft', color: 'bg-amber-500/20 text-amber-400 border-amber-500/30', icon: Edit },
-  posted: { label: 'Active', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', icon: CheckCircle2 },
-  in_review: { label: 'In Review', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
-  assigned: { label: 'Assigned', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: CheckCircle2 },
-  in_progress: { label: 'In Progress', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30', icon: Clock },
-  completed: { label: 'Completed', color: 'bg-slate-500/20 text-slate-400 border-slate-500/30', icon: CheckCircle2 },
-  cancelled: { label: 'Cancelled', color: 'bg-red-500/20 text-red-400 border-red-500/30', icon: XCircle },
+const statusBadgeVariant: Record<string, 'brand' | 'success' | 'warning' | 'error' | 'neutral'> = {
+  draft: 'warning',
+  posted: 'brand',
+  in_review: 'brand',
+  assigned: 'brand',
+  in_progress: 'brand',
+  completed: 'success',
+  cancelled: 'error',
+}
+
+const statusLabels: Record<string, string> = {
+  draft: 'Draft',
+  posted: 'Active',
+  in_review: 'In Review',
+  assigned: 'Assigned',
+  in_progress: 'In Progress',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
 }
 
 function JobDetailSkeleton() {
@@ -306,34 +318,28 @@ export default function HiringJobDetailPage() {
   if (error || !job) {
     return (
       <div className="min-h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center pb-24 lg:pb-8">
-        <div className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+        <GlassPanel variant="elevated" padding="xl" border="light" rounded="2xl" className="max-w-md w-full mx-4 text-center">
           <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-400" />
           </div>
           <h2 className="text-xl font-semibold text-white mb-2">Failed to Load Job</h2>
           <p className="text-slate-400 mb-6">{error || 'Job not found'}</p>
           <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={fetchJob}
-              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-colors"
-            >
+            <Button variant="primary" onClick={fetchJob}>
               Retry
-            </button>
-            <button
-              onClick={() => router.back()}
-              className="px-5 py-2.5 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
-            >
+            </Button>
+            <Button variant="secondary" onClick={() => router.back()}>
               Go Back
-            </button>
+            </Button>
           </div>
-        </div>
+        </GlassPanel>
       </div>
     )
   }
 
   const jobStatus = job.status as string
-  const statusInfo = statusConfig[jobStatus] || statusConfig.draft
-  const StatusIcon = statusInfo.icon
+  const badgeVariant = statusBadgeVariant[jobStatus] || 'neutral'
+  const statusLabel = statusLabels[jobStatus] || 'Unknown'
   const categoryIcon = categoryIcons[job.category] || categoryIcons.general
   const location = job.city || job.address
   const postedAt = formatRelativeTime(job.createdAt)
@@ -346,35 +352,31 @@ export default function HiringJobDetailPage() {
     : 0
 
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8 relative">
+      <AmbientBackground />
+
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50">
+      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <button
+            <Button
+              variant="ghost"
+              size="sm"
               onClick={() => router.back()}
-              className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
+              leftIcon={<ArrowLeft className="w-5 h-5" />}
             >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
+              Back
+            </Button>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleShare}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Share job"
-              >
+              <Button variant="ghost" size="icon-sm" onClick={handleShare} aria-label="Share job">
                 <Share2 className="w-5 h-5" />
-              </button>
+              </Button>
               <div className="relative">
-                <button
-                  onClick={() => setShowActions(!showActions)}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                >
+                <Button variant="ghost" size="icon-sm" onClick={() => setShowActions(!showActions)}>
                   <MoreHorizontal className="w-5 h-5" />
-                </button>
+                </Button>
                 {showActions && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-slate-800 border border-white/10 rounded-xl shadow-xl z-10 overflow-hidden">
+                  <GlassPanel variant="elevated" padding="none" border="light" rounded="lg" className="absolute right-0 top-full mt-2 w-48 shadow-xl z-10 overflow-hidden">
                     <button
                       onClick={handleEditJob}
                       className="w-full px-4 py-3 flex items-center gap-3 text-sm text-white hover:bg-white/5 transition-colors"
@@ -394,7 +396,7 @@ export default function HiringJobDetailPage() {
                       )}
                       {cancelling ? 'Cancelling...' : 'Cancel Job'}
                     </button>
-                  </div>
+                  </GlassPanel>
                 )}
               </div>
             </div>
@@ -402,82 +404,80 @@ export default function HiringJobDetailPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6 relative z-10">
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Job Header */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl bg-slate-800 flex items-center justify-center text-4xl shrink-0">
-                  {categoryIcon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-start justify-between gap-4">
-                    <h1 className="text-2xl font-bold text-white">{job.title}</h1>
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border shrink-0',
-                        statusInfo.color
-                      )}
-                    >
-                      <StatusIcon className="w-3.5 h-3.5" />
-                      {statusInfo.label}
-                    </span>
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
+              {/* Ambient glow behind title */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-cyan-500/10 blur-3xl rounded-full pointer-events-none" />
+              <div className="relative">
+                <div className="flex items-start gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center text-4xl shrink-0">
+                    {categoryIcon}
                   </div>
-                  <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-slate-400">
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4" />
-                      {location}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <h1 className="text-2xl font-bold text-white">{job.title}</h1>
+                      <Badge variant={badgeVariant} size="md" dot>
+                        {statusLabel}
+                      </Badge>
                     </div>
-                    <div className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
-                      {postedAt}
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <Eye className="w-4 h-4" />
-                      {job.viewCount} views
+                    <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-slate-400">
+                      <div className="flex items-center gap-1.5">
+                        <MapPin className="w-4 h-4" />
+                        {location}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4" />
+                        {postedAt}
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <Eye className="w-4 h-4" />
+                        {job.viewCount} views
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Budget & Details */}
-              <div className="grid sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
-                <div className="p-4 bg-slate-800/50 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
-                    <DollarSign className="w-4 h-4" />
-                    <span className="text-sm">Budget</span>
-                  </div>
-                  <div className="text-xl font-bold text-white">
-                    ${budgetMin} - ${budgetMax}
-                  </div>
-                </div>
-                <div className="p-4 bg-slate-800/50 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm">Duration</span>
-                  </div>
-                  <div className="text-xl font-bold text-white">{duration}</div>
-                </div>
-                <div className="p-4 bg-slate-800/50 rounded-xl">
-                  <div className="flex items-center gap-2 text-cyan-400 mb-1">
-                    <Calendar className="w-4 h-4" />
-                    <span className="text-sm">Urgency</span>
-                  </div>
-                  <div className="text-xl font-bold text-white capitalize">{job.scheduleType}</div>
+                {/* Budget & Details */}
+                <div className="grid sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-white/5">
+                  <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
+                    <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                      <DollarSign className="w-4 h-4" />
+                      <span className="text-sm">Budget</span>
+                    </div>
+                    <div className="text-xl font-bold text-white">
+                      ${budgetMin} - ${budgetMax}
+                    </div>
+                  </GlassPanel>
+                  <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
+                    <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                      <Clock className="w-4 h-4" />
+                      <span className="text-sm">Duration</span>
+                    </div>
+                    <div className="text-xl font-bold text-white">{duration}</div>
+                  </GlassPanel>
+                  <GlassPanel variant="subtle" padding="md" border="none" rounded="lg">
+                    <div className="flex items-center gap-2 text-cyan-400 mb-1">
+                      <Calendar className="w-4 h-4" />
+                      <span className="text-sm">Urgency</span>
+                    </div>
+                    <div className="text-xl font-bold text-white capitalize">{job.scheduleType}</div>
+                  </GlassPanel>
                 </div>
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Description */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h2 className="text-lg font-semibold text-white mb-4">Description</h2>
               <div className="text-slate-300 whitespace-pre-line">{job.description}</div>
-            </div>
+            </GlassPanel>
 
             {/* Bids Section */}
-            <div id="bids" className="bg-slate-900 border border-white/5 rounded-2xl overflow-hidden scroll-mt-24">
+            <GlassPanel id="bids" variant="elevated" padding="none" border="light" rounded="xl" className="overflow-hidden scroll-mt-24">
               <div className="p-6 border-b border-white/5">
                 <div className="flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-white flex items-center gap-2">
@@ -501,7 +501,7 @@ export default function HiringJobDetailPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-white/5">
-                  {bids.map((bid) => {
+                  {bids.map((bid, index) => {
                     const workerName = bid.worker.name || 'Anonymous'
                     const workerAvatar = workerName.charAt(0).toUpperCase()
                     const workerProfile = bid.worker.workerProfile
@@ -514,14 +514,15 @@ export default function HiringJobDetailPage() {
                       <div
                         key={bid.id}
                         className={cn(
-                          'p-6 transition-colors',
+                          'p-6 transition-colors animate-card-enter',
                           selectedBid === bid.id ? 'bg-cyan-500/5' : 'hover:bg-white/5'
                         )}
+                        style={{ animationDelay: `${index * 80}ms` }}
                       >
                         <div className="flex gap-4">
                           {/* Worker Avatar */}
                           <div className="relative shrink-0">
-                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-xl font-semibold">
+                            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-xl font-semibold ring-2 ring-cyan-500/30">
                               {workerAvatar}
                             </div>
                             {workerVerified && (
@@ -554,7 +555,7 @@ export default function HiringJobDetailPage() {
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <div className="text-2xl font-bold text-cyan-400">${bid.amount}</div>
+                                <div className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">${bid.amount}</div>
                               </div>
                             </div>
 
@@ -565,33 +566,33 @@ export default function HiringJobDetailPage() {
                             {/* Actions */}
                             {bid.status === 'pending' && (
                               <div className="flex items-center gap-3 mt-4">
-                                <button
+                                <Button
+                                  variant="success"
+                                  size="sm"
                                   onClick={() => handleAcceptBid(bid.id)}
-                                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-sm font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-colors"
+                                  leftIcon={<CheckCircle2 className="w-4 h-4" />}
                                 >
-                                  <CheckCircle2 className="w-4 h-4" />
                                   Accept Bid
-                                </button>
-                                <Link
-                                  href="/hiring/messages"
-                                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
-                                >
-                                  <MessageCircle className="w-4 h-4" />
-                                  Message
+                                </Button>
+                                <Link href="/hiring/messages">
+                                  <Button variant="secondary" size="sm" leftIcon={<MessageCircle className="w-4 h-4" />}>
+                                    Message
+                                  </Button>
                                 </Link>
-                                <Link
-                                  href={`/hiring/worker/${bid.worker.id}`}
-                                  className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                  View Profile
+                                <Link href={`/hiring/worker/${bid.worker.id}`}>
+                                  <Button variant="secondary" size="sm" leftIcon={<Eye className="w-4 h-4" />}>
+                                    View Profile
+                                  </Button>
                                 </Link>
-                                <button
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
                                   onClick={() => handleDeclineBid(bid.id)}
-                                  className="p-2 text-slate-400 hover:text-red-400 hover:bg-white/5 rounded-lg transition-colors ml-auto"
+                                  className="ml-auto text-slate-400 hover:text-red-400"
+                                  aria-label="Decline bid"
                                 >
                                   <XCircle className="w-5 h-5" />
-                                </button>
+                                </Button>
                               </div>
                             )}
                             {bid.status === 'accepted' && (
@@ -613,26 +614,26 @@ export default function HiringJobDetailPage() {
                   })}
                 </div>
               )}
-            </div>
+            </GlassPanel>
           </div>
 
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Location Card */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h3 className="font-semibold text-white mb-4 flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-cyan-400" />
                 Location
               </h3>
-              <div className="aspect-video bg-slate-800 rounded-xl mb-3 flex items-center justify-center">
+              <div className="aspect-video bg-slate-800/50 rounded-xl mb-3 flex items-center justify-center">
                 <MapPin className="w-8 h-8 text-slate-600" />
               </div>
               <p className="text-white font-medium">{location}</p>
               <p className="text-sm text-slate-400 mt-1">{job.address}</p>
-            </div>
+            </GlassPanel>
 
             {/* Quick Stats */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h3 className="font-semibold text-white mb-4">Job Stats</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -650,33 +651,31 @@ export default function HiringJobDetailPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </GlassPanel>
 
             {/* Actions */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
               <h3 className="font-semibold text-white mb-4">Actions</h3>
               <div className="space-y-2">
-                <button
+                <Button
+                  variant="secondary"
+                  fullWidth
                   onClick={handleEditJob}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-800 text-white text-sm font-medium rounded-xl hover:bg-slate-700 transition-colors"
+                  leftIcon={<Edit className="w-4 h-4" />}
                 >
-                  <Edit className="w-4 h-4" />
                   Edit Job
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="danger"
+                  fullWidth
                   onClick={handleCancelJob}
-                  disabled={cancelling}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-red-500/10 text-red-400 text-sm font-medium rounded-xl hover:bg-red-500/20 transition-colors disabled:opacity-50"
+                  isLoading={cancelling}
+                  leftIcon={!cancelling ? <XCircle className="w-4 h-4" /> : undefined}
                 >
-                  {cancelling ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <XCircle className="w-4 h-4" />
-                  )}
                   {cancelling ? 'Cancelling...' : 'Cancel Job'}
-                </button>
+                </Button>
               </div>
-            </div>
+            </GlassPanel>
           </div>
         </div>
       </div>
