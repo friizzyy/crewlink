@@ -1,129 +1,148 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import {
   Bell, Check, CheckCheck, Trash2, Settings,
   Briefcase, MessageCircle, DollarSign, Star, Clock,
-  AlertCircle, CheckCircle2, XCircle, Filter, Zap, Award
+  AlertCircle, CheckCircle2, XCircle, Loader2, Zap, Award,
+  RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { formatRelativeTime } from '@/lib/utils'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 
-// Mock notifications data
-const mockNotifications = [
-  {
-    id: '1',
-    type: 'job-match',
-    title: 'New Job Match!',
-    message: 'A new "Deep House Cleaning" job was posted near you - $120-180',
-    time: '5 min ago',
-    read: false,
-    link: '/work/job/1',
-    icon: Briefcase,
-    iconColor: 'text-emerald-400 bg-emerald-500/20',
-  },
-  {
-    id: '2',
-    type: 'bid-accepted',
-    title: 'Bid Accepted!',
-    message: 'Alex J. accepted your bid for "Deep House Cleaning"',
-    time: '1 hour ago',
-    read: false,
-    link: '/work/messages',
-    icon: CheckCircle2,
-    iconColor: 'text-emerald-400 bg-emerald-500/20',
-  },
-  {
-    id: '3',
-    type: 'message',
-    title: 'New Message',
-    message: 'Jordan K. sent you a message about "IKEA Furniture Assembly"',
-    time: '2 hours ago',
-    read: true,
-    link: '/work/messages',
-    icon: MessageCircle,
-    iconColor: 'text-blue-400 bg-blue-500/20',
-  },
-  {
-    id: '4',
-    type: 'payment',
-    title: 'Payment Received!',
-    message: 'You received $95 for "IKEA Furniture Assembly" - now available for withdrawal',
-    time: '3 hours ago',
-    read: true,
-    link: '/work/earnings',
-    icon: DollarSign,
-    iconColor: 'text-green-400 bg-green-500/20',
-  },
-  {
-    id: '5',
-    type: 'review',
-    title: 'New Review',
-    message: 'Jordan K. left you a 5-star review! "Excellent work, very professional."',
-    time: '3 hours ago',
-    read: true,
-    link: '/work/profile',
-    icon: Star,
-    iconColor: 'text-amber-400 bg-amber-500/20',
-  },
-  {
-    id: '6',
-    type: 'reminder',
-    title: 'Job Starting Soon',
-    message: '"Help Moving Furniture" starts in 2 hours. Don\'t forget!',
-    time: '4 hours ago',
-    read: true,
-    link: '/work/job/2',
-    icon: Clock,
-    iconColor: 'text-amber-400 bg-amber-500/20',
-  },
-  {
-    id: '7',
-    type: 'bid-declined',
-    title: 'Bid Not Selected',
-    message: 'Your bid for "Yard Work" was not selected. Keep bidding!',
-    time: '1 day ago',
-    read: true,
-    link: '/work/jobs',
-    icon: XCircle,
-    iconColor: 'text-slate-400 bg-slate-500/20',
-  },
-  {
-    id: '8',
-    type: 'achievement',
-    title: 'Achievement Unlocked!',
-    message: 'You\'ve completed 100+ jobs! You earned the "Pro Worker" badge.',
-    time: '2 days ago',
-    read: true,
-    link: '/work/profile',
-    icon: Award,
-    iconColor: 'text-purple-400 bg-purple-500/20',
-  },
-]
+interface Notification {
+  id: string
+  type: string
+  title: string
+  body: string
+  data: Record<string, unknown> | null
+  actionUrl: string | null
+  isRead: boolean
+  readAt: string | null
+  createdAt: string
+}
+
+const notificationIconMap: Record<string, { icon: typeof Bell; iconColor: string }> = {
+  'job_match': { icon: Briefcase, iconColor: 'text-emerald-400 bg-emerald-500/20' },
+  'new_job': { icon: Briefcase, iconColor: 'text-emerald-400 bg-emerald-500/20' },
+  'bid_accepted': { icon: CheckCircle2, iconColor: 'text-emerald-400 bg-emerald-500/20' },
+  'bid_rejected': { icon: XCircle, iconColor: 'text-slate-400 bg-slate-500/20' },
+  'bid_declined': { icon: XCircle, iconColor: 'text-slate-400 bg-slate-500/20' },
+  'new_message': { icon: MessageCircle, iconColor: 'text-blue-400 bg-blue-500/20' },
+  'message': { icon: MessageCircle, iconColor: 'text-blue-400 bg-blue-500/20' },
+  'payment': { icon: DollarSign, iconColor: 'text-green-400 bg-green-500/20' },
+  'payment_received': { icon: DollarSign, iconColor: 'text-green-400 bg-green-500/20' },
+  'new_review': { icon: Star, iconColor: 'text-amber-400 bg-amber-500/20' },
+  'review': { icon: Star, iconColor: 'text-amber-400 bg-amber-500/20' },
+  'booking_in_progress': { icon: Clock, iconColor: 'text-amber-400 bg-amber-500/20' },
+  'booking_completed': { icon: CheckCircle2, iconColor: 'text-emerald-400 bg-emerald-500/20' },
+  'booking_cancelled': { icon: XCircle, iconColor: 'text-red-400 bg-red-500/20' },
+  'reminder': { icon: Clock, iconColor: 'text-amber-400 bg-amber-500/20' },
+  'achievement': { icon: Award, iconColor: 'text-purple-400 bg-purple-500/20' },
+}
+
+const defaultIcon = { icon: Bell, iconColor: 'text-slate-400 bg-slate-500/20' }
+
+function getNotificationIcon(type: string) {
+  return notificationIconMap[type] || defaultIcon
+}
+
+function NotificationSkeleton() {
+  return (
+    <div className="space-y-2">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="bg-slate-900 border border-white/5 rounded-xl p-4 flex gap-4">
+          <Skeleton variant="rectangular" width={40} height={40} className="shrink-0 !rounded-xl" />
+          <div className="flex-1 space-y-2">
+            <Skeleton variant="text" width="40%" height={16} />
+            <Skeleton variant="text" width="80%" height={14} />
+            <Skeleton variant="text" width="20%" height={12} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 export default function WorkNotificationsPage() {
-  const [notifications, setNotifications] = useState(mockNotifications)
+  const { data: session } = useSession()
+  const toast = useToast()
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | 'unread'>('all')
 
+  const fetchNotifications = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch('/api/notifications')
+      if (!res.ok) throw new Error('Failed to load notifications')
+      const json = await res.json()
+      setNotifications(json.data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchNotifications()
+  }, [fetchNotifications])
+
   const filteredNotifications = notifications.filter((n) => {
-    if (filter === 'unread') return !n.read
+    if (filter === 'unread') return !n.isRead
     return true
   })
 
-  const unreadCount = notifications.filter((n) => !n.read).length
+  const unreadCount = notifications.filter((n) => !n.isRead).length
 
-  const markAsRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-    )
+  const markAsRead = async (id: string) => {
+    try {
+      const res = await fetch(`/api/notifications/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ read: true }),
+      })
+      if (!res.ok) throw new Error('Failed to mark as read')
+      setNotifications((prev) =>
+        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+      )
+    } catch {
+      toast.error('Failed to mark notification as read')
+    }
   }
 
-  const markAllAsRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  const markAllAsRead = async () => {
+    try {
+      const res = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAllRead: true }),
+      })
+      if (!res.ok) throw new Error('Failed to mark all as read')
+      setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })))
+      toast.success('All notifications marked as read')
+    } catch {
+      toast.error('Failed to mark all as read')
+    }
   }
 
-  const deleteNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id))
+  const deleteNotification = async (id: string) => {
+    try {
+      const res = await fetch(`/api/notifications/${id}`, {
+        method: 'DELETE',
+      })
+      if (!res.ok) throw new Error('Failed to delete notification')
+      setNotifications((prev) => prev.filter((n) => n.id !== id))
+    } catch {
+      toast.error('Failed to delete notification')
+    }
   }
 
   return (
@@ -189,30 +208,49 @@ export default function WorkNotificationsPage() {
 
       {/* Notifications List */}
       <div className="max-w-3xl mx-auto px-4 py-4">
-        {filteredNotifications.length > 0 ? (
+        {loading ? (
+          <NotificationSkeleton />
+        ) : error ? (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-10 h-10 text-red-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-white mb-2">Failed to load notifications</h2>
+            <p className="text-slate-400 max-w-sm mx-auto mb-6">{error}</p>
+            <button
+              onClick={fetchNotifications}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Retry
+            </button>
+          </div>
+        ) : filteredNotifications.length > 0 ? (
           <div className="space-y-2">
             {filteredNotifications.map((notification) => {
-              const Icon = notification.icon
+              const { icon: Icon, iconColor } = getNotificationIcon(notification.type)
               return (
                 <div
                   key={notification.id}
                   className={cn(
                     'relative group bg-slate-900 border rounded-xl p-4 transition-colors',
-                    notification.read
+                    notification.isRead
                       ? 'border-white/5 hover:border-white/10'
                       : 'border-emerald-500/30 bg-emerald-500/5'
                   )}
                 >
                   <Link
-                    href={notification.link}
-                    onClick={() => markAsRead(notification.id)}
+                    href={notification.actionUrl || '/work/notifications'}
+                    onClick={() => {
+                      if (!notification.isRead) markAsRead(notification.id)
+                    }}
                     className="flex gap-4"
                   >
                     {/* Icon */}
                     <div
                       className={cn(
                         'w-10 h-10 rounded-xl flex items-center justify-center shrink-0',
-                        notification.iconColor
+                        iconColor
                       )}
                     >
                       <Icon className="w-5 h-5" />
@@ -225,28 +263,28 @@ export default function WorkNotificationsPage() {
                           <h3
                             className={cn(
                               'font-semibold',
-                              notification.read ? 'text-white' : 'text-emerald-400'
+                              notification.isRead ? 'text-white' : 'text-emerald-400'
                             )}
                           >
                             {notification.title}
                           </h3>
                           <p className="text-sm text-slate-400 mt-0.5">
-                            {notification.message}
+                            {notification.body}
                           </p>
                         </div>
-                        {!notification.read && (
+                        {!notification.isRead && (
                           <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full shrink-0 mt-1.5" />
                         )}
                       </div>
                       <span className="text-xs text-slate-500 mt-2 block">
-                        {notification.time}
+                        {formatRelativeTime(notification.createdAt)}
                       </span>
                     </div>
                   </Link>
 
                   {/* Actions */}
                   <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                    {!notification.read && (
+                    {!notification.isRead && (
                       <button
                         onClick={() => markAsRead(notification.id)}
                         className="p-1.5 text-slate-400 hover:text-emerald-400 hover:bg-white/5 rounded-lg transition-colors"

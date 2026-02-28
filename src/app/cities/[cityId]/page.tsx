@@ -5,8 +5,10 @@ import Link from 'next/link'
 import { useParams } from 'next/navigation'
 import {
   MapPin, ArrowRight, Users, Briefcase, Star, Shield, Clock,
-  Sparkles, ChevronRight, DollarSign, Map
+  Sparkles, ChevronRight, DollarSign, Map,
+  Package, Wrench, Leaf, Armchair, PartyPopper
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { MarketingLayout } from '@/components/MarketingLayout'
 import { useScrollReveal, getRevealClasses } from '@/hooks/useScrollReveal'
 import { useUserRole } from '@/contexts/UserRoleContext'
@@ -18,13 +20,13 @@ import { getCityById, regionLabels, getCitiesByRegion, type City } from '@/lib/c
 // ============================================
 
 // Popular categories for each city type
-const categories = [
-  { id: 'cleaning', name: 'House Cleaning', icon: '🧹', jobs: 45 },
-  { id: 'moving', name: 'Moving & Delivery', icon: '📦', jobs: 32 },
-  { id: 'handyman', name: 'Handyman', icon: '🔧', jobs: 28 },
-  { id: 'yard', name: 'Yard Work', icon: '🌱', jobs: 24 },
-  { id: 'assembly', name: 'Furniture Assembly', icon: '🪑', jobs: 18 },
-  { id: 'events', name: 'Event Help', icon: '🎉', jobs: 12 },
+const categories: { id: string; name: string; Icon: LucideIcon; jobs: number }[] = [
+  { id: 'cleaning', name: 'House Cleaning', Icon: Sparkles, jobs: 45 },
+  { id: 'moving', name: 'Moving & Delivery', Icon: Package, jobs: 32 },
+  { id: 'handyman', name: 'Handyman', Icon: Wrench, jobs: 28 },
+  { id: 'yard', name: 'Yard Work', Icon: Leaf, jobs: 24 },
+  { id: 'assembly', name: 'Furniture Assembly', Icon: Armchair, jobs: 18 },
+  { id: 'events', name: 'Event Help', Icon: PartyPopper, jobs: 12 },
 ]
 
 // How it works steps - role aware
@@ -340,8 +342,8 @@ function CityPageContent() {
                   style={{ transitionDelay: `${index * 60}ms` }}
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center text-3xl group-hover:scale-110 transition-transform">
-                      {cat.icon}
+                    <div className={`w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <cat.Icon className={`w-7 h-7 ${accentColor}`} />
                     </div>
                     <div>
                       <h3 className={`font-semibold text-white group-hover:${accentColor} transition-colors`}>

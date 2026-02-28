@@ -1,74 +1,111 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   ArrowLeft, Star, MapPin, Clock, BadgeCheck, Award,
   MessageCircle, Calendar, CheckCircle2, Briefcase,
-  Shield, ThumbsUp, ExternalLink
+  Shield, ThumbsUp, ExternalLink, Loader2, AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 
-// Mock worker data
-const mockWorker = {
-  id: 'w1',
-  name: 'Maria Garcia',
-  avatar: 'M',
-  bio: 'Professional cleaner with 5+ years of experience. I specialize in deep cleaning, move-out cleaning, and regular maintenance. I take pride in my attention to detail and always leave homes spotless.',
-  rating: 4.9,
-  reviews: 127,
-  verified: true,
-  completedJobs: 215,
-  memberSince: 'March 2023',
-  location: 'San Francisco, CA',
-  responseTime: '< 30 min',
-  responseRate: '98%',
-  skills: ['Deep Cleaning', 'Move-out Cleaning', 'Window Cleaning', 'Organization', 'Laundry'],
-  badges: [
-    { id: '1', name: 'Verified', icon: BadgeCheck, color: 'text-cyan-400' },
-    { id: '2', name: 'Top Rated', icon: Star, color: 'text-amber-400' },
-    { id: '3', name: '200+ Jobs', icon: Award, color: 'text-purple-400' },
-  ],
-  recentReviews: [
-    {
-      id: '1',
-      hirer: 'Alex J.',
-      rating: 5,
-      comment: 'Maria did an amazing job! My apartment has never looked this clean. She was punctual, professional, and thorough. Highly recommend!',
-      job: 'Deep House Cleaning',
-      date: '1 week ago',
-    },
-    {
-      id: '2',
-      hirer: 'Sam W.',
-      rating: 5,
-      comment: 'Excellent work on the move-out cleaning. Got my full deposit back thanks to Maria!',
-      job: 'Move-out Cleaning',
-      date: '2 weeks ago',
-    },
-    {
-      id: '3',
-      hirer: 'Jordan K.',
-      rating: 4,
-      comment: 'Great job overall. Very detail-oriented and friendly.',
-      job: 'Regular Cleaning',
-      date: '3 weeks ago',
-    },
-  ],
-  completedJobsRecent: [
-    { id: '1', title: 'Deep House Cleaning', date: '1 week ago', amount: 150 },
-    { id: '2', title: 'Move-out Cleaning', date: '2 weeks ago', amount: 200 },
-    { id: '3', title: 'Regular Cleaning', date: '3 weeks ago', amount: 80 },
-  ],
+interface WorkerProfileInfo {
+  headline: string | null
+  bio: string | null
+  hourlyRate: number | null
+  skills: string[]
+  isVerified: boolean
+  serviceRadius: number
+  averageRating: number
+  completedJobs: number
+}
+
+interface UserData {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  role: string
+  memberSince: string
+  reviewCount: number
+  workerProfile: WorkerProfileInfo | null
+  hirerProfile: null
+}
+
+function WorkerProfileSkeleton() {
+  return (
+    <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
+      <div className="border-b border-white/5 bg-slate-900/50">
+        <div className="max-w-4xl mx-auto px-4 py-4">
+          <Skeleton variant="text" width={80} height={20} />
+        </div>
+      </div>
+      <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 mb-6">
+          <div className="flex flex-col sm:flex-row gap-6">
+            <Skeleton variant="rectangular" width={96} height={96} className="rounded-2xl" />
+            <div className="flex-1 space-y-3">
+              <Skeleton variant="text" width="50%" height={28} />
+              <Skeleton variant="text" width="70%" height={16} />
+              <div className="flex gap-2">
+                <Skeleton variant="rectangular" width={100} height={28} className="rounded-full" />
+                <Skeleton variant="rectangular" width={100} height={28} className="rounded-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-6">
+          <Skeleton variant="rectangular" height={120} className="rounded-2xl" />
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {[...Array(4)].map((_, i) => (
+              <Skeleton key={i} variant="rectangular" height={80} className="rounded-xl" />
+            ))}
+          </div>
+          <Skeleton variant="rectangular" height={100} className="rounded-2xl" />
+          <Skeleton variant="rectangular" height={150} className="rounded-2xl" />
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default function WorkerProfilePage() {
   const params = useParams()
   const router = useRouter()
   const toast = useToast()
+  const userId = params.id as string
+
+  const [user, setUser] = useState<UserData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'about' | 'reviews' | 'jobs'>('about')
+
+  const fetchUser = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch(`/api/users/${userId}`)
+      if (!res.ok) {
+        if (res.status === 404) throw new Error('User not found')
+        throw new Error('Failed to load profile')
+      }
+      const json = await res.json()
+      setUser(json.data || json)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }, [userId])
+
+  useEffect(() => {
+    if (userId) {
+      fetchUser()
+    }
+  }, [userId, fetchUser])
 
   const handleMessage = () => {
     router.push('/hiring/messages')
@@ -78,6 +115,44 @@ export default function WorkerProfilePage() {
     toast.success('Redirecting to job posting...')
     router.push('/hiring/post')
   }
+
+  if (loading) {
+    return <WorkerProfileSkeleton />
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
+          <p className="text-white text-lg font-medium">
+            {error === 'User not found' ? 'Worker not found' : 'Failed to load profile'}
+          </p>
+          <p className="text-slate-400">{error}</p>
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={() => router.back()}
+              className="px-6 py-2.5 bg-slate-800 text-white font-medium rounded-xl hover:bg-slate-700 transition-colors"
+            >
+              Go Back
+            </button>
+            <button
+              onClick={fetchUser}
+              className="px-6 py-2.5 bg-cyan-500 text-white font-medium rounded-xl hover:bg-cyan-400 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (!user) return null
+
+  const wp = user.workerProfile
+  const displayName = user.name || 'Worker'
+  const memberSince = new Date(user.memberSince).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
@@ -101,9 +176,13 @@ export default function WorkerProfilePage() {
             {/* Avatar */}
             <div className="relative shrink-0 mx-auto sm:mx-0">
               <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white text-3xl font-bold">
-                {mockWorker.avatar}
+                {user.avatarUrl ? (
+                  <Image src={user.avatarUrl} alt={displayName} width={96} height={96} className="w-24 h-24 rounded-2xl object-cover" />
+                ) : (
+                  displayName.charAt(0)
+                )}
               </div>
-              {mockWorker.verified && (
+              {wp?.isVerified && (
                 <div className="absolute -bottom-1 -right-1 w-7 h-7 bg-cyan-500 rounded-full flex items-center justify-center border-2 border-slate-900">
                   <CheckCircle2 className="w-4 h-4 text-white" />
                 </div>
@@ -113,8 +192,8 @@ export default function WorkerProfilePage() {
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl font-bold text-white">{mockWorker.name}</h1>
-                {mockWorker.verified && (
+                <h1 className="text-2xl font-bold text-white">{displayName}</h1>
+                {wp?.isVerified && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-cyan-500/20 text-cyan-400 text-xs font-medium rounded-full mx-auto sm:mx-0">
                     <BadgeCheck className="w-3 h-3" />
                     Verified
@@ -122,36 +201,47 @@ export default function WorkerProfilePage() {
                 )}
               </div>
 
+              {wp?.headline && (
+                <p className="text-slate-300 text-sm mt-1">{wp.headline}</p>
+              )}
+
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mt-2 text-sm text-slate-400">
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                  <span className="text-white font-semibold">{mockWorker.rating}</span>
-                  <span>({mockWorker.reviews} reviews)</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MapPin className="w-4 h-4" />
-                  {mockWorker.location}
+                  <span className="text-white font-semibold">{wp?.averageRating?.toFixed(1) || '0.0'}</span>
+                  <span>({user.reviewCount} reviews)</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <Briefcase className="w-4 h-4" />
-                  {mockWorker.completedJobs} jobs
+                  {wp?.completedJobs ?? 0} jobs
                 </div>
+                {wp?.hourlyRate && (
+                  <div className="flex items-center gap-1 text-cyan-400">
+                    ${wp.hourlyRate}/hr
+                  </div>
+                )}
               </div>
 
               {/* Badges */}
               <div className="flex gap-2 mt-4 justify-center sm:justify-start flex-wrap">
-                {mockWorker.badges.map((badge) => {
-                  const Icon = badge.icon
-                  return (
-                    <div
-                      key={badge.id}
-                      className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full"
-                    >
-                      <Icon className={cn('w-3.5 h-3.5', badge.color)} />
-                      <span className="text-xs text-slate-300">{badge.name}</span>
-                    </div>
-                  )
-                })}
+                {wp?.isVerified && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                    <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
+                    <span className="text-xs text-slate-300">Verified</span>
+                  </div>
+                )}
+                {(wp?.averageRating ?? 0) >= 4.5 && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                    <Star className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="text-xs text-slate-300">Top Rated</span>
+                  </div>
+                )}
+                {(wp?.completedJobs ?? 0) >= 200 && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-slate-800 rounded-full">
+                    <Award className="w-3.5 h-3.5 text-purple-400" />
+                    <span className="text-xs text-slate-300">{wp?.completedJobs}+ Jobs</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -177,7 +267,7 @@ export default function WorkerProfilePage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto">
-          {(['about', 'reviews', 'jobs'] as const).map((tab) => (
+          {(['about', 'reviews'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -199,46 +289,50 @@ export default function WorkerProfilePage() {
             {/* Bio */}
             <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4">About</h2>
-              <p className="text-slate-300 leading-relaxed">{mockWorker.bio}</p>
+              <p className="text-slate-300 leading-relaxed">
+                {wp?.bio || 'This worker has not added a bio yet.'}
+              </p>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{mockWorker.completedJobs}</div>
+                <div className="text-2xl font-bold text-white">{wp?.completedJobs ?? 0}</div>
                 <div className="text-sm text-slate-400 mt-1">Jobs Done</div>
               </div>
               <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{mockWorker.responseRate}</div>
-                <div className="text-sm text-slate-400 mt-1">Response Rate</div>
+                <div className="text-2xl font-bold text-white">{user.reviewCount}</div>
+                <div className="text-sm text-slate-400 mt-1">Reviews</div>
               </div>
               <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-white">{mockWorker.responseTime}</div>
-                <div className="text-sm text-slate-400 mt-1">Response Time</div>
+                <div className="text-2xl font-bold text-white">{wp?.serviceRadius ?? 25} mi</div>
+                <div className="text-sm text-slate-400 mt-1">Service Radius</div>
               </div>
               <div className="bg-slate-900 border border-white/5 rounded-xl p-4 text-center">
                 <div className="flex items-center justify-center gap-1">
                   <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                  <span className="text-2xl font-bold text-white">{mockWorker.rating}</span>
+                  <span className="text-2xl font-bold text-white">{wp?.averageRating?.toFixed(1) || '0.0'}</span>
                 </div>
                 <div className="text-sm text-slate-400 mt-1">Rating</div>
               </div>
             </div>
 
             {/* Skills */}
-            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
-              <h2 className="text-lg font-semibold text-white mb-4">Skills</h2>
-              <div className="flex flex-wrap gap-2">
-                {mockWorker.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-3 py-1.5 bg-slate-800 text-slate-300 text-sm rounded-lg"
-                  >
-                    {skill}
-                  </span>
-                ))}
+            {(wp?.skills ?? []).length > 0 && (
+              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+                <h2 className="text-lg font-semibold text-white mb-4">Skills</h2>
+                <div className="flex flex-wrap gap-2">
+                  {wp?.skills.map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="px-3 py-1.5 bg-slate-800 text-slate-300 text-sm rounded-lg"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Member Info */}
             <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
@@ -246,17 +340,25 @@ export default function WorkerProfilePage() {
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Member since</span>
-                  <span className="text-white">{mockWorker.memberSince}</span>
+                  <span className="text-white">{memberSince}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Location</span>
-                  <span className="text-white">{mockWorker.location}</span>
-                </div>
+                {wp?.hourlyRate && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Hourly Rate</span>
+                    <span className="text-cyan-400 font-semibold">${wp.hourlyRate}/hr</span>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Verification</span>
-                  <span className="flex items-center gap-1 text-cyan-400">
-                    <Shield className="w-4 h-4" />
-                    ID Verified
+                  <span className="flex items-center gap-1">
+                    {wp?.isVerified ? (
+                      <span className="flex items-center gap-1 text-cyan-400">
+                        <Shield className="w-4 h-4" />
+                        ID Verified
+                      </span>
+                    ) : (
+                      <span className="text-slate-500">Not verified</span>
+                    )}
                   </span>
                 </div>
               </div>
@@ -266,68 +368,20 @@ export default function WorkerProfilePage() {
 
         {activeTab === 'reviews' && (
           <div className="space-y-4">
-            {mockWorker.recentReviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-slate-900 border border-white/5 rounded-2xl p-5"
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-white">{review.hirer}</span>
-                      <div className="flex items-center gap-0.5">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={cn(
-                              'w-3.5 h-3.5',
-                              i < review.rating
-                                ? 'text-amber-400 fill-amber-400'
-                                : 'text-slate-600'
-                            )}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-300 mt-2">{review.comment}</p>
-                    <p className="text-xs text-slate-500 mt-3">
-                      {review.job} • {review.date}
-                    </p>
-                  </div>
-                </div>
+            {user.reviewCount > 0 ? (
+              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 text-center">
+                <p className="text-slate-400">
+                  {user.reviewCount} review{user.reviewCount !== 1 ? 's' : ''} available.
+                </p>
+                <p className="text-sm text-slate-500 mt-2">
+                  Detailed review listing coming soon.
+                </p>
               </div>
-            ))}
-
-            <div className="text-center py-4">
-              <p className="text-slate-400 text-sm">
-                Showing {mockWorker.recentReviews.length} of {mockWorker.reviews} reviews
-              </p>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'jobs' && (
-          <div className="space-y-4">
-            {mockWorker.completedJobsRecent.map((job) => (
-              <div
-                key={job.id}
-                className="bg-slate-900 border border-white/5 rounded-2xl p-5"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="font-medium text-white">{job.title}</h3>
-                    <p className="text-sm text-slate-400 mt-1">{job.date}</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-cyan-400 font-semibold">${job.amount}</div>
-                    <div className="flex items-center gap-1 text-xs text-emerald-400 mt-1">
-                      <CheckCircle2 className="w-3 h-3" />
-                      Completed
-                    </div>
-                  </div>
-                </div>
+            ) : (
+              <div className="bg-slate-900 border border-white/5 rounded-2xl p-6 text-center">
+                <p className="text-slate-400">No reviews yet</p>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>

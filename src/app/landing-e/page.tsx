@@ -2,11 +2,13 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { 
-  MapPin, ArrowRight, Shield, Clock, Star, Briefcase, 
+import {
+  MapPin, ArrowRight, Shield, Clock, Star, Briefcase,
   Users, Menu, X, Zap, BadgeCheck, Sparkles, CheckCircle2,
-  TrendingUp, DollarSign, Compass, Target, Award
+  TrendingUp, DollarSign, Compass, Target, Award, Wrench,
+  Package, Leaf, Armchair, PartyPopper, Truck, PawPrint
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'How It Works', href: '/how-it-works' },
@@ -32,15 +34,15 @@ const topWorkers = [
   { id: 3, name: 'Elena Rodriguez', specialty: 'Event Setup', rating: 4.98, jobs: 312, earnings: '$21.8K', avatar: 'E', badge: 'Superstar', direction: 'left' },
 ]
 
-const categories = [
-  { name: 'Cleaning', icon: '🧹', count: '1.2K', hot: true },
-  { name: 'Moving', icon: '📦', count: '890' },
-  { name: 'Handyman', icon: '🔧', count: '1.5K', hot: true },
-  { name: 'Yard Work', icon: '🌱', count: '720' },
-  { name: 'Assembly', icon: '🪑', count: '430' },
-  { name: 'Events', icon: '🎉', count: '280' },
-  { name: 'Delivery', icon: '🚚', count: '560' },
-  { name: 'Pet Care', icon: '🐕', count: '340' },
+const categories: { name: string; Icon: LucideIcon; count: string; hot?: boolean; gradient: string }[] = [
+  { name: 'Cleaning', Icon: Sparkles, count: '1.2K', hot: true, gradient: 'from-blue-500 to-cyan-400' },
+  { name: 'Moving', Icon: Package, count: '890', gradient: 'from-orange-500 to-amber-400' },
+  { name: 'Handyman', Icon: Wrench, count: '1.5K', hot: true, gradient: 'from-violet-500 to-purple-400' },
+  { name: 'Yard Work', Icon: Leaf, count: '720', gradient: 'from-green-500 to-emerald-400' },
+  { name: 'Assembly', Icon: Armchair, count: '430', gradient: 'from-rose-500 to-pink-400' },
+  { name: 'Events', Icon: PartyPopper, count: '280', gradient: 'from-yellow-500 to-orange-400' },
+  { name: 'Delivery', Icon: Truck, count: '560', gradient: 'from-indigo-500 to-blue-400' },
+  { name: 'Pet Care', Icon: PawPrint, count: '340', gradient: 'from-teal-500 to-emerald-400' },
 ]
 
 const processSteps = [
@@ -374,7 +376,9 @@ export default function LandingPageE() {
                 </div>
                 
                 <div className="relative flex items-center gap-4">
-                  <span className="text-3xl group-hover:scale-110 transition-transform duration-300">{cat.icon}</span>
+                  <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${cat.gradient} flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform duration-300`}>
+                    <cat.Icon className="w-5 h-5 text-white" />
+                  </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-white">{cat.name}</h3>

@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  MapPin, ArrowRight, Shield, Clock, Star, Briefcase, 
+import {
+  MapPin, ArrowRight, Shield, Clock, Star, Briefcase,
   Users, ChevronRight, Menu, X, Zap, Check, Sparkles,
-  TrendingUp, BadgeCheck, Search
+  TrendingUp, BadgeCheck, Search, Wrench, Package, Leaf,
+  Armchair, PartyPopper
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'How It Works', href: '/how-it-works' },
@@ -22,13 +24,13 @@ const stats = [
   { value: '98%', label: 'Satisfaction', icon: TrendingUp },
 ]
 
-const categories = [
-  { name: 'Cleaning', icon: '🧹', jobs: 1240, color: 'from-blue-500 to-cyan-400' },
-  { name: 'Moving', icon: '📦', jobs: 890, color: 'from-orange-500 to-amber-400' },
-  { name: 'Handyman', icon: '🔧', jobs: 1560, color: 'from-violet-500 to-purple-400' },
-  { name: 'Yard Work', icon: '🌱', jobs: 720, color: 'from-green-500 to-emerald-400' },
-  { name: 'Assembly', icon: '🪑', jobs: 430, color: 'from-rose-500 to-pink-400' },
-  { name: 'Event Help', icon: '🎉', jobs: 280, color: 'from-yellow-500 to-orange-400' },
+const categories: { name: string; Icon: LucideIcon; jobs: number; color: string }[] = [
+  { name: 'Cleaning', Icon: Sparkles, jobs: 1240, color: 'from-blue-500 to-cyan-400' },
+  { name: 'Moving', Icon: Package, jobs: 890, color: 'from-orange-500 to-amber-400' },
+  { name: 'Handyman', Icon: Wrench, jobs: 1560, color: 'from-violet-500 to-purple-400' },
+  { name: 'Yard Work', Icon: Leaf, jobs: 720, color: 'from-green-500 to-emerald-400' },
+  { name: 'Assembly', Icon: Armchair, jobs: 430, color: 'from-rose-500 to-pink-400' },
+  { name: 'Event Help', Icon: PartyPopper, jobs: 280, color: 'from-yellow-500 to-orange-400' },
 ]
 
 const features = [
@@ -341,7 +343,9 @@ export default function LandingPageA() {
               >
                 <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
                 <div className="relative">
-                  <span className="text-4xl mb-4 block">{category.icon}</span>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.color} flex items-center justify-center mb-4`}>
+                    <category.Icon className="w-6 h-6 text-white" />
+                  </div>
                   <h3 className="font-semibold text-slate-900 group-hover:text-white transition-colors">{category.name}</h3>
                   <p className="text-sm text-slate-500 group-hover:text-white/80 transition-colors">{category.jobs.toLocaleString()} jobs</p>
                 </div>

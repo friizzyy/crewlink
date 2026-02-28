@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  MapPin, ArrowRight, Shield, Clock, Star, Briefcase, 
+import {
+  MapPin, ArrowRight, Shield, Clock, Star, Briefcase,
   Users, Menu, X, Zap, Check, Sparkles, BadgeCheck,
-  TrendingUp, DollarSign, CheckCircle2, Play
+  TrendingUp, DollarSign, CheckCircle2, Play, Wrench,
+  Package, Leaf, Armchair, PartyPopper
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'How It Works', href: '/how-it-works' },
@@ -30,13 +32,13 @@ const orbitingWorkers = [
   { id: 3, name: 'Elena R.', rating: 5.0, jobs: 203, color: 'from-emerald-400 to-cyan-500', orbitClass: 'animate-orbit-slow' },
 ]
 
-const categories = [
-  { name: 'Cleaning', icon: '🧹', jobs: 1240, gradient: 'from-cyan-500 to-blue-600' },
-  { name: 'Moving', icon: '📦', jobs: 890, gradient: 'from-orange-500 to-red-600' },
-  { name: 'Handyman', icon: '🔧', jobs: 1560, gradient: 'from-purple-500 to-pink-600' },
-  { name: 'Yard Work', icon: '🌱', jobs: 720, gradient: 'from-emerald-500 to-teal-600' },
-  { name: 'Assembly', icon: '🪑', jobs: 430, gradient: 'from-amber-500 to-orange-600' },
-  { name: 'Events', icon: '🎉', jobs: 280, gradient: 'from-rose-500 to-pink-600' },
+const categories: { name: string; Icon: LucideIcon; jobs: number; gradient: string }[] = [
+  { name: 'Cleaning', Icon: Sparkles, jobs: 1240, gradient: 'from-cyan-500 to-blue-600' },
+  { name: 'Moving', Icon: Package, jobs: 890, gradient: 'from-orange-500 to-red-600' },
+  { name: 'Handyman', Icon: Wrench, jobs: 1560, gradient: 'from-purple-500 to-pink-600' },
+  { name: 'Yard Work', Icon: Leaf, jobs: 720, gradient: 'from-emerald-500 to-teal-600' },
+  { name: 'Assembly', Icon: Armchair, jobs: 430, gradient: 'from-amber-500 to-orange-600' },
+  { name: 'Events', Icon: PartyPopper, jobs: 280, gradient: 'from-rose-500 to-pink-600' },
 ]
 
 const features = [
@@ -297,7 +299,9 @@ export default function LandingPageD() {
                 <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500`} />
                 
                 <div className="relative">
-                  <span className="text-4xl mb-4 block group-hover:scale-110 transition-transform duration-300">{category.icon}</span>
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                    <category.Icon className="w-6 h-6 text-white" />
+                  </div>
                   <h3 className="font-semibold text-white mb-1">{category.name}</h3>
                   <p className="text-sm text-slate-500">{category.jobs.toLocaleString()} jobs</p>
                 </div>

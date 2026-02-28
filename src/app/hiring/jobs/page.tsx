@@ -6,20 +6,22 @@ import { useSearchParams } from 'next/navigation'
 import {
   Plus, Search, MapPin, Clock, DollarSign, Users,
   MoreHorizontal, CheckCircle2, XCircle, Eye,
-  MessageCircle, Edit, Star, Loader2, RefreshCw
+  MessageCircle, Edit, Star, Loader2, RefreshCw,
+  Sparkles, Package, Wrench, Leaf, Armchair, Truck, PartyPopper, ClipboardList
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 // Category icons mapping
-const categoryIcons: Record<string, string> = {
-  cleaning: '🧹',
-  moving: '📦',
-  handyman: '🔧',
-  yard: '🌱',
-  assembly: '🪑',
-  delivery: '🚚',
-  events: '🎉',
-  other: '📋',
+const categoryIcons: Record<string, LucideIcon> = {
+  cleaning: Sparkles,
+  moving: Package,
+  handyman: Wrench,
+  yard: Leaf,
+  assembly: Armchair,
+  delivery: Truck,
+  events: PartyPopper,
+  other: ClipboardList,
 }
 
 // Job type from API
@@ -307,8 +309,11 @@ export default function HiringJobsPage() {
                 >
                   <div className="flex gap-4">
                     {/* Category Icon */}
-                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center text-3xl shrink-0">
-                      {categoryIcons[job.category] || '📋'}
+                    <div className="w-14 h-14 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
+                      {(() => {
+                        const CategoryIcon = categoryIcons[job.category] || ClipboardList
+                        return <CategoryIcon className="w-7 h-7 text-cyan-400" />
+                      })()}
                     </div>
 
                     {/* Job Info */}

@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { 
-  MapPin, ArrowRight, Shield, Clock, Star, Briefcase, 
+import {
+  MapPin, ArrowRight, Shield, Clock, Star, Briefcase,
   Users, Menu, X, Zap, BadgeCheck, Sparkles, CheckCircle2,
-  TrendingUp, DollarSign, Heart, Award, Flame, Rocket
+  TrendingUp, DollarSign, Heart, Award, Flame, Rocket,
+  Wrench, Package, Leaf, Armchair, PartyPopper
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'How It Works', href: '/how-it-works' },
@@ -24,21 +26,21 @@ const notifications = [
 ]
 
 // Orbiting icons around the main content
-const orbitIcons = [
-  { icon: '🧹', size: 'w-12 h-12', delay: '0s', duration: '20s' },
-  { icon: '📦', size: 'w-10 h-10', delay: '3s', duration: '25s' },
-  { icon: '🔧', size: 'w-14 h-14', delay: '6s', duration: '22s' },
-  { icon: '🌱', size: 'w-10 h-10', delay: '9s', duration: '28s' },
-  { icon: '🎉', size: 'w-12 h-12', delay: '12s', duration: '24s' },
+const orbitIcons: { Icon: LucideIcon; size: string; iconSize: string; delay: string; duration: string; gradient: string }[] = [
+  { Icon: Sparkles, size: 'w-12 h-12', iconSize: 'w-6 h-6', delay: '0s', duration: '20s', gradient: 'from-blue-500 to-cyan-400' },
+  { Icon: Package, size: 'w-10 h-10', iconSize: 'w-5 h-5', delay: '3s', duration: '25s', gradient: 'from-orange-500 to-amber-400' },
+  { Icon: Wrench, size: 'w-14 h-14', iconSize: 'w-7 h-7', delay: '6s', duration: '22s', gradient: 'from-violet-500 to-purple-400' },
+  { Icon: Leaf, size: 'w-10 h-10', iconSize: 'w-5 h-5', delay: '9s', duration: '28s', gradient: 'from-green-500 to-emerald-400' },
+  { Icon: PartyPopper, size: 'w-12 h-12', iconSize: 'w-6 h-6', delay: '12s', duration: '24s', gradient: 'from-yellow-500 to-orange-400' },
 ]
 
-const categories = [
-  { name: 'Cleaning', icon: '🧹', jobs: 1240, popular: true },
-  { name: 'Moving', icon: '📦', jobs: 890 },
-  { name: 'Handyman', icon: '🔧', jobs: 1560, popular: true },
-  { name: 'Yard Work', icon: '🌱', jobs: 720 },
-  { name: 'Assembly', icon: '🪑', jobs: 430 },
-  { name: 'Events', icon: '🎉', jobs: 280 },
+const categories: { name: string; Icon: LucideIcon; jobs: number; popular?: boolean; gradient: string }[] = [
+  { name: 'Cleaning', Icon: Sparkles, jobs: 1240, popular: true, gradient: 'from-blue-500 to-cyan-400' },
+  { name: 'Moving', Icon: Package, jobs: 890, gradient: 'from-orange-500 to-amber-400' },
+  { name: 'Handyman', Icon: Wrench, jobs: 1560, popular: true, gradient: 'from-violet-500 to-purple-400' },
+  { name: 'Yard Work', Icon: Leaf, jobs: 720, gradient: 'from-green-500 to-emerald-400' },
+  { name: 'Assembly', Icon: Armchair, jobs: 430, gradient: 'from-rose-500 to-pink-400' },
+  { name: 'Events', Icon: PartyPopper, jobs: 280, gradient: 'from-yellow-500 to-orange-400' },
 ]
 
 const benefits = [
@@ -377,7 +379,9 @@ export default function LandingPageF() {
                 )}
                 
                 <div className="relative text-center">
-                  <span className="text-5xl mb-4 block group-hover:scale-125 group-hover:-rotate-12 transition-all duration-300">{category.icon}</span>
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center mb-4 mx-auto group-hover:scale-125 group-hover:-rotate-12 transition-all duration-300`}>
+                    <category.Icon className="w-7 h-7 text-white" />
+                  </div>
                   <h3 className="font-semibold text-white mb-1">{category.name}</h3>
                   <p className="text-sm text-slate-500">{category.jobs.toLocaleString()} jobs</p>
                 </div>

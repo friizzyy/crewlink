@@ -8,7 +8,7 @@ import {
   Search, MapPin, Star, Clock, Plus,
   MessageCircle, Heart, ArrowRight, BadgeCheck,
   Users, ChevronLeft, Navigation, Briefcase, Building2,
-  SlidersHorizontal
+  SlidersHorizontal, Loader2, AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlassPanel, Button, GeolocationModal, LiveDot, CategoryDropdown, BudgetDropdown, parseBudgetFilter } from '@/components/ui'
@@ -18,6 +18,7 @@ import { MapLoadingState, SidebarEmptyState } from '@/components/map/MapStates'
 import type { JobPostItem, WorkerItem } from '@/components/cards'
 import type { MapMarker, UserLocation } from '@/components/map/LeafletMap'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 import { getCityById } from '@/lib/cities-data'
 import {
   normalizeCategorySlug,
@@ -42,80 +43,109 @@ const LeafletMap = dynamic(() => import('@/components/map/LeafletMap'), {
 })
 
 // ============================================
-// MOCK DATA - Job Posts (Hirer's own job listings)
+// API Response Types
 // ============================================
-const mockJobPosts: JobPostItem[] = [
-  {
-    id: 'jp1',
-    title: 'House Cleaning Needed',
-    category: 'cleaning',
-    description: 'Weekly house cleaning for 3BR home.',
-    budget: { min: 100, max: 150 },
-    location: { area: 'Pacific Heights', lat: 37.7925, lng: -122.4382 },
-    applicants: 8,
-    status: 'active',
-    postedAt: '2 days ago',
-  },
-  {
-    id: 'jp2',
-    title: 'Help with Office Move',
-    category: 'moving',
-    description: 'Small office relocation next weekend.',
-    budget: { min: 300, max: 500 },
-    location: { area: 'Financial District', lat: 37.7946, lng: -122.3999 },
-    applicants: 12,
-    status: 'active',
-    postedAt: '1 week ago',
-  },
-]
+interface ApiJobPoster {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  image: string | null
+  hirerProfile: {
+    companyName: string | null
+    averageRating: number | null
+    isVerified: boolean
+  } | null
+}
 
-// ============================================
-// MOCK DATA - Companies/Crews
-// ============================================
-const mockCompanies = [
-  {
-    id: 'c1',
-    name: 'CleanPro Services',
-    category: 'cleaning',
-    description: 'Professional residential and commercial cleaning. Fully insured and bonded.',
-    rating: 4.9,
-    reviews: 156,
-    workers: 12,
-    location: { area: 'Mission District', lat: 37.7599, lng: -122.4148 },
-    verified: true,
-    responseTime: '< 1 hour',
-    priceRange: '$$',
-    type: 'company',
-  },
-  {
-    id: 'c2',
-    name: 'Bay Area Movers',
-    category: 'moving',
-    description: 'Full-service moving company. Local and long-distance moves. Free quotes.',
-    rating: 4.8,
-    reviews: 89,
-    workers: 8,
-    location: { area: 'SOMA', lat: 37.7785, lng: -122.4056 },
-    verified: true,
-    responseTime: '< 30 min',
-    priceRange: '$$$',
-    type: 'company',
-  },
-  {
-    id: 'c3',
-    name: 'HandyHelpers',
-    category: 'handyman',
-    description: 'Skilled handymen for all your home repair needs. No job too small.',
-    rating: 4.7,
-    reviews: 203,
-    workers: 15,
-    location: { area: 'Hayes Valley', lat: 37.7759, lng: -122.4245 },
-    verified: true,
-    responseTime: '< 2 hours',
-    priceRange: '$$',
-    type: 'company',
-  },
-]
+interface ApiJob {
+  id: string
+  title: string
+  description: string
+  category: string
+  address: string | null
+  city: string | null
+  lat: number | null
+  lng: number | null
+  isRemote: boolean
+  scheduleType: string
+  startDate: string | null
+  endDate: string | null
+  estimatedHours: number | null
+  budgetType: string
+  budgetMin: number | null
+  budgetMax: number | null
+  status: string
+  viewCount: number
+  bidCount: number
+  createdAt: string
+  updatedAt: string
+  poster: ApiJobPoster | null
+}
+
+/** Format a date string to relative time (e.g., "2 days ago") */
+function formatRelativeTime(dateString: string): string {
+  const now = Date.now()
+  const then = new Date(dateString).getTime()
+  const diffMs = now - then
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHrs = Math.floor(diffMin / 60)
+  if (diffHrs < 24) return `${diffHrs} hr${diffHrs > 1 ? 's' : ''} ago`
+  const diffDays = Math.floor(diffHrs / 24)
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  const diffWeeks = Math.floor(diffDays / 7)
+  return `${diffWeeks} week${diffWeeks > 1 ? 's' : ''} ago`
+}
+
+/** Map API job status to JobPostItem status */
+function mapApiStatus(status: string): JobPostItem['status'] {
+  switch (status) {
+    case 'posted': return 'active'
+    case 'in_progress': return 'active'
+    case 'completed': return 'completed'
+    case 'cancelled': return 'cancelled'
+    default: return 'pending'
+  }
+}
+
+/** Transform an API job into a JobPostItem for the hirer UI */
+function transformApiJobToJobPostItem(apiJob: ApiJob): JobPostItem {
+  return {
+    id: apiJob.id,
+    title: apiJob.title,
+    category: apiJob.category,
+    description: apiJob.description,
+    budget: {
+      min: apiJob.budgetMin ?? 0,
+      max: apiJob.budgetMax ?? apiJob.budgetMin ?? 0,
+    },
+    location: {
+      area: apiJob.city || apiJob.address || 'Unknown',
+      lat: apiJob.lat ?? 0,
+      lng: apiJob.lng ?? 0,
+    },
+    applicants: apiJob.bidCount,
+    status: mapApiStatus(apiJob.status),
+    postedAt: formatRelativeTime(apiJob.createdAt),
+  }
+}
+
+// Company type for sidebar company listings (kept for companies tab)
+interface CompanyItem {
+  id: string
+  name: string
+  category: string
+  description: string
+  rating: number
+  reviews: number
+  workers: number
+  location: { area: string; lat: number; lng: number }
+  verified: boolean
+  responseTime: string
+  priceRange: string
+  type: 'company'
+}
 
 // Use canonical categories from lib/categories.ts
 const categories = getCategoryDropdownOptions()
@@ -137,10 +167,16 @@ function HiringMapContent() {
   // Sidebar view state: 'job_posts' or 'companies'
   const [sidebarView, setSidebarView] = useState<'job_posts' | 'companies'>('job_posts')
 
+  // API data state
+  const [jobPosts, setJobPosts] = useState<JobPostItem[]>([])
+  const [companies] = useState<CompanyItem[]>([]) // Companies will be fetched when API exists
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
   // Local state
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedItem, setSelectedItem] = useState<any>(null)
+  const [selectedItem, setSelectedItem] = useState<JobPostItem | CompanyItem | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
   const [mounted, setMounted] = useState(false)
@@ -158,6 +194,28 @@ function HiringMapContent() {
   const [filters, setFilters] = useState({
     budget: 'any',
   })
+
+  // Fetch hirer's own job posts from API
+  const fetchJobPosts = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch('/api/jobs?mine=true')
+      if (!res.ok) throw new Error('Failed to load your job posts')
+      const json: { success: boolean; data: ApiJob[]; error?: string } = await res.json()
+      if (!json.success) throw new Error(json.error || 'Failed to load your job posts')
+      const transformed = (json.data || []).map(transformApiJobToJobPostItem)
+      setJobPosts(transformed)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong'
+      setError(message)
+      toast.error(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [toast])
+
+  useEffect(() => { fetchJobPosts() }, [fetchJobPosts])
 
   // Initialize from URL params (category from URL > localStorage > 'all')
   useEffect(() => {
@@ -224,11 +282,11 @@ function HiringMapContent() {
   }, [searchParams, router])
 
   // Get data based on sidebar view
-  const getListData = () => {
+  const getListData = (): (JobPostItem | CompanyItem)[] => {
     if (sidebarView === 'companies') {
-      return mockCompanies
+      return companies
     }
-    return mockJobPosts
+    return jobPosts
   }
 
   const listData = getListData()
@@ -237,11 +295,12 @@ function HiringMapContent() {
   const budgetRange = parseBudgetFilter(filters.budget)
 
   // Filter data based on category, search, budget, and city bounds
-  const filteredData = listData.filter((item: any) => {
+  const filteredData = listData.filter((item) => {
     if (selectedCategory !== 'all' && item.category !== selectedCategory) return false
-    if (searchQuery && !item.title?.toLowerCase().includes(searchQuery.toLowerCase()) &&
-        !item.name?.toLowerCase().includes(searchQuery.toLowerCase())) return false
-    if (item.budget && filters.budget !== 'any') {
+    const searchTarget = 'name' in item ? item.name : item.title
+    if (searchQuery && !('title' in item && item.title?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+        !searchTarget?.toLowerCase().includes(searchQuery.toLowerCase())) return false
+    if ('budget' in item && item.budget && filters.budget !== 'any') {
       if (item.budget.min > budgetRange.max || item.budget.max < budgetRange.min) return false
     }
     if (cityBounds && item.location?.lat && item.location?.lng) {
@@ -252,16 +311,19 @@ function HiringMapContent() {
 
   // Convert data to map markers
   const mapMarkers: MapMarker[] = filteredData
-    .filter((item: any) => item.location?.lat && item.location?.lng)
-    .map((item: any) => ({
-      id: item.id,
-      latitude: item.location.lat,
-      longitude: item.location.lng,
-      type: item.type === 'company' ? 'worker' : 'job',
-      category: item.category,
-      title: item.title || item.name,
-      price: item.budget ? `$${item.budget.min}+` : item.priceRange,
-    }))
+    .filter((item) => item.location?.lat && item.location?.lng)
+    .map((item) => {
+      const isCompany = 'type' in item && item.type === 'company'
+      return {
+        id: item.id,
+        latitude: item.location.lat,
+        longitude: item.location.lng,
+        type: isCompany ? 'worker' : 'job',
+        category: item.category,
+        title: 'name' in item ? item.name : item.title,
+        price: 'budget' in item && item.budget ? `$${item.budget.min}+` : ('priceRange' in item ? item.priceRange : ''),
+      }
+    })
 
   // Handlers
   const handlePostJob = useCallback(() => {
@@ -279,12 +341,12 @@ function HiringMapContent() {
   }, [selectedItem, router])
 
   const handleMarkerClick = useCallback((marker: MapMarker) => {
-    const item = listData.find((j: any) => j.id === marker.id)
+    const item = listData.find((j) => j.id === marker.id)
     if (item) setSelectedItem(item)
   }, [listData])
 
   // Focus on an item: select it AND fly map to its location
-  const focusItem = useCallback((item: any) => {
+  const focusItem = useCallback((item: JobPostItem | CompanyItem) => {
     setSelectedItem(item)
     if (leafletMapRef.current && item.location) {
       leafletMapRef.current.flyToWithAnimation(item.location.lat, item.location.lng)
@@ -477,13 +539,13 @@ function HiringMapContent() {
               {/* Header */}
               <div className="mb-6">
                 <div className="flex items-start justify-between mb-3">
-                  {selectedItem.verified && (
+                  {'verified' in selectedItem && selectedItem.verified && (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
                       <BadgeCheck className="w-3.5 h-3.5" />
                       Verified
                     </span>
                   )}
-                  {selectedItem.status && (
+                  {'status' in selectedItem && selectedItem.status && (
                     <span className={cn(
                       'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide border',
                       selectedItem.status === 'active'
@@ -498,13 +560,13 @@ function HiringMapContent() {
                     </span>
                   )}
                 </div>
-                <h2 className="text-2xl font-bold text-white mb-3 leading-tight">{selectedItem.title || selectedItem.name}</h2>
+                <h2 className="text-2xl font-bold text-white mb-3 leading-tight">{'name' in selectedItem ? selectedItem.name : selectedItem.title}</h2>
                 <div className="flex items-center gap-3 text-sm text-slate-400">
                   <span className="flex items-center gap-1.5">
                     <MapPin className="w-4 h-4 text-slate-500" />
                     {selectedItem.location?.area}
                   </span>
-                  {selectedItem.postedAt && (
+                  {'postedAt' in selectedItem && selectedItem.postedAt && (
                     <>
                       <span className="text-slate-600">·</span>
                       <span className="flex items-center gap-1.5">
@@ -517,22 +579,22 @@ function HiringMapContent() {
               </div>
 
               {/* Budget / Price */}
-              {(selectedItem.budget || selectedItem.priceRange) && (
+              {('budget' in selectedItem || 'priceRange' in selectedItem) && (
                 <GlassPanel padding="md" className="mb-5">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 text-sm">{selectedItem.budget ? 'Budget' : 'Price Range'}</span>
+                    <span className="text-slate-400 text-sm">{'budget' in selectedItem ? 'Budget' : 'Price Range'}</span>
                     <span className="text-2xl font-bold text-cyan-400 tabular-nums">
-                      {selectedItem.budget
+                      {'budget' in selectedItem && selectedItem.budget
                         ? <>
                             ${selectedItem.budget.min}
                             {selectedItem.budget.max !== selectedItem.budget.min && (
                               <>
-                                <span className="text-slate-500 font-normal text-lg"> – </span>
+                                <span className="text-slate-500 font-normal text-lg"> -- </span>
                                 ${selectedItem.budget.max}
                               </>
                             )}
                           </>
-                        : selectedItem.priceRange}
+                        : 'priceRange' in selectedItem ? selectedItem.priceRange : ''}
                     </span>
                   </div>
                 </GlassPanel>
@@ -545,7 +607,7 @@ function HiringMapContent() {
               </div>
 
               {/* Stats Grid (for companies) */}
-              {selectedItem.type === 'company' && (
+              {'type' in selectedItem && selectedItem.type === 'company' && (
                 <div className="grid grid-cols-3 gap-3 mb-6">
                   <GlassPanel padding="sm" className="text-center">
                     <div className="flex items-center justify-center gap-1 text-amber-400 mb-1">
@@ -566,7 +628,7 @@ function HiringMapContent() {
               )}
 
               {/* Applicants Count */}
-              {selectedItem.applicants !== undefined && (
+              {'applicants' in selectedItem && selectedItem.applicants !== undefined && (
                 <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
                   <Users className="w-4 h-4" />
                   <span>{selectedItem.applicants} applicants have applied</span>
@@ -575,7 +637,7 @@ function HiringMapContent() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {selectedItem.type === 'company' && (
+                {'type' in selectedItem && selectedItem.type === 'company' && (
                   <Button
                     size="lg"
                     fullWidth
@@ -587,7 +649,7 @@ function HiringMapContent() {
                   </Button>
                 )}
 
-                {selectedItem.applicants !== undefined && (
+                {'applicants' in selectedItem && selectedItem.applicants !== undefined && (
                   <>
                     <Button
                       size="lg"
@@ -610,6 +672,43 @@ function HiringMapContent() {
                   </>
                 )}
               </div>
+            </div>
+          ) : loading && sidebarView === 'job_posts' ? (
+            /* ============ LOADING STATE ============ */
+            <div className="p-5 space-y-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Skeleton variant="rectangular" width="48px" height="48px" className="rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton variant="text" width="70%" height="16px" />
+                      <Skeleton variant="text" width="40%" height="12px" />
+                    </div>
+                  </div>
+                  <Skeleton variant="text" width="100%" height="12px" />
+                  <div className="flex gap-2">
+                    <Skeleton variant="text" width="60px" height="20px" />
+                    <Skeleton variant="text" width="80px" height="20px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error && sidebarView === 'job_posts' ? (
+            /* ============ ERROR STATE ============ */
+            <div className="p-5 flex flex-col items-center justify-center gap-4 text-center min-h-[300px]">
+              <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <AlertCircle className="w-7 h-7 text-red-400" />
+              </div>
+              <div>
+                <p className="text-white font-semibold mb-1">Failed to load your job posts</p>
+                <p className="text-sm text-slate-400">{error}</p>
+              </div>
+              <button
+                onClick={fetchJobPosts}
+                className="px-4 py-2 rounded-xl text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all duration-200"
+              >
+                Try again
+              </button>
             </div>
           ) : (
             /* ============ LIST VIEW ============ */
@@ -634,14 +733,14 @@ function HiringMapContent() {
                 </div>
               )}
 
-              {filteredData.map((item: any) => (
+              {filteredData.map((item) => (
                 sidebarView === 'job_posts' ? (
                   <JobPostListCard
                     key={item.id}
-                    jobPost={item}
+                    jobPost={item as JobPostItem}
                     onClick={() => focusItem(item)}
                     getCategoryIcon={getCategoryIcon}
-                    isSelected={selectedItem?.id === item.id}
+                    isSelected={false}
                   />
                 ) : (
                   /* Company Card - Elevated */
@@ -668,7 +767,7 @@ function HiringMapContent() {
                         'ring-2 ring-offset-2 ring-offset-slate-900 ring-cyan-500/20'
                       )}>
                         <Building2 className="w-5 h-5" />
-                        {item.verified && (
+                        {'verified' in item && item.verified && (
                           <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center">
                             <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
                           </div>
@@ -678,7 +777,7 @@ function HiringMapContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold text-[15px] text-white leading-snug truncate transition-colors duration-200 group-hover:text-cyan-400">
-                            {item.name}
+                            {'name' in item ? item.name : item.title}
                           </h3>
                         </div>
 
@@ -686,17 +785,19 @@ function HiringMapContent() {
                           {item.location?.area}
                         </p>
 
+                        {'rating' in item && (
                         <div className="flex items-center gap-3 text-[13px]">
                           <div className="flex items-center gap-1">
                             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                             <span className="font-medium text-white tabular-nums">{item.rating}</span>
-                            {item.reviews > 0 && (
+                            {'reviews' in item && item.reviews > 0 && (
                               <span className="text-slate-500">({item.reviews})</span>
                             )}
                           </div>
                           <span className="text-slate-700">·</span>
-                          <span className="font-semibold text-cyan-400">{item.priceRange}</span>
+                          {'priceRange' in item && <span className="font-semibold text-cyan-400">{item.priceRange}</span>}
                         </div>
+                        )}
                       </div>
                     </div>
                   </article>
@@ -739,18 +840,34 @@ function HiringMapContent() {
         {/* Mobile List View - shown when list view is active */}
         {viewMode === 'list' && (
           <div className="lg:hidden absolute inset-0 bg-slate-950 overflow-y-auto pb-40">
+            {loading && sidebarView === 'job_posts' ? (
+              <div className="p-5 flex items-center justify-center min-h-[200px]">
+                <Loader2 className="w-8 h-8 text-cyan-400 animate-spin" />
+              </div>
+            ) : error && sidebarView === 'job_posts' ? (
+              <div className="p-5 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
+                <AlertCircle className="w-8 h-8 text-red-400" />
+                <p className="text-sm text-slate-400">{error}</p>
+                <button
+                  onClick={fetchJobPosts}
+                  className="px-4 py-2 rounded-xl text-sm font-medium bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all duration-200"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
             <div className="divide-y divide-white/[0.04]">
-              {filteredData.map((item: any) => (
+              {filteredData.map((item) => (
                 sidebarView === 'job_posts' ? (
                   <JobPostListCard
                     key={item.id}
-                    jobPost={item}
+                    jobPost={item as JobPostItem}
                     onClick={() => {
                       focusItem(item)
                       setViewMode('map')
                     }}
                     getCategoryIcon={getCategoryIcon}
-                    isSelected={selectedItem?.id === item.id}
+                    isSelected={false}
                   />
                 ) : (
                   /* Company Card */
@@ -780,7 +897,7 @@ function HiringMapContent() {
                         'ring-2 ring-offset-2 ring-offset-slate-900 ring-cyan-500/20'
                       )}>
                         <Building2 className="w-5 h-5" />
-                        {item.verified && (
+                        {'verified' in item && item.verified && (
                           <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full bg-slate-900 flex items-center justify-center">
                             <BadgeCheck className="w-3.5 h-3.5 text-cyan-400" />
                           </div>
@@ -790,7 +907,7 @@ function HiringMapContent() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-semibold text-[15px] text-white leading-snug truncate transition-colors duration-200 group-hover:text-cyan-400">
-                            {item.name}
+                            {'name' in item ? item.name : item.title}
                           </h3>
                         </div>
 
@@ -798,17 +915,19 @@ function HiringMapContent() {
                           {item.location?.area}
                         </p>
 
+                        {'rating' in item && (
                         <div className="flex items-center gap-3 text-[13px]">
                           <div className="flex items-center gap-1">
                             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                             <span className="font-medium text-white tabular-nums">{item.rating}</span>
-                            {item.reviews > 0 && (
+                            {'reviews' in item && item.reviews > 0 && (
                               <span className="text-slate-500">({item.reviews})</span>
                             )}
                           </div>
                           <span className="text-slate-700">·</span>
-                          <span className="font-semibold text-cyan-400">{item.priceRange}</span>
+                          {'priceRange' in item && <span className="font-semibold text-cyan-400">{item.priceRange}</span>}
                         </div>
+                        )}
                       </div>
                     </div>
                   </article>
@@ -824,6 +943,7 @@ function HiringMapContent() {
                 />
               )}
             </div>
+            )}
           </div>
         )}
 

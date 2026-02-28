@@ -2,143 +2,158 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import {
-  MessageCircle, Search, Phone, Video, MoreHorizontal,
-  Send, Paperclip, Image as ImageIcon, Smile, Check, CheckCheck,
-  ArrowLeft, Star, Clock, MapPin, Loader2
+  MessageCircle, Search, MoreHorizontal,
+  Send, Smile, Check, CheckCheck,
+  ArrowLeft, Star, Loader2, AlertCircle, RefreshCw
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 
-// Mock conversations data
-const mockConversations = [
-  {
-    id: '1',
-    worker: {
-      name: 'Marcus Thompson',
-      avatar: 'M',
-      rating: 4.9,
-      verified: true,
-      online: true,
-    },
-    job: {
-      id: '2',
-      title: 'Help Moving Furniture',
-    },
-    lastMessage: {
-      text: "I'll be there in about 15 minutes. Just finishing up parking.",
-      time: '2 min ago',
-      isFromMe: false,
-      read: true,
-    },
-    unread: 2,
-  },
-  {
-    id: '2',
-    worker: {
-      name: 'Sarah Kim',
-      avatar: 'S',
-      rating: 5.0,
-      verified: true,
-      online: false,
-    },
-    job: {
-      id: '3',
-      title: 'IKEA Furniture Assembly',
-    },
-    lastMessage: {
-      text: 'Thank you for the great review! Happy to help anytime.',
-      time: '2 days ago',
-      isFromMe: false,
-      read: true,
-    },
-    unread: 0,
-  },
-  {
-    id: '3',
-    worker: {
-      name: 'David Chen',
-      avatar: 'D',
-      rating: 4.7,
-      verified: false,
-      online: true,
-    },
-    job: {
-      id: '1',
-      title: 'Deep House Cleaning',
-    },
-    lastMessage: {
-      text: 'Sounds good! I can start tomorrow morning at 9am.',
-      time: '1 hour ago',
-      isFromMe: false,
-      read: false,
-    },
-    unread: 1,
-  },
-]
+// --- Types matching API response shapes ---
 
-const mockMessages = [
-  {
-    id: '1',
-    text: "Hi! I'm interested in hiring you for the moving job. Are you available this Saturday?",
-    time: '10:30 AM',
-    isFromMe: true,
-    read: true,
-  },
-  {
-    id: '2',
-    text: "Hi there! Yes, Saturday works great for me. What time were you thinking?",
-    time: '10:32 AM',
-    isFromMe: false,
-    read: true,
-  },
-  {
-    id: '3',
-    text: "Perfect! How about 10am? It's a 2-bedroom apartment, mostly furniture and boxes.",
-    time: '10:35 AM',
-    isFromMe: true,
-    read: true,
-  },
-  {
-    id: '4',
-    text: "10am works! I have a truck so we should be able to do it in one trip. Do you have an elevator or stairs?",
-    time: '10:38 AM',
-    isFromMe: false,
-    read: true,
-  },
-  {
-    id: '5',
-    text: "There's an elevator, so that should make things easier. Building has a loading dock too.",
-    time: '10:40 AM',
-    isFromMe: true,
-    read: true,
-  },
-  {
-    id: '6',
-    text: "I'll be there in about 15 minutes. Just finishing up parking.",
-    time: '2 min ago',
-    isFromMe: false,
-    read: true,
-  },
-]
+interface ConversationUser {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  image: string | null
+}
+
+interface ConversationJob {
+  id: string
+  title: string
+  status: string
+}
+
+interface ConversationLastMessage {
+  id: string
+  content: string
+  senderId: string
+  createdAt: string
+}
+
+interface Conversation {
+  id: string
+  job: ConversationJob | null
+  otherUser: ConversationUser | undefined
+  lastMessage: ConversationLastMessage | null
+  lastMessageAt: string | null
+  lastMessagePreview: string | null
+  unreadCount: number
+  isMuted: boolean
+}
+
+interface MessageSender {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  image: string | null
+}
+
+interface Message {
+  id: string
+  content: string
+  senderId: string
+  createdAt: string
+  sender: MessageSender
+}
+
+// --- Helper to format timestamps ---
+
+function formatTime(dateStr: string): string {
+  const date = new Date(dateStr)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMin = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMin < 1) return 'Just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  return date.toLocaleDateString()
+}
+
+function formatMessageTime(dateStr: string): string {
+  const date = new Date(dateStr)
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+}
+
+function getInitial(name: string | null | undefined): string {
+  if (!name) return '?'
+  return name.charAt(0).toUpperCase()
+}
 
 export default function HiringMessagesPage() {
-  const [selectedConversation, setSelectedConversation] = useState<string | null>('1')
+  const { data: session } = useSession()
+  const toast = useToast()
+
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [conversationsLoading, setConversationsLoading] = useState(true)
+  const [conversationsError, setConversationsError] = useState<string | null>(null)
+
+  const [selectedConversation, setSelectedConversation] = useState<string | null>(null)
+
+  const [messages, setMessages] = useState<Message[]>([])
+  const [messagesLoading, setMessagesLoading] = useState(false)
+  const [messagesError, setMessagesError] = useState<string | null>(null)
+
   const [messageText, setMessageText] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
   const [isSending, setIsSending] = useState(false)
-  const [messages, setMessages] = useState(mockMessages)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  const filteredConversations = mockConversations.filter((conv) =>
-    conv.worker.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    conv.job.title.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Fetch conversations
+  const fetchConversations = useCallback(async () => {
+    try {
+      setConversationsLoading(true)
+      setConversationsError(null)
+      const res = await fetch('/api/conversations')
+      if (!res.ok) throw new Error('Failed to load conversations')
+      const json = await res.json()
+      setConversations(json.data || [])
+    } catch (err) {
+      setConversationsError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setConversationsLoading(false)
+    }
+  }, [])
 
-  const currentConversation = mockConversations.find((c) => c.id === selectedConversation)
+  useEffect(() => {
+    fetchConversations()
+  }, [fetchConversations])
 
-  const toast = useToast()
+  // Fetch messages when conversation is selected
+  const fetchMessages = useCallback(async (conversationId: string) => {
+    try {
+      setMessagesLoading(true)
+      setMessagesError(null)
+      const res = await fetch(`/api/conversations/${conversationId}/messages`)
+      if (!res.ok) throw new Error('Failed to load messages')
+      const json = await res.json()
+      setMessages(json.data || [])
+    } catch (err) {
+      setMessagesError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setMessagesLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectedConversation) {
+      fetchMessages(selectedConversation)
+    }
+  }, [selectedConversation, fetchMessages])
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   // Auto-resize textarea
   const adjustTextareaHeight = useCallback(() => {
@@ -152,7 +167,6 @@ export default function HiringMessagesPage() {
   // Focus input when conversation changes
   useEffect(() => {
     if (selectedConversation && textareaRef.current) {
-      // Small delay to ensure the DOM is updated
       setTimeout(() => {
         textareaRef.current?.focus()
       }, 100)
@@ -165,57 +179,119 @@ export default function HiringMessagesPage() {
     adjustTextareaHeight()
   }
 
+  const filteredConversations = conversations.filter((conv) => {
+    const name = conv.otherUser?.name || ''
+    const title = conv.job?.title || ''
+    const q = searchQuery.toLowerCase()
+    return name.toLowerCase().includes(q) || title.toLowerCase().includes(q)
+  })
+
+  const currentConversation = conversations.find((c) => c.id === selectedConversation)
+
   const handleSendMessage = async () => {
     const trimmedText = messageText.trim()
-    if (!trimmedText || isSending) return
+    if (!trimmedText || isSending || !selectedConversation) return
 
     setIsSending(true)
 
+    // Optimistic update
+    const optimisticMessage: Message = {
+      id: `optimistic-${Date.now()}`,
+      content: trimmedText,
+      senderId: session?.user?.id || '',
+      createdAt: new Date().toISOString(),
+      sender: {
+        id: session?.user?.id || '',
+        name: session?.user?.name || null,
+        avatarUrl: null,
+        image: null,
+      },
+    }
+    setMessages((prev) => [...prev, optimisticMessage])
+
+    // Clear input and reset height
+    setMessageText('')
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
+
     try {
-      // Simulate API call (in real app, send via API)
-      await new Promise(resolve => setTimeout(resolve, 300))
+      const res = await fetch(`/api/conversations/${selectedConversation}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: trimmedText }),
+      })
 
-      // Add message to local state
-      const newMessage = {
-        id: `msg-${Date.now()}`,
-        text: trimmedText,
-        time: 'Just now',
-        isFromMe: true,
-        read: false,
-      }
-      setMessages(prev => [...prev, newMessage])
-
-      // Clear input and reset height
-      setMessageText('')
-      if (textareaRef.current) {
-        textareaRef.current.style.height = 'auto'
+      if (!res.ok) {
+        const json = await res.json()
+        throw new Error(json.error || 'Failed to send message')
       }
 
-      toast.success('Message sent')
-    } catch (error) {
-      console.error('Error sending message:', error)
-      toast.error('Failed to send message. Please try again.')
+      const json = await res.json()
+      // Replace optimistic message with real one
+      setMessages((prev) =>
+        prev.map((m) => (m.id === optimisticMessage.id ? json.data : m))
+      )
+    } catch (err) {
+      // Remove optimistic message on failure
+      setMessages((prev) => prev.filter((m) => m.id !== optimisticMessage.id))
+      toast.error(err instanceof Error ? err.message : 'Failed to send message')
     } finally {
       setIsSending(false)
-      // Re-focus the input after sending
       textareaRef.current?.focus()
     }
   }
 
-  const handleCall = () => {
-    toast.info('Voice calls coming soon')
+  // --- Loading skeleton for conversations ---
+  if (conversationsLoading) {
+    return (
+      <div className="h-[calc(100vh-80px)] bg-slate-950 flex">
+        <div className="w-full md:w-96 border-r border-white/5 flex flex-col bg-slate-900/50">
+          <div className="p-4 border-b border-white/5">
+            <h1 className="text-xl font-bold text-white mb-4">Messages</h1>
+            <Skeleton variant="rectangular" height={42} className="rounded-xl" />
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-4 flex gap-3 border-b border-white/5">
+                <Skeleton variant="circular" width={48} height={48} />
+                <div className="flex-1 space-y-2">
+                  <Skeleton variant="text" width="60%" height={16} />
+                  <Skeleton variant="text" width="40%" height={12} />
+                  <Skeleton variant="text" width="80%" height={14} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="hidden md:flex flex-1 items-center justify-center bg-slate-950">
+          <div className="text-center">
+            <Loader2 className="w-10 h-10 text-slate-600 mx-auto mb-3 animate-spin" />
+            <p className="text-slate-400">Loading conversations...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
-  const handleVideoCall = () => {
-    toast.info('Video calls coming soon')
-  }
-
-  const handleAttachment = () => {
-    toast.info('File attachments coming soon')
-  }
-
-  const handleImageUpload = () => {
-    toast.info('Image sharing coming soon')
+  // --- Error state for conversations ---
+  if (conversationsError) {
+    return (
+      <div className="h-[calc(100vh-80px)] bg-slate-950 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-3" />
+          <h2 className="text-lg font-semibold text-white mb-2">Failed to load conversations</h2>
+          <p className="text-slate-400 mb-4">{conversationsError}</p>
+          <button
+            onClick={fetchConversations}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Retry
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -257,11 +333,8 @@ export default function HiringMessagesPage() {
                 {/* Avatar */}
                 <div className="relative shrink-0">
                   <div className="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-semibold">
-                    {conv.worker.avatar}
+                    {getInitial(conv.otherUser?.name)}
                   </div>
-                  {conv.worker.online && (
-                    <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-slate-900" />
-                  )}
                 </div>
 
                 {/* Info */}
@@ -269,27 +342,26 @@ export default function HiringMessagesPage() {
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5">
                       <span className="font-semibold text-white truncate">
-                        {conv.worker.name}
+                        {conv.otherUser?.name || 'Unknown User'}
                       </span>
-                      {conv.worker.verified && (
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                      )}
                     </div>
                     <span className="text-xs text-slate-500 shrink-0">
-                      {conv.lastMessage.time}
+                      {conv.lastMessageAt ? formatTime(conv.lastMessageAt) : ''}
                     </span>
                   </div>
-                  <div className="text-xs text-cyan-400 mt-0.5 truncate">
-                    {conv.job.title}
-                  </div>
+                  {conv.job && (
+                    <div className="text-xs text-cyan-400 mt-0.5 truncate">
+                      {conv.job.title}
+                    </div>
+                  )}
                   <div className="flex items-center justify-between gap-2 mt-1">
                     <p className="text-sm text-slate-400 truncate">
-                      {conv.lastMessage.isFromMe && 'You: '}
-                      {conv.lastMessage.text}
+                      {conv.lastMessage && conv.lastMessage.senderId === session?.user?.id && 'You: '}
+                      {conv.lastMessagePreview || conv.lastMessage?.content || 'No messages yet'}
                     </p>
-                    {conv.unread > 0 && (
+                    {conv.unreadCount > 0 && (
                       <span className="shrink-0 w-5 h-5 bg-cyan-500 rounded-full flex items-center justify-center text-xs font-semibold text-white">
-                        {conv.unread}
+                        {conv.unreadCount}
                       </span>
                     )}
                   </div>
@@ -319,47 +391,26 @@ export default function HiringMessagesPage() {
               </button>
               <div className="relative">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-semibold">
-                  {currentConversation.worker.avatar}
+                  {getInitial(currentConversation.otherUser?.name)}
                 </div>
-                {currentConversation.worker.online && (
-                  <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-slate-900" />
-                )}
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
                   <span className="font-semibold text-white">
-                    {currentConversation.worker.name}
+                    {currentConversation.otherUser?.name || 'Unknown User'}
                   </span>
-                  <div className="flex items-center gap-0.5">
-                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                    <span className="text-xs text-slate-400">
-                      {currentConversation.worker.rating}
-                    </span>
-                  </div>
                 </div>
-                <Link
-                  href={`/hiring/job/${currentConversation.job.id}`}
-                  className="text-xs text-cyan-400 hover:underline"
-                >
-                  {currentConversation.job.title}
-                </Link>
+                {currentConversation.job && (
+                  <Link
+                    href={`/hiring/job/${currentConversation.job.id}`}
+                    className="text-xs text-cyan-400 hover:underline"
+                  >
+                    {currentConversation.job.title}
+                  </Link>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                onClick={handleCall}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Voice call"
-              >
-                <Phone className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleVideoCall}
-                className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
-                title="Video call"
-              >
-                <Video className="w-5 h-5" />
-              </button>
               <button className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
                 <MoreHorizontal className="w-5 h-5" />
               </button>
@@ -368,61 +419,83 @@ export default function HiringMessagesPage() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn('flex', message.isFromMe ? 'justify-end' : 'justify-start')}
-              >
-                <div
-                  className={cn(
-                    'max-w-[75%] px-4 py-2.5 rounded-2xl',
-                    message.isFromMe
-                      ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
-                      : 'bg-slate-800 text-white'
-                  )}
-                >
-                  <p className="text-sm">{message.text}</p>
-                  <div
-                    className={cn(
-                      'flex items-center justify-end gap-1 mt-1',
-                      message.isFromMe ? 'text-white/70' : 'text-slate-500'
-                    )}
-                  >
-                    <span className="text-xs">{message.time}</span>
-                    {message.isFromMe && (
-                      message.read ? (
-                        <CheckCheck className="w-3.5 h-3.5" />
-                      ) : (
-                        <Check className="w-3.5 h-3.5" />
-                      )
-                    )}
+            {messagesLoading ? (
+              <div className="space-y-4">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className={cn('flex', i % 2 === 0 ? 'justify-end' : 'justify-start')}>
+                    <div className="max-w-[75%]">
+                      <Skeleton
+                        variant="rectangular"
+                        width={i % 3 === 0 ? 200 : 280}
+                        height={60}
+                        className="rounded-2xl"
+                      />
+                    </div>
                   </div>
+                ))}
+              </div>
+            ) : messagesError ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <AlertCircle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+                  <p className="text-slate-400 mb-3">{messagesError}</p>
+                  <button
+                    onClick={() => fetchMessages(selectedConversation)}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-cyan-500 text-white text-sm rounded-lg hover:bg-cyan-600 transition-colors"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Retry
+                  </button>
                 </div>
               </div>
-            ))}
+            ) : messages.length === 0 ? (
+              <div className="flex items-center justify-center h-full">
+                <div className="text-center">
+                  <MessageCircle className="w-10 h-10 text-slate-600 mx-auto mb-3" />
+                  <p className="text-slate-400">No messages yet. Send the first message!</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((message) => {
+                  const isFromMe = message.senderId === session?.user?.id
+                  return (
+                    <div
+                      key={message.id}
+                      className={cn('flex', isFromMe ? 'justify-end' : 'justify-start')}
+                    >
+                      <div
+                        className={cn(
+                          'max-w-[75%] px-4 py-2.5 rounded-2xl',
+                          isFromMe
+                            ? 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white'
+                            : 'bg-slate-800 text-white'
+                        )}
+                      >
+                        <p className="text-sm">{message.content}</p>
+                        <div
+                          className={cn(
+                            'flex items-center justify-end gap-1 mt-1',
+                            isFromMe ? 'text-white/70' : 'text-slate-500'
+                          )}
+                        >
+                          <span className="text-xs">{formatMessageTime(message.createdAt)}</span>
+                          {isFromMe && (
+                            <CheckCheck className="w-3.5 h-3.5" />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                <div ref={messagesEndRef} />
+              </>
+            )}
           </div>
 
           {/* Message Input */}
           <div className="p-4 border-t border-white/5 bg-slate-900/50">
             <div className="flex items-end gap-3">
-              <div className="flex gap-2">
-                <button
-                  onClick={handleAttachment}
-                  disabled={isSending}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
-                  title="Attach file"
-                >
-                  <Paperclip className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleImageUpload}
-                  disabled={isSending}
-                  className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors disabled:opacity-50"
-                  title="Send image"
-                >
-                  <ImageIcon className="w-5 h-5" />
-                </button>
-              </div>
               <div className="flex-1 relative">
                 <textarea
                   ref={textareaRef}

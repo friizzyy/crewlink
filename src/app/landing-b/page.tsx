@@ -2,11 +2,13 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { 
-  MapPin, ArrowRight, Shield, Clock, Star, Briefcase, 
+import {
+  MapPin, ArrowRight, Shield, Clock, Star, Briefcase,
   Users, Menu, X, Zap, ChevronDown, Play, BadgeCheck,
-  Sparkles, ArrowUpRight, MousePointer2
+  Sparkles, ArrowUpRight, MousePointer2, Wrench, Package,
+  Leaf, Armchair, PartyPopper
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 const navigation = [
   { name: 'How It Works', href: '/how-it-works' },
@@ -15,13 +17,13 @@ const navigation = [
   { name: 'Cities', href: '/cities' },
 ]
 
-const categories = [
-  { name: 'Cleaning', icon: '🧹', jobs: '1.2K', trending: true },
-  { name: 'Moving', icon: '📦', jobs: '890' },
-  { name: 'Handyman', icon: '🔧', jobs: '1.5K', trending: true },
-  { name: 'Yard Work', icon: '🌱', jobs: '720' },
-  { name: 'Assembly', icon: '🪑', jobs: '430' },
-  { name: 'Events', icon: '🎉', jobs: '280' },
+const categories: { name: string; Icon: LucideIcon; jobs: string; trending?: boolean; gradient: string }[] = [
+  { name: 'Cleaning', Icon: Sparkles, jobs: '1.2K', trending: true, gradient: 'from-blue-500 to-cyan-400' },
+  { name: 'Moving', Icon: Package, jobs: '890', gradient: 'from-orange-500 to-amber-400' },
+  { name: 'Handyman', Icon: Wrench, jobs: '1.5K', trending: true, gradient: 'from-violet-500 to-purple-400' },
+  { name: 'Yard Work', Icon: Leaf, jobs: '720', gradient: 'from-green-500 to-emerald-400' },
+  { name: 'Assembly', Icon: Armchair, jobs: '430', gradient: 'from-rose-500 to-pink-400' },
+  { name: 'Events', Icon: PartyPopper, jobs: '280', gradient: 'from-yellow-500 to-orange-400' },
 ]
 
 const testimonials = [
@@ -257,7 +259,9 @@ export default function LandingPageB() {
                     Hot
                   </div>
                 )}
-                <span className="text-4xl mb-4 block">{category.icon}</span>
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${category.gradient} flex items-center justify-center mb-4`}>
+                  <category.Icon className="w-6 h-6 text-white" />
+                </div>
                 <h3 className="font-semibold text-white group-hover:text-cyan-400 transition-colors">{category.name}</h3>
                 <p className="text-sm text-slate-500">{category.jobs} jobs</p>
               </Link>

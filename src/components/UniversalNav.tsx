@@ -7,7 +7,7 @@ import {
   Users, Menu, X, Briefcase, Plus, Bell, MessageSquare,
   ChevronDown, User, Settings, LogOut, HelpCircle,
   Map, ClipboardList, Compass, DollarSign, Wrench,
-  ArrowRight, Shield, BadgeCheck
+  ArrowRight, Shield, BadgeCheck, CheckCircle2
 } from 'lucide-react'
 import { ENABLE_ROLE_TOGGLE, useAuthStore } from '@/store'
 import { useToast } from '@/components/ui/Toast'
@@ -79,23 +79,87 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
   const [notificationsOpen, setNotificationsOpen] = useState(false)
   const [messagesOpen, setMessagesOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [notifications, setNotifications] = useState([
-    { id: '1', type: 'bid', title: 'New Bid!', desc: 'Marcus J. bid $85 on cleaning job', time: '5m ago', unread: true, emoji: '💰' },
-    { id: '2', type: 'completed', title: 'Completed', desc: 'Sarah M. finished "Deep Clean"', time: '1h ago', unread: true, emoji: '✅' },
-    { id: '3', type: 'message', title: 'Message', desc: 'New message from David T.', time: '2h ago', unread: true, emoji: '💬' },
-  ])
-  const [messages, setMessages] = useState([
-    { id: '1', name: 'Sarah M.', avatar: 'SM', message: 'Thanks for the quick response!', time: '2m ago', unread: true },
-    { id: '2', name: 'Marcus J.', avatar: 'MJ', message: 'I can start tomorrow at 9am', time: '15m ago', unread: true },
-    { id: '3', name: 'David T.', avatar: 'DT', message: 'Is the job still available?', time: '1h ago', unread: false },
-  ])
+  const [notifications, setNotifications] = useState<{
+    id: string
+    type: string
+    title: string
+    desc: string
+    time: string
+    unread: boolean
+    icon: 'bid' | 'completed' | 'message'
+  }[]>([])
+  const [messages, setMessages] = useState<{
+    id: string
+    name: string
+    avatar: string
+    message: string
+    time: string
+    unread: boolean
+  }[]>([])
 
   const notificationsRef = useRef<HTMLDivElement>(null)
   const messagesRef = useRef<HTMLDivElement>(null)
   const userMenuRef = useRef<HTMLDivElement>(null)
 
-  const { getCurrentRole, logout } = useAuthStore()
+  // Fetch real notifications and messages for app variant
+  useEffect(() => {
+    if (variant !== 'app') return
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/notifications?limit=5')
+        if (res.ok) {
+          const json = await res.json()
+          const data = json.data || json.notifications || json
+          if (Array.isArray(data)) {
+            setNotifications(data.slice(0, 5).map((n: Record<string, unknown>) => ({
+              id: String(n.id || ''),
+              type: String(n.type || 'message'),
+              title: String(n.title || ''),
+              desc: String(n.message || n.description || n.content || ''),
+              time: n.createdAt ? new Date(n.createdAt as string).toLocaleDateString() : '',
+              unread: !n.read,
+              icon: (String(n.type || '')).includes('bid') ? 'bid' as const :
+                    (String(n.type || '')).includes('complet') ? 'completed' as const : 'message' as const,
+            })))
+          }
+        }
+      } catch {
+        // Silently fail - empty state shown
+      }
+    }
+
+    const fetchMessages = async () => {
+      try {
+        const res = await fetch('/api/conversations?limit=5')
+        if (res.ok) {
+          const json = await res.json()
+          const data = json.data || json.conversations || json
+          if (Array.isArray(data)) {
+            setMessages(data.slice(0, 5).map((c: Record<string, unknown>) => ({
+              id: String(c.id || ''),
+              name: String(c.participantName || c.name || 'Unknown'),
+              avatar: String(c.participantName || c.name || 'U').slice(0, 2).toUpperCase(),
+              message: String(c.lastMessage || c.preview || ''),
+              time: c.updatedAt ? new Date(c.updatedAt as string).toLocaleDateString() : '',
+              unread: Boolean(c.unread || c.hasUnread),
+            })))
+          }
+        }
+      } catch {
+        // Silently fail - empty state shown
+      }
+    }
+
+    fetchNotifications()
+    fetchMessages()
+  }, [variant])
+
+  const { getCurrentRole, logout, user } = useAuthStore()
   const userRole = getCurrentRole()
+  const userName = user?.name || 'User'
+  const userEmail = user?.email || ''
+  const userInitials = userName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) || 'U'
 
   const handleMarkAllRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })))
@@ -413,7 +477,11 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                 )}
               </div>
               <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
-                {notifications.map((notification, i) => (
+                {notifications.length === 0 ? (
+                  <div className="text-center py-6 text-slate-500 text-sm">
+                    No notifications yet
+                  </div>
+                ) : notifications.map((notification, i) => (
                   <div
                     key={notification.id}
                     onClick={() => handleNotificationClick(notification)}
@@ -424,8 +492,14 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                     style={{ animationDelay: `${i * 50}ms` }}
                   >
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-lg shrink-0">
-                        {notification.emoji}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                        notification.icon === 'bid' ? 'bg-cyan-500/10' :
+                        notification.icon === 'completed' ? 'bg-emerald-500/10' :
+                        'bg-blue-500/10'
+                      }`}>
+                        {notification.icon === 'bid' ? <DollarSign className="w-5 h-5 text-cyan-400" /> :
+                         notification.icon === 'completed' ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> :
+                         <MessageSquare className="w-5 h-5 text-blue-400" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
@@ -502,7 +576,11 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
                 )}
               </div>
               <div className="p-3 space-y-2 max-h-80 overflow-y-auto">
-                {messages.map((message, i) => (
+                {messages.length === 0 ? (
+                  <div className="text-center py-6 text-slate-500 text-sm">
+                    No messages yet
+                  </div>
+                ) : messages.map((message, i) => (
                   <div
                     key={message.id}
                     onClick={() => handleMessageClick(message)}
@@ -586,7 +664,7 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
             <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-white text-sm font-semibold bg-gradient-to-br ${
               effectiveMode === 'work' ? 'from-emerald-400 to-teal-600' : 'from-cyan-400 to-blue-600'
             }`}>
-              JD
+              {userInitials}
             </div>
           </button>
 
@@ -596,8 +674,8 @@ export function UniversalNav({ variant, mode = 'hire', onModeChange, routePrefix
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-4 border-b border-white/10">
-                <p className="font-semibold text-white">John Doe</p>
-                <p className="text-sm text-slate-400">john@example.com</p>
+                <p className="font-semibold text-white">{userName}</p>
+                <p className="text-sm text-slate-400">{userEmail}</p>
               </div>
               <div className="py-2">
                 <Link

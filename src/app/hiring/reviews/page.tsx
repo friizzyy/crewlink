@@ -1,92 +1,147 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import {
-  Star, ArrowLeft, Filter, ChevronDown
+  Star, ArrowLeft, AlertCircle, Loader2, RefreshCw
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, formatRelativeTime } from '@/lib/utils'
+import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 
-// Mock reviews data
-const mockReviews = [
-  {
-    id: '1',
-    worker: {
-      name: 'Sarah K.',
-      avatar: 'S',
-    },
-    rating: 5,
-    comment: 'Great communication and paid promptly. Would work with again!',
-    job: 'IKEA Furniture Assembly',
-    date: '2 days ago',
-    response: null,
-  },
-  {
-    id: '2',
-    worker: {
-      name: 'Marcus T.',
-      avatar: 'M',
-    },
-    rating: 5,
-    comment: 'Very clear instructions and easy to work with. The job went smoothly.',
-    job: 'Help Moving Furniture',
-    date: '1 week ago',
-    response: 'Thanks Marcus! Great job on the move.',
-  },
-  {
-    id: '3',
-    worker: {
-      name: 'David C.',
-      avatar: 'D',
-    },
-    rating: 4,
-    comment: 'Good client overall. Fair expectations and reasonable timeline.',
-    job: 'Deep House Cleaning',
-    date: '2 weeks ago',
-    response: null,
-  },
-  {
-    id: '4',
-    worker: {
-      name: 'Lisa M.',
-      avatar: 'L',
-    },
-    rating: 5,
-    comment: 'Excellent experience! Very respectful and the home was ready for cleaning.',
-    job: 'Regular Cleaning',
-    date: '3 weeks ago',
-    response: 'Thank you Lisa! Your work was amazing.',
-  },
-  {
-    id: '5',
-    worker: {
-      name: 'James P.',
-      avatar: 'J',
-    },
-    rating: 5,
-    comment: 'One of the best clients on the platform. Clear communication and prompt payment.',
-    job: 'Yard Work',
-    date: '1 month ago',
-    response: null,
-  },
-]
+interface ReviewAuthor {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  image: string | null
+}
 
-const stats = {
-  avgRating: 4.9,
-  totalReviews: 7,
-  fiveStars: 6,
-  fourStars: 1,
-  threeStars: 0,
-  twoStars: 0,
-  oneStars: 0,
+interface ReviewBooking {
+  id: string
+  job: {
+    id: string
+    title: string
+    category: string
+  } | null
+}
+
+interface Review {
+  id: string
+  rating: number
+  title: string | null
+  content: string | null
+  response: string | null
+  createdAt: string
+  author: ReviewAuthor
+  booking: ReviewBooking | null
+}
+
+interface ReviewStats {
+  avgRating: number
+  totalReviews: number
+  distribution: Record<number, number>
+}
+
+function ReviewsSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Stats skeleton */}
+      <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+        <div className="flex flex-col sm:flex-row gap-6">
+          <div className="flex items-center gap-3">
+            <Skeleton variant="text" width={80} height={48} />
+            <div className="space-y-1">
+              <Skeleton variant="text" width={100} height={16} />
+              <Skeleton variant="text" width={70} height={14} />
+            </div>
+          </div>
+          <div className="flex-1 space-y-2">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex items-center gap-3">
+                <Skeleton variant="text" width={40} height={14} />
+                <Skeleton variant="text" width="100%" height={8} />
+                <Skeleton variant="text" width={20} height={14} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      {/* Reviews skeleton */}
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="bg-slate-900 border border-white/5 rounded-2xl p-5">
+          <div className="flex items-start gap-4">
+            <Skeleton variant="rectangular" width={48} height={48} className="!rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <div className="flex items-center justify-between">
+                <Skeleton variant="text" width={100} height={16} />
+                <Skeleton variant="text" width={80} height={14} />
+              </div>
+              <Skeleton variant="text" width="90%" height={14} />
+              <Skeleton variant="text" width="60%" height={14} />
+              <Skeleton variant="text" width={120} height={12} />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function computeStats(reviews: Review[]): ReviewStats {
+  if (reviews.length === 0) {
+    return { avgRating: 0, totalReviews: 0, distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 } }
+  }
+
+  const distribution: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+  let sum = 0
+
+  for (const review of reviews) {
+    sum += review.rating
+    if (review.rating >= 1 && review.rating <= 5) {
+      distribution[review.rating] = (distribution[review.rating] || 0) + 1
+    }
+  }
+
+  return {
+    avgRating: Math.round((sum / reviews.length) * 10) / 10,
+    totalReviews: reviews.length,
+    distribution,
+  }
 }
 
 export default function HiringReviewsPage() {
+  const { data: session } = useSession()
+  const toast = useToast()
+  const [reviews, setReviews] = useState<Review[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<'all' | '5' | '4' | '3' | '2' | '1'>('all')
 
+  const fetchReviews = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch('/api/reviews?type=received')
+      if (!res.ok) throw new Error('Failed to load reviews')
+      const json = await res.json()
+      setReviews(json.data || [])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchReviews()
+  }, [fetchReviews])
+
+  const stats = computeStats(reviews)
+
   const filteredReviews = filter === 'all'
-    ? mockReviews
-    : mockReviews.filter(r => r.rating === parseInt(filter))
+    ? reviews
+    : reviews.filter(r => r.rating === parseInt(filter))
 
   return (
     <div className="min-h-[calc(100vh-80px)] bg-slate-950 pb-24 lg:pb-8">
@@ -106,125 +161,167 @@ export default function HiringReviewsPage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-        {/* Stats Overview */}
-        <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
-          <div className="flex flex-col sm:flex-row gap-6">
-            {/* Rating Summary */}
-            <div className="text-center sm:text-left">
-              <div className="flex items-center gap-2 justify-center sm:justify-start">
-                <span className="text-5xl font-bold text-white">{stats.avgRating}</span>
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-0.5">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={cn(
-                          'w-4 h-4',
-                          i < Math.round(stats.avgRating)
-                            ? 'text-amber-400 fill-amber-400'
-                            : 'text-slate-600'
-                        )}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-sm text-slate-400">{stats.totalReviews} reviews</span>
-                </div>
-              </div>
+        {loading ? (
+          <ReviewsSkeleton />
+        ) : error ? (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-red-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-10 h-10 text-red-400" />
             </div>
-
-            {/* Rating Breakdown */}
-            <div className="flex-1 space-y-2">
-              {[5, 4, 3, 2, 1].map((rating) => {
-                const count = stats[`${rating === 5 ? 'fiveStars' : rating === 4 ? 'fourStars' : rating === 3 ? 'threeStars' : rating === 2 ? 'twoStars' : 'oneStars'}` as keyof typeof stats] as number
-                const percentage = (count / stats.totalReviews) * 100
-                return (
-                  <div key={rating} className="flex items-center gap-3">
-                    <span className="text-sm text-slate-400 w-8">{rating} star</span>
-                    <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-amber-400 rounded-full"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                    <span className="text-sm text-slate-400 w-8">{count}</span>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Filter */}
-        <div className="flex items-center gap-2 overflow-x-auto">
-          {(['all', '5', '4', '3', '2', '1'] as const).map((f) => (
+            <h2 className="text-xl font-semibold text-white mb-2">Failed to load reviews</h2>
+            <p className="text-slate-400 max-w-sm mx-auto mb-6">{error}</p>
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={cn(
-                'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors',
-                filter === f
-                  ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                  : 'bg-slate-900 text-slate-400 border border-white/5 hover:text-white'
-              )}
+              onClick={fetchReviews}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500 text-white rounded-xl hover:bg-cyan-600 transition-colors"
             >
-              {f === 'all' ? 'All Reviews' : `${f} Stars`}
+              <RefreshCw className="w-4 h-4" />
+              Retry
             </button>
-          ))}
-        </div>
-
-        {/* Reviews List */}
-        <div className="space-y-4">
-          {filteredReviews.length > 0 ? (
-            filteredReviews.map((review) => (
-              <div
-                key={review.id}
-                className="bg-slate-900 border border-white/5 rounded-2xl p-5"
-              >
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-semibold shrink-0">
-                    {review.worker.avatar}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-white">{review.worker.name}</span>
+          </div>
+        ) : (
+          <>
+            {/* Stats Overview */}
+            <div className="bg-slate-900 border border-white/5 rounded-2xl p-6">
+              <div className="flex flex-col sm:flex-row gap-6">
+                {/* Rating Summary */}
+                <div className="text-center sm:text-left">
+                  <div className="flex items-center gap-2 justify-center sm:justify-start">
+                    <span className="text-5xl font-bold text-white">{stats.avgRating || '0.0'}</span>
+                    <div className="flex flex-col">
                       <div className="flex items-center gap-0.5">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
                             className={cn(
-                              'w-3.5 h-3.5',
-                              i < review.rating
+                              'w-4 h-4',
+                              i < Math.round(stats.avgRating)
                                 ? 'text-amber-400 fill-amber-400'
                                 : 'text-slate-600'
                             )}
                           />
                         ))}
                       </div>
+                      <span className="text-sm text-slate-400">{stats.totalReviews} reviews</span>
                     </div>
-                    <p className="text-slate-300 mt-2">{review.comment}</p>
-                    <p className="text-xs text-slate-500 mt-3">
-                      {review.job} • {review.date}
-                    </p>
-
-                    {review.response && (
-                      <div className="mt-4 pl-4 border-l-2 border-cyan-500/30">
-                        <p className="text-sm text-slate-400">
-                          <span className="text-cyan-400 font-medium">Your response:</span> {review.response}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
+
+                {/* Rating Breakdown */}
+                <div className="flex-1 space-y-2">
+                  {[5, 4, 3, 2, 1].map((rating) => {
+                    const count = stats.distribution[rating] || 0
+                    const percentage = stats.totalReviews > 0 ? (count / stats.totalReviews) * 100 : 0
+                    return (
+                      <div key={rating} className="flex items-center gap-3">
+                        <span className="text-sm text-slate-400 w-8">{rating} star</span>
+                        <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-amber-400 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        <span className="text-sm text-slate-400 w-8">{count}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
-            ))
-          ) : (
-            <div className="text-center py-12">
-              <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
-              <h3 className="text-lg font-semibold text-white mb-2">No reviews found</h3>
-              <p className="text-slate-400">No reviews match the selected filter.</p>
             </div>
-          )}
-        </div>
+
+            {/* Filter */}
+            <div className="flex items-center gap-2 overflow-x-auto">
+              {(['all', '5', '4', '3', '2', '1'] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={cn(
+                    'px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-colors',
+                    filter === f
+                      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                      : 'bg-slate-900 text-slate-400 border border-white/5 hover:text-white'
+                  )}
+                >
+                  {f === 'all' ? 'All Reviews' : `${f} Stars`}
+                </button>
+              ))}
+            </div>
+
+            {/* Reviews List */}
+            <div className="space-y-4">
+              {filteredReviews.length > 0 ? (
+                filteredReviews.map((review) => {
+                  const authorName = review.author?.name || 'Anonymous'
+                  const avatarInitial = authorName.charAt(0).toUpperCase()
+                  const jobTitle = review.booking?.job?.title || 'Job'
+
+                  return (
+                    <div
+                      key={review.id}
+                      className="bg-slate-900 border border-white/5 rounded-2xl p-5"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-white font-semibold shrink-0">
+                          {review.author?.avatarUrl || review.author?.image ? (
+                            <img
+                              src={review.author.avatarUrl || review.author.image || ''}
+                              alt={authorName}
+                              className="w-12 h-12 rounded-xl object-cover"
+                            />
+                          ) : (
+                            avatarInitial
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="font-semibold text-white">{authorName}</span>
+                            <div className="flex items-center gap-0.5">
+                              {[...Array(5)].map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={cn(
+                                    'w-3.5 h-3.5',
+                                    i < review.rating
+                                      ? 'text-amber-400 fill-amber-400'
+                                      : 'text-slate-600'
+                                  )}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                          {review.title && (
+                            <p className="text-white font-medium mt-1">{review.title}</p>
+                          )}
+                          <p className="text-slate-300 mt-2">{review.content || 'No comment provided.'}</p>
+                          <p className="text-xs text-slate-500 mt-3">
+                            {jobTitle} {' '} {formatRelativeTime(review.createdAt)}
+                          </p>
+
+                          {review.response && (
+                            <div className="mt-4 pl-4 border-l-2 border-cyan-500/30">
+                              <p className="text-sm text-slate-400">
+                                <span className="text-cyan-400 font-medium">Your response:</span> {review.response}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })
+              ) : (
+                <div className="text-center py-12">
+                  <Star className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-white mb-2">No reviews found</h3>
+                  <p className="text-slate-400">
+                    {filter === 'all'
+                      ? 'No reviews yet. Reviews will appear here after workers review completed jobs.'
+                      : 'No reviews match the selected filter.'}
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

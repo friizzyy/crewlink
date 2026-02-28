@@ -8,16 +8,17 @@ import {
   Search, MapPin, Star, Clock,
   MessageCircle, Heart, ArrowRight, BadgeCheck,
   Users, ChevronLeft, Navigation, Briefcase,
-  SlidersHorizontal
+  SlidersHorizontal, Loader2, AlertCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { GlassPanel, Button, GeolocationModal, LiveDot, CategoryDropdown, BudgetDropdown, parseBudgetFilter } from '@/components/ui'
 import { MobileBottomSheet } from '@/components/sidebar'
 import { JobListCard, urgencyConfig } from '@/components/cards'
 import { MapLoadingState, SidebarEmptyState } from '@/components/map/MapStates'
-import type { JobItem } from '@/components/cards'
+import type { JobItem, UrgencyType } from '@/components/cards'
 import type { MapMarker, UserLocation } from '@/components/map/LeafletMap'
 import { useToast } from '@/components/ui/Toast'
+import { Skeleton } from '@/components/ui/Card'
 import { getCityById } from '@/lib/cities-data'
 import {
   normalizeCategorySlug,
@@ -42,122 +43,104 @@ const LeafletMap = dynamic(() => import('@/components/map/LeafletMap'), {
 })
 
 // ============================================
-// MOCK DATA - Available Jobs (Worker sees jobs to apply for)
+// API Response Types
 // ============================================
-const mockJobs: JobItem[] = [
-  {
-    id: '1',
-    title: 'Deep House Cleaning',
-    category: 'cleaning',
-    description: 'Need thorough cleaning of 3BR apartment including kitchen and bathrooms. Looking for someone detail-oriented who can make the space spotless.',
-    budget: { min: 120, max: 180 },
-    location: { area: 'Mission District', lat: 37.7599, lng: -122.4148 },
-    postedBy: { name: 'Sarah M.', rating: 4.8, jobs: 12, verified: true },
-    postedAt: '15 min ago',
-    urgency: 'today',
-    bids: 3,
-    status: 'open',
-  },
-  {
-    id: '2',
-    title: 'Help Moving Furniture',
-    category: 'moving',
-    description: 'Moving from 2nd floor apartment to ground floor. Need 2 people. Have a few heavy items including a couch and dresser.',
-    budget: { min: 150, max: 250 },
-    location: { area: 'SOMA', lat: 37.7785, lng: -122.4056 },
-    postedBy: { name: 'Mike T.', rating: 4.9, jobs: 8, verified: true },
-    postedAt: '32 min ago',
-    urgency: 'urgent',
-    bids: 5,
-    status: 'open',
-  },
-  {
-    id: '3',
-    title: 'IKEA Furniture Assembly',
-    category: 'assembly',
-    description: 'Need help assembling KALLAX shelf unit and PAX wardrobe. Tools provided.',
-    budget: { min: 80, max: 120 },
-    location: { area: 'Hayes Valley', lat: 37.7759, lng: -122.4245 },
-    postedBy: { name: 'Lisa K.', rating: 5.0, jobs: 3, verified: false },
-    postedAt: '1 hr ago',
-    urgency: 'flexible',
-    bids: 2,
-    status: 'open',
-  },
-  {
-    id: '4',
-    title: 'Yard Work & Landscaping',
-    category: 'yard-work',
-    description: 'Lawn mowing, hedge trimming, and general yard cleanup. About 2-3 hours of work.',
-    budget: { min: 100, max: 150 },
-    location: { area: 'Noe Valley', lat: 37.7502, lng: -122.4337 },
-    postedBy: { name: 'David R.', rating: 4.7, jobs: 15, verified: true },
-    postedAt: '2 hrs ago',
-    urgency: 'scheduled',
-    bids: 4,
-    status: 'open',
-  },
-  {
-    id: '5',
-    title: 'Fix Leaky Faucet',
-    category: 'handyman',
-    description: 'Kitchen faucet is dripping constantly. Need someone experienced with basic plumbing.',
-    budget: { min: 60, max: 100 },
-    location: { area: 'Castro', lat: 37.7609, lng: -122.4350 },
-    postedBy: { name: 'Emma W.', rating: 4.6, jobs: 7, verified: true },
-    postedAt: '3 hrs ago',
-    urgency: 'today',
-    bids: 1,
-    status: 'open',
-  },
-  {
-    id: '6',
-    title: 'Event Setup Help',
-    category: 'events',
-    description: 'Birthday party setup - tables, chairs, decorations. Event starts at 4pm.',
-    budget: { min: 80, max: 120 },
-    location: { area: 'Marina', lat: 37.8024, lng: -122.4382 },
-    postedBy: { name: 'Anna L.', rating: 4.9, jobs: 5, verified: true },
-    postedAt: '4 hrs ago',
-    urgency: 'scheduled',
-    bids: 6,
-    status: 'open',
-  },
-]
+interface ApiJobPoster {
+  id: string
+  name: string | null
+  avatarUrl: string | null
+  image: string | null
+  hirerProfile: {
+    companyName: string | null
+    averageRating: number | null
+    isVerified: boolean
+  } | null
+}
 
-// ============================================
-// MOCK DATA - Worker's Applications
-// ============================================
-const mockApplications = [
-  {
-    id: 'app1',
-    title: 'Office Deep Clean',
-    category: 'cleaning',
-    description: 'Weekly office cleaning for startup.',
-    budget: { min: 150, max: 200 },
-    location: { area: 'SOMA', lat: 37.7785, lng: -122.4056 },
-    postedBy: { name: 'TechStart Inc.', rating: 4.8, jobs: 20, verified: true },
-    postedAt: '3 days ago',
-    appliedAt: '2 days ago',
-    status: 'pending',
-    urgency: 'scheduled' as const,
-    bids: 8,
-  },
-  {
-    id: 'app2',
-    title: 'Furniture Assembly',
-    category: 'assembly',
-    description: 'Assemble new office furniture.',
-    budget: { min: 100, max: 150 },
-    location: { area: 'Financial District', lat: 37.7946, lng: -122.3999 },
-    postedBy: { name: 'James P.', rating: 4.9, jobs: 5, verified: true },
-    postedAt: '1 week ago',
-    appliedAt: '5 days ago',
-    status: 'accepted',
-    urgency: 'flexible' as const,
-    bids: 4,
-  },
-]
+interface ApiJob {
+  id: string
+  title: string
+  description: string
+  category: string
+  address: string | null
+  city: string | null
+  lat: number | null
+  lng: number | null
+  isRemote: boolean
+  scheduleType: string
+  startDate: string | null
+  endDate: string | null
+  estimatedHours: number | null
+  budgetType: string
+  budgetMin: number | null
+  budgetMax: number | null
+  status: string
+  viewCount: number
+  bidCount: number
+  createdAt: string
+  updatedAt: string
+  poster: ApiJobPoster | null
+}
+
+/** Map scheduleType from API to UrgencyType for the UI */
+function mapScheduleToUrgency(scheduleType: string): UrgencyType {
+  switch (scheduleType) {
+    case 'asap': return 'urgent'
+    case 'specific': return 'scheduled'
+    case 'flexible':
+    default: return 'flexible'
+  }
+}
+
+/** Format a date string to relative time (e.g., "2 hrs ago") */
+function formatRelativeTime(dateString: string): string {
+  const now = Date.now()
+  const then = new Date(dateString).getTime()
+  const diffMs = now - then
+  const diffMin = Math.floor(diffMs / 60000)
+  if (diffMin < 1) return 'just now'
+  if (diffMin < 60) return `${diffMin} min ago`
+  const diffHrs = Math.floor(diffMin / 60)
+  if (diffHrs < 24) return `${diffHrs} hr${diffHrs > 1 ? 's' : ''} ago`
+  const diffDays = Math.floor(diffHrs / 24)
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+  const diffWeeks = Math.floor(diffDays / 7)
+  return `${diffWeeks} week${diffWeeks > 1 ? 's' : ''} ago`
+}
+
+/** Transform an API job into a JobItem for the UI */
+function transformApiJobToJobItem(apiJob: ApiJob): JobItem {
+  return {
+    id: apiJob.id,
+    title: apiJob.title,
+    category: apiJob.category,
+    description: apiJob.description,
+    budget: {
+      min: apiJob.budgetMin ?? 0,
+      max: apiJob.budgetMax ?? apiJob.budgetMin ?? 0,
+    },
+    location: {
+      area: apiJob.city || apiJob.address || 'Unknown',
+      lat: apiJob.lat ?? 0,
+      lng: apiJob.lng ?? 0,
+    },
+    postedBy: {
+      name: apiJob.poster?.hirerProfile?.companyName || apiJob.poster?.name || 'Anonymous',
+      rating: apiJob.poster?.hirerProfile?.averageRating ?? 0,
+      jobs: 0,
+      verified: apiJob.poster?.hirerProfile?.isVerified ?? false,
+    },
+    postedAt: formatRelativeTime(apiJob.createdAt),
+    urgency: mapScheduleToUrgency(apiJob.scheduleType),
+    bids: apiJob.bidCount,
+    status: apiJob.status,
+  }
+}
+
+// Application type extends JobItem with extra fields
+interface ApplicationItem extends JobItem {
+  appliedAt: string
+}
 
 // Use canonical categories from lib/categories.ts
 const categories = getCategoryDropdownOptions()
@@ -179,10 +162,18 @@ function WorkerMapContent() {
   // Sidebar view state: 'all_jobs' or 'my_applications'
   const [sidebarView, setSidebarView] = useState<'all_jobs' | 'my_applications'>('all_jobs')
 
+  // API data state
+  const [jobs, setJobs] = useState<JobItem[]>([])
+  const [applications, setApplications] = useState<ApplicationItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [applicationsLoading, setApplicationsLoading] = useState(true)
+  const [applicationsError, setApplicationsError] = useState<string | null>(null)
+
   // Local state
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('all')
-  const [selectedJob, setSelectedJob] = useState<any>(null)
+  const [selectedJob, setSelectedJob] = useState<JobItem | ApplicationItem | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
   const [mounted, setMounted] = useState(false)
@@ -202,6 +193,85 @@ function WorkerMapContent() {
     urgency: 'all',
   })
   const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set())
+
+  // Fetch available jobs from API
+  const fetchJobs = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const res = await fetch('/api/jobs')
+      if (!res.ok) throw new Error('Failed to load jobs')
+      const json: { success: boolean; data: ApiJob[]; error?: string } = await res.json()
+      if (!json.success) throw new Error(json.error || 'Failed to load jobs')
+      const transformed = (json.data || []).map(transformApiJobToJobItem)
+      setJobs(transformed)
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Something went wrong'
+      setError(message)
+      toast.error(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [toast])
+
+  // Fetch worker's own applications (bids) from API
+  const fetchApplications = useCallback(async () => {
+    try {
+      setApplicationsLoading(true)
+      setApplicationsError(null)
+      const res = await fetch('/api/bids?mine=true')
+      if (!res.ok) {
+        // If endpoint doesn't exist yet, silently set empty
+        setApplications([])
+        return
+      }
+      const json = await res.json()
+      // Transform bids into application items if the API returns job data with bids
+      const bidsData = json.data || json.bids || json || []
+      const transformed: ApplicationItem[] = Array.isArray(bidsData)
+        ? bidsData.map((bid: Record<string, unknown>) => {
+            const job = (bid.job || {}) as Record<string, unknown>
+            const poster = (job.poster || {}) as Record<string, unknown>
+            const hirerProfile = (poster.hirerProfile || {}) as Record<string, unknown>
+            return {
+              id: (bid.id as string) || '',
+              title: (job.title as string) || 'Untitled Job',
+              category: (job.category as string) || 'other',
+              description: (job.description as string) || '',
+              budget: {
+                min: (job.budgetMin as number) ?? 0,
+                max: (job.budgetMax as number) ?? (job.budgetMin as number) ?? 0,
+              },
+              location: {
+                area: (job.city as string) || (job.address as string) || 'Unknown',
+                lat: (job.lat as number) ?? 0,
+                lng: (job.lng as number) ?? 0,
+              },
+              postedBy: {
+                name: (hirerProfile.companyName as string) || (poster.name as string) || 'Anonymous',
+                rating: (hirerProfile.averageRating as number) ?? 0,
+                jobs: 0,
+                verified: (hirerProfile.isVerified as boolean) ?? false,
+              },
+              postedAt: job.createdAt ? formatRelativeTime(job.createdAt as string) : 'Unknown',
+              urgency: mapScheduleToUrgency((job.scheduleType as string) || 'flexible'),
+              bids: (job.bidCount as number) ?? 0,
+              status: (bid.status as string) || 'pending',
+              appliedAt: bid.createdAt ? formatRelativeTime(bid.createdAt as string) : 'Unknown',
+            }
+          })
+        : []
+      setApplications(transformed)
+    } catch {
+      setApplicationsError('Failed to load applications')
+      setApplications([])
+    } finally {
+      setApplicationsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { fetchJobs() }, [fetchJobs])
+  useEffect(() => { fetchApplications() }, [fetchApplications])
 
   // Initialize from URL params (category from URL > localStorage > 'all')
   useEffect(() => {
@@ -268,20 +338,25 @@ function WorkerMapContent() {
   }, [searchParams, router])
 
   // Get data based on sidebar view
-  const getListData = () => {
+  const getListData = (): (JobItem | ApplicationItem)[] => {
     if (sidebarView === 'my_applications') {
-      return mockApplications
+      return applications
     }
-    return mockJobs
+    return jobs
   }
 
   const listData = getListData()
+
+  // Loading/error state for current view
+  const isCurrentViewLoading = sidebarView === 'my_applications' ? applicationsLoading : loading
+  const currentViewError = sidebarView === 'my_applications' ? applicationsError : error
+  const retryCurrentView = sidebarView === 'my_applications' ? fetchApplications : fetchJobs
 
   // Parse budget filter
   const budgetRange = parseBudgetFilter(filters.budget)
 
   // Filter data based on category, search, budget, urgency, and city bounds
-  const filteredData = listData.filter((item: any) => {
+  const filteredData = listData.filter((item) => {
     if (selectedCategory !== 'all' && item.category !== selectedCategory) return false
     if (searchQuery && !item.title.toLowerCase().includes(searchQuery.toLowerCase())) return false
     if (item.budget && filters.budget !== 'any') {
@@ -296,8 +371,8 @@ function WorkerMapContent() {
 
   // Convert jobs to map markers
   const mapMarkers: MapMarker[] = filteredData
-    .filter((item: any) => item.location?.lat && item.location?.lng)
-    .map((item: any) => ({
+    .filter((item) => item.location?.lat && item.location?.lng)
+    .map((item) => ({
       id: item.id,
       latitude: item.location.lat,
       longitude: item.location.lng,
@@ -334,12 +409,12 @@ function WorkerMapContent() {
   }, [selectedJob, router])
 
   const handleMarkerClick = useCallback((marker: MapMarker) => {
-    const job = listData.find((j: any) => j.id === marker.id)
+    const job = listData.find((j) => j.id === marker.id)
     if (job) setSelectedJob(job)
   }, [listData])
 
   // Focus on a job: select it AND fly map to its location
-  const focusJob = useCallback((job: any) => {
+  const focusJob = useCallback((job: JobItem | ApplicationItem) => {
     setSelectedJob(job)
     if (leafletMapRef.current && job.location) {
       leafletMapRef.current.flyToWithAnimation(job.location.lat, job.location.lng)
@@ -655,7 +730,7 @@ function WorkerMapContent() {
               )}
 
               {/* Application Status */}
-              {selectedJob.appliedAt && (
+              {'appliedAt' in selectedJob && (selectedJob as ApplicationItem).appliedAt && (
                 <div className={cn(
                   'flex items-center gap-2 px-4 py-3 rounded-xl mb-6 border',
                   selectedJob.status === 'accepted'
@@ -668,13 +743,13 @@ function WorkerMapContent() {
                   )}>
                     {selectedJob.status === 'accepted' ? 'Application Accepted' : 'Application Pending'}
                   </span>
-                  <span className="text-slate-500 text-sm">· Applied {selectedJob.appliedAt}</span>
+                  <span className="text-slate-500 text-sm">· Applied {(selectedJob as ApplicationItem).appliedAt}</span>
                 </div>
               )}
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                {!selectedJob.appliedAt && (
+                {!('appliedAt' in selectedJob) && (
                   <Button
                     size="lg"
                     fullWidth
@@ -696,17 +771,54 @@ function WorkerMapContent() {
                 </Button>
               </div>
             </div>
+          ) : isCurrentViewLoading ? (
+            /* ============ LOADING STATE ============ */
+            <div className="p-5 space-y-4">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="bg-slate-900/80 backdrop-blur-md border border-white/5 rounded-2xl p-4 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <Skeleton variant="rectangular" width="48px" height="48px" className="rounded-xl shrink-0" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton variant="text" width="70%" height="16px" />
+                      <Skeleton variant="text" width="40%" height="12px" />
+                    </div>
+                  </div>
+                  <Skeleton variant="text" width="100%" height="12px" />
+                  <div className="flex gap-2">
+                    <Skeleton variant="text" width="60px" height="20px" />
+                    <Skeleton variant="text" width="80px" height="20px" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : currentViewError ? (
+            /* ============ ERROR STATE ============ */
+            <div className="p-5 flex flex-col items-center justify-center gap-4 text-center min-h-[300px]">
+              <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <AlertCircle className="w-7 h-7 text-red-400" />
+              </div>
+              <div>
+                <p className="text-white font-semibold mb-1">Failed to load {sidebarView === 'all_jobs' ? 'jobs' : 'applications'}</p>
+                <p className="text-sm text-slate-400">{currentViewError}</p>
+              </div>
+              <button
+                onClick={retryCurrentView}
+                className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-200"
+              >
+                Try again
+              </button>
+            </div>
           ) : (
             /* ============ LIST VIEW ============ */
             <div className="divide-y divide-white/[0.04]">
-              {filteredData.map((job: any) => (
+              {filteredData.map((job) => (
                 <JobListCard
                   key={job.id}
                   job={job}
                   onClick={() => focusJob(job)}
                   getCategoryIcon={getCategoryIcon}
                   colorMode="work"
-                  isSelected={selectedJob?.id === job.id}
+                  isSelected={false}
                 />
               ))}
 
@@ -746,8 +858,24 @@ function WorkerMapContent() {
         {/* Mobile List View - shown when list view is active */}
         {viewMode === 'list' && (
           <div className="lg:hidden absolute inset-0 bg-slate-950 overflow-y-auto pb-40">
+            {isCurrentViewLoading ? (
+              <div className="p-5 flex items-center justify-center min-h-[200px]">
+                <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+              </div>
+            ) : currentViewError ? (
+              <div className="p-5 flex flex-col items-center justify-center gap-4 text-center min-h-[200px]">
+                <AlertCircle className="w-8 h-8 text-red-400" />
+                <p className="text-sm text-slate-400">{currentViewError}</p>
+                <button
+                  onClick={retryCurrentView}
+                  className="px-4 py-2 rounded-xl text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all duration-200"
+                >
+                  Try again
+                </button>
+              </div>
+            ) : (
             <div className="divide-y divide-white/[0.04]">
-              {filteredData.map((job: any) => (
+              {filteredData.map((job) => (
                 <JobListCard
                   key={job.id}
                   job={job}
@@ -757,7 +885,7 @@ function WorkerMapContent() {
                   }}
                   getCategoryIcon={getCategoryIcon}
                   colorMode="work"
-                  isSelected={selectedJob?.id === job.id}
+                  isSelected={false}
                 />
               ))}
 
@@ -770,6 +898,7 @@ function WorkerMapContent() {
                 />
               )}
             </div>
+            )}
           </div>
         )}
 

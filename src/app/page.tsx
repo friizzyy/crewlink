@@ -5,7 +5,9 @@ import Link from 'next/link'
 import {
   ArrowRight, Shield, Briefcase,
   CheckCircle2, BadgeCheck, Star,
-  DollarSign, Clock, TrendingUp, Lock
+  DollarSign, Clock, TrendingUp, Lock,
+  Wrench, Sparkles, Package, Leaf, Armchair, Truck,
+  Quote, MapPin, Zap, Users, Heart
 } from 'lucide-react'
 import { UniversalNav } from '@/components/UniversalNav'
 import { MarketingFooter } from '@/components/MarketingFooter'
@@ -66,7 +68,7 @@ const floatingCards = [
     id: 1,
     title: 'Handyman Help',
     subtitle: 'Available now',
-    icon: '🔧',
+    Icon: Wrench,
     gradient: 'from-cyan-400 to-blue-600',
     desktopPosition: 'top-[15%] right-[8%]',
     mobilePosition: { top: '12%', right: '4%' },
@@ -78,7 +80,7 @@ const floatingCards = [
     id: 2,
     title: 'Deep Cleaning',
     subtitle: '$35/hr',
-    icon: '🧹',
+    Icon: Sparkles,
     gradient: 'from-emerald-400 to-teal-600',
     desktopPosition: 'top-[35%] left-[5%]',
     mobilePosition: { top: '18%', left: '4%' },
@@ -90,7 +92,7 @@ const floatingCards = [
     id: 3,
     title: 'Moving Help',
     subtitle: '2 workers · $45/hr',
-    icon: '📦',
+    Icon: Package,
     gradient: 'from-purple-400 to-pink-600',
     desktopPosition: 'bottom-[25%] left-[8%]',
     mobilePosition: { bottom: '35%', left: '4%' },
@@ -102,7 +104,7 @@ const floatingCards = [
     id: 4,
     title: 'Job Complete!',
     subtitle: '+$127.50 earned',
-    icon: '⭐',
+    Icon: CheckCircle2,
     gradient: 'from-amber-400 to-orange-600',
     desktopPosition: 'bottom-[18%] right-[10%]',
     mobilePosition: { bottom: '30%', right: '4%' },
@@ -114,12 +116,12 @@ const floatingCards = [
 ]
 
 const categories = [
-  { name: 'Cleaning', icon: '🧹', count: '1.2K', hot: true },
-  { name: 'Moving', icon: '📦', count: '890' },
-  { name: 'Handyman', icon: '🔧', count: '1.5K', hot: true },
-  { name: 'Yard Work', icon: '🌱', count: '720' },
-  { name: 'Assembly', icon: '🪑', count: '430' },
-  { name: 'Delivery', icon: '🚚', count: '560' },
+  { name: 'Cleaning', Icon: Sparkles, count: '1.2K', hot: true, gradient: 'from-cyan-400 to-blue-500' },
+  { name: 'Moving', Icon: Package, count: '890', gradient: 'from-purple-400 to-pink-500' },
+  { name: 'Handyman', Icon: Wrench, count: '1.5K', hot: true, gradient: 'from-amber-400 to-orange-500' },
+  { name: 'Yard Work', Icon: Leaf, count: '720', gradient: 'from-emerald-400 to-teal-500' },
+  { name: 'Assembly', Icon: Armchair, count: '430', gradient: 'from-indigo-400 to-violet-500' },
+  { name: 'Delivery', Icon: Truck, count: '560', gradient: 'from-rose-400 to-red-500' },
 ]
 
 const trustBadges = [
@@ -167,7 +169,7 @@ function MobileFloatingCard({
         )}
         <div className="relative flex items-center gap-2">
           <div className={`w-6 h-6 rounded-md bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-sm`}>
-            <span className="text-[10px]">{card.icon}</span>
+            <card.Icon className="w-3 h-3 text-white" />
           </div>
           <div>
             <div className="font-semibold text-white text-[9px] leading-tight">{card.title}</div>
@@ -222,7 +224,7 @@ function DesktopFloatingCard({
         )}
         <div className="relative flex items-center gap-3">
           <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-lg`}>
-            <span className="text-xl">{card.icon}</span>
+            <card.Icon className="w-5 h-5 text-white" />
           </div>
           <div>
             <div className="font-semibold text-white text-sm">{card.title}</div>
@@ -259,11 +261,17 @@ export default function HomePage() {
   const desktopStatsReveal = useDesktopScrollReveal()
   const desktopCategoriesReveal = useDesktopScrollReveal()
   const desktopHowReveal = useDesktopScrollReveal()
+  const desktopFeaturesReveal = useDesktopScrollReveal()
+  const desktopTestimonialsReveal = useDesktopScrollReveal()
+  const desktopCtaReveal = useDesktopScrollReveal()
 
   // Mobile scroll reveals (new system)
   const mobileStatsReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
   const mobileCategoriesReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
   const mobileHowReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
+  const mobileFeaturesReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
+  const mobileTestimonialsReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
+  const mobileCtaReveal = useMobileReveal({ rootMargin: '0px 0px -5% 0px', threshold: 0.05 })
 
   useEffect(() => {
     setMounted(true)
@@ -273,6 +281,9 @@ export default function HomePage() {
   const statsReveal = isMobile || isTablet ? mobileStatsReveal : desktopStatsReveal
   const categoriesReveal = isMobile || isTablet ? mobileCategoriesReveal : desktopCategoriesReveal
   const howReveal = isMobile || isTablet ? mobileHowReveal : desktopHowReveal
+  const featuresReveal = isMobile || isTablet ? mobileFeaturesReveal : desktopFeaturesReveal
+  const testimonialsReveal = isMobile || isTablet ? mobileTestimonialsReveal : desktopTestimonialsReveal
+  const ctaReveal = isMobile || isTablet ? mobileCtaReveal : desktopCtaReveal
 
   return (
     <div className="min-h-screen min-h-[100dvh] text-white bg-slate-950">
@@ -558,11 +569,13 @@ export default function HomePage() {
                   transition: `all 0.5s ease-out ${i * 50}ms`,
                 }}
               >
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="text-xl sm:text-2xl">{cat.icon}</span>
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br ${cat.gradient} flex items-center justify-center shadow-lg shrink-0`}>
+                    <cat.Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5 sm:gap-2">
-                      <h3 className="font-medium text-white text-sm sm:text-base group-hover:text-cyan-400 transition-colors truncate">{cat.name}</h3>
+                      <h3 className="font-semibold text-white text-sm sm:text-base group-hover:text-cyan-400 transition-colors truncate">{cat.name}</h3>
                       {cat.hot && (
                         <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-400 shrink-0" />
                       )}
@@ -623,6 +636,205 @@ export default function HomePage() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ WHY CREWLINK ============ */}
+      <section ref={featuresReveal.ref} className="py-14 sm:py-20">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div
+            className="text-center mb-8 sm:mb-12"
+            style={isMobile || isTablet ? mobileFeaturesReveal.style : {
+              opacity: desktopFeaturesReveal.isVisible ? 1 : 0,
+              transform: desktopFeaturesReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.5s ease-out',
+            }}
+          >
+            <h2 className="text-xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">
+              Why people choose CrewLink
+            </h2>
+            <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto">
+              Built for trust, speed, and reliability from the ground up.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {[
+              { icon: Shield, title: 'Verified Workers', desc: 'Every worker passes background checks and identity verification.', color: 'emerald' },
+              { icon: Zap, title: 'Instant Matching', desc: 'AI-powered matching connects you with the right person in minutes.', color: 'cyan' },
+              { icon: Lock, title: 'Secure Payments', desc: 'Funds held safely until work is complete and approved.', color: 'blue' },
+              { icon: MapPin, title: 'Local Focus', desc: 'Find help right in your neighborhood with real-time availability.', color: 'purple' },
+              { icon: Star, title: 'Trusted Reviews', desc: 'Transparent ratings from real clients build accountability.', color: 'amber' },
+              { icon: Heart, title: 'Fair Pay', desc: 'Workers set their own rates. No middleman markups.', color: 'rose' },
+            ].map((feature, i) => (
+              <div
+                key={feature.title}
+                className="group p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-slate-900/40 border border-white/5 hover:border-white/10 transition-all duration-300"
+                style={isMobile || isTablet ? {
+                  opacity: mobileFeaturesReveal.isVisible ? 1 : 0,
+                  transform: mobileFeaturesReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
+                  transition: `opacity 0.4s ease-out ${i * 50}ms, transform 0.4s ease-out ${i * 50}ms`,
+                } : {
+                  opacity: desktopFeaturesReveal.isVisible ? 1 : 0,
+                  transform: desktopFeaturesReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: `all 0.5s ease-out ${i * 60}ms`,
+                }}
+              >
+                <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center mb-3 ${
+                  feature.color === 'emerald' ? 'bg-emerald-500/10' :
+                  feature.color === 'cyan' ? 'bg-cyan-500/10' :
+                  feature.color === 'blue' ? 'bg-blue-500/10' :
+                  feature.color === 'purple' ? 'bg-purple-500/10' :
+                  feature.color === 'amber' ? 'bg-amber-500/10' :
+                  'bg-rose-500/10'
+                }`}>
+                  <feature.icon className={`w-4.5 h-4.5 sm:w-5 sm:h-5 ${
+                    feature.color === 'emerald' ? 'text-emerald-400' :
+                    feature.color === 'cyan' ? 'text-cyan-400' :
+                    feature.color === 'blue' ? 'text-blue-400' :
+                    feature.color === 'purple' ? 'text-purple-400' :
+                    feature.color === 'amber' ? 'text-amber-400' :
+                    'text-rose-400'
+                  }`} />
+                </div>
+                <h3 className="font-semibold text-white text-sm sm:text-base mb-1">{feature.title}</h3>
+                <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ TESTIMONIALS ============ */}
+      <section ref={testimonialsReveal.ref} className="py-14 sm:py-20 border-y border-white/5 bg-slate-900/20">
+        <div className="max-w-5xl mx-auto px-5 sm:px-8">
+          <div
+            className="text-center mb-8 sm:mb-12"
+            style={isMobile || isTablet ? mobileTestimonialsReveal.style : {
+              opacity: desktopTestimonialsReveal.isVisible ? 1 : 0,
+              transform: desktopTestimonialsReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+              transition: 'all 0.5s ease-out',
+            }}
+          >
+            <h2 className="text-xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">
+              Trusted by thousands
+            </h2>
+            <p className="text-sm sm:text-base text-slate-400">
+              Real feedback from hirers and workers on the platform.
+            </p>
+          </div>
+
+          <div className="grid sm:grid-cols-3 gap-3 sm:gap-4">
+            {[
+              {
+                quote: 'Found a cleaner in 10 minutes. She was professional, thorough, and reasonably priced. Will definitely use again.',
+                name: 'Rachel K.',
+                role: 'Hirer',
+                rating: 5,
+                gradient: 'from-cyan-400 to-blue-600',
+              },
+              {
+                quote: 'I make more per hour than my old job, pick my own schedule, and get paid fast. CrewLink changed everything for me.',
+                name: 'Marcus T.',
+                role: 'Worker',
+                rating: 5,
+                gradient: 'from-emerald-400 to-teal-600',
+              },
+              {
+                quote: 'The background checks and reviews gave me confidence. Hired a handyman for a weekend project — perfect work.',
+                name: 'David L.',
+                role: 'Hirer',
+                rating: 5,
+                gradient: 'from-purple-400 to-pink-600',
+              },
+            ].map((testimonial, i) => (
+              <div
+                key={testimonial.name}
+                className="p-5 sm:p-6 rounded-xl sm:rounded-2xl bg-slate-900/60 border border-white/5 flex flex-col"
+                style={isMobile || isTablet ? {
+                  opacity: mobileTestimonialsReveal.isVisible ? 1 : 0,
+                  transform: mobileTestimonialsReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
+                  transition: `opacity 0.4s ease-out ${i * 75}ms, transform 0.4s ease-out ${i * 75}ms`,
+                } : {
+                  opacity: desktopTestimonialsReveal.isVisible ? 1 : 0,
+                  transform: desktopTestimonialsReveal.isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: `all 0.5s ease-out ${i * 75}ms`,
+                }}
+              >
+                <Quote className="w-5 h-5 text-slate-600 mb-3 shrink-0" />
+                <p className="text-sm sm:text-base text-slate-300 leading-relaxed flex-1 mb-4">
+                  &ldquo;{testimonial.quote}&rdquo;
+                </p>
+                <div className="flex items-center gap-3 mt-auto">
+                  <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${testimonial.gradient} flex items-center justify-center text-white text-xs font-bold`}>
+                    {testimonial.name.charAt(0)}
+                  </div>
+                  <div>
+                    <div className="font-medium text-white text-sm">{testimonial.name}</div>
+                    <div className="text-xs text-slate-500">{testimonial.role}</div>
+                  </div>
+                  <div className="ml-auto flex gap-0.5">
+                    {Array.from({ length: testimonial.rating }).map((_, j) => (
+                      <Star key={j} className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ============ BOTTOM CTA ============ */}
+      <section ref={ctaReveal.ref} className="py-14 sm:py-20">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8">
+          <div
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-cyan-500/20 p-6 sm:p-10 text-center"
+            style={isMobile || isTablet ? mobileCtaReveal.style : {
+              opacity: desktopCtaReveal.isVisible ? 1 : 0,
+              transform: desktopCtaReveal.isVisible ? 'scale(1)' : 'scale(0.98)',
+              transition: 'all 0.5s ease-out',
+            }}
+          >
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-[80px]" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-[80px]" />
+            </div>
+            <div className="relative">
+              <h2 className="text-xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">
+                Ready to get started?
+              </h2>
+              <p className="text-sm sm:text-base text-slate-400 mb-6 sm:mb-8 max-w-md mx-auto">
+                Create your free account in under a minute. No credit card required.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <Link
+                  href="/create-account?mode=hire"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg shadow-cyan-500/25"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <span className="relative flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white">
+                    <Briefcase className="w-4 h-4" />
+                    Start Hiring
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+                <Link
+                  href="/create-account?mode=work"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl"
+                >
+                  <div className="absolute inset-0 border-2 border-emerald-500/40 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/60 transition-colors" />
+                  <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
+                  <span className="relative flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-emerald-400">
+                    <DollarSign className="w-4 h-4" />
+                    Start Earning
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </span>
+                </Link>
+              </div>
             </div>
           </div>
         </div>

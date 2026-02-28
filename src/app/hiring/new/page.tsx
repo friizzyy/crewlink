@@ -6,19 +6,21 @@ import Link from 'next/link'
 import {
   ArrowLeft, ArrowRight, MapPin, Calendar, Clock, DollarSign,
   Sparkles, CheckCircle2, AlertCircle, Loader2, X, Plus,
-  Zap, Shield, ChevronDown, Camera, FileText
+  Zap, Shield, ChevronDown, Camera, FileText,
+  Package, Wrench, Leaf, Armchair, Truck, PartyPopper, ClipboardList
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { AddressAutocomplete, type AddressResult } from '@/components/ui/AddressAutocomplete'
 
-const categories = [
-  { id: 'cleaning', name: 'Cleaning', icon: '🧹', description: 'Home, office, deep clean' },
-  { id: 'moving', name: 'Moving', icon: '📦', description: 'Packing, loading, transport' },
-  { id: 'handyman', name: 'Handyman', icon: '🔧', description: 'Repairs, installations' },
-  { id: 'yard', name: 'Yard Work', icon: '🌱', description: 'Lawn, garden, outdoor' },
-  { id: 'assembly', name: 'Assembly', icon: '🪑', description: 'Furniture, equipment' },
-  { id: 'delivery', name: 'Delivery', icon: '🚚', description: 'Pickup, transport' },
-  { id: 'events', name: 'Events', icon: '🎉', description: 'Setup, service, cleanup' },
-  { id: 'other', name: 'Other', icon: '📋', description: 'Custom tasks' },
+const categories: { id: string; name: string; Icon: LucideIcon; description: string }[] = [
+  { id: 'cleaning', name: 'Cleaning', Icon: Sparkles, description: 'Home, office, deep clean' },
+  { id: 'moving', name: 'Moving', Icon: Package, description: 'Packing, loading, transport' },
+  { id: 'handyman', name: 'Handyman', Icon: Wrench, description: 'Repairs, installations' },
+  { id: 'yard', name: 'Yard Work', Icon: Leaf, description: 'Lawn, garden, outdoor' },
+  { id: 'assembly', name: 'Assembly', Icon: Armchair, description: 'Furniture, equipment' },
+  { id: 'delivery', name: 'Delivery', Icon: Truck, description: 'Pickup, transport' },
+  { id: 'events', name: 'Events', Icon: PartyPopper, description: 'Setup, service, cleanup' },
+  { id: 'other', name: 'Other', Icon: ClipboardList, description: 'Custom tasks' },
 ]
 
 const urgencyOptions = [
@@ -225,7 +227,7 @@ export default function NewJobPage() {
                       : 'bg-slate-900 border-white/5 hover:border-white/20'
                   }`}
                 >
-                  <span className="text-3xl block mb-2">{cat.icon}</span>
+                  <cat.Icon className="w-8 h-8 text-cyan-400 mb-2" />
                   <span className="font-semibold text-white block">{cat.name}</span>
                   <span className="text-xs text-slate-500 block mt-0.5">{cat.description}</span>
                   {formData.category === cat.id && (
@@ -462,7 +464,17 @@ export default function NewJobPage() {
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Category</span>
-                    <span className="text-white">{categories.find(c => c.id === formData.category)?.icon} {categories.find(c => c.id === formData.category)?.name}</span>
+                    <span className="text-white flex items-center gap-1.5">
+                      {(() => {
+                        const selectedCat = categories.find(c => c.id === formData.category)
+                        if (selectedCat) {
+                          const CatIcon = selectedCat.Icon
+                          return <CatIcon className="w-4 h-4 text-cyan-400" />
+                        }
+                        return null
+                      })()}
+                      {categories.find(c => c.id === formData.category)?.name}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-400">Title</span>
