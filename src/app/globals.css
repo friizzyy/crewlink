@@ -16,21 +16,21 @@
   --color-error: #ef4444;
   
   /* Text colors */
-  --color-text-primary: #0f172a;
-  --color-text-secondary: #475569;
-  --color-text-tertiary: #94a3b8;
-  --color-text-inverse: #ffffff;
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #94a3b8;
+  --color-text-tertiary: #64748b;
+  --color-text-inverse: #0f172a;
   
   /* Background colors */
-  --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f8fafc;
-  --color-bg-tertiary: #f1f5f9;
-  --color-bg-elevated: #ffffff;
+  --color-bg-primary: #020617;
+  --color-bg-secondary: #0f172a;
+  --color-bg-tertiary: #1e293b;
+  --color-bg-elevated: #1e293b;
   
   /* Border colors */
-  --color-border-light: #e2e8f0;
-  --color-border-medium: #cbd5e1;
-  --color-border-heavy: #94a3b8;
+  --color-border-light: rgba(255, 255, 255, 0.06);
+  --color-border-medium: rgba(255, 255, 255, 0.12);
+  --color-border-heavy: rgba(255, 255, 255, 0.20);
   
   /* Spacing scale */
   --space-1: 0.25rem;
@@ -103,12 +103,12 @@
   
   /* Focus styles */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-500 ring-offset-2;
+    @apply outline-none ring-2 ring-brand-500/50 ring-offset-2 ring-offset-slate-950;
   }
   
   /* Selection */
   ::selection {
-    @apply bg-brand-100 text-brand-900;
+    @apply bg-brand-500/20 text-white;
   }
   
   /* Scrollbar styling */
@@ -121,11 +121,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-slate-300 rounded-full;
+    @apply bg-slate-700 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-slate-400;
+    @apply bg-slate-600;
   }
 }
 
@@ -147,12 +147,12 @@
   }
   
   .btn-secondary {
-    @apply btn bg-slate-100 text-slate-700 hover:bg-slate-200 active:bg-slate-300;
+    @apply btn bg-slate-800 text-slate-200 hover:bg-slate-700 active:bg-slate-600;
     @apply focus-visible:ring-slate-400;
   }
   
   .btn-ghost {
-    @apply btn bg-transparent text-slate-600 hover:bg-slate-100 active:bg-slate-200;
+    @apply btn bg-transparent text-slate-400 hover:bg-white/5 active:bg-white/10;
     @apply focus-visible:ring-slate-400;
   }
   
@@ -167,7 +167,7 @@
   }
   
   .btn-outline {
-    @apply btn border-2 border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50;
+    @apply btn border border-white/10 text-slate-300 hover:border-white/20 hover:bg-white/5;
     @apply focus-visible:ring-slate-400;
   }
   
@@ -199,11 +199,11 @@
   
   /* Input base styles */
   .input {
-    @apply w-full bg-white border border-slate-200 rounded-lg px-4 py-2.5;
-    @apply text-slate-900 placeholder:text-slate-400;
+    @apply w-full bg-slate-800/50 border border-white/10 rounded-xl px-4 py-2.5;
+    @apply text-white placeholder:text-slate-500;
     @apply transition-colors duration-200;
-    @apply focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20;
-    @apply disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed;
+    @apply focus:outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/20;
+    @apply disabled:bg-slate-800 disabled:text-slate-500 disabled:cursor-not-allowed;
   }
   
   .input-sm { @apply h-9 px-3 text-sm; }
@@ -215,7 +215,7 @@
   }
   
   .input-success {
-    @apply border-success-500 focus:border-success-500 focus:ring-success-500/20;
+    @apply border-emerald-500 focus:border-emerald-500 focus:ring-emerald-500/20;
   }
   
   /* Textarea */
@@ -226,23 +226,23 @@
   /* Select */
   .select {
     @apply input appearance-none bg-no-repeat bg-right;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
     background-position: right 12px center;
     padding-right: 40px;
   }
   
   /* Card styles */
   .card {
-    @apply bg-white rounded-2xl border border-slate-200;
+    @apply bg-slate-900/60 rounded-2xl border border-white/[0.06];
   }
   
   .card-elevated {
-    @apply card shadow-soft;
+    @apply card shadow-medium;
   }
   
   .card-interactive {
     @apply card cursor-pointer transition-all duration-200;
-    @apply hover:border-slate-300 hover:shadow-soft;
+    @apply hover:bg-slate-900/80 hover:border-white/10 hover:shadow-soft;
   }
   
   /* Badge styles */
@@ -250,21 +250,21 @@
     @apply inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
   
-  .badge-brand { @apply bg-brand-100 text-brand-700; }
-  .badge-accent { @apply bg-accent-100 text-accent-700; }
-  .badge-success { @apply bg-success-100 text-success-700; }
-  .badge-warning { @apply bg-amber-100 text-amber-700; }
-  .badge-error { @apply bg-red-100 text-red-700; }
-  .badge-neutral { @apply bg-slate-100 text-slate-700; }
+  .badge-brand { @apply bg-brand-500/10 text-brand-400; }
+  .badge-accent { @apply bg-accent-500/10 text-accent-400; }
+  .badge-success { @apply bg-success-500/10 text-success-400; }
+  .badge-warning { @apply bg-amber-500/10 text-amber-400; }
+  .badge-error { @apply bg-red-500/10 text-red-400; }
+  .badge-neutral { @apply bg-slate-500/10 text-slate-400; }
   
   /* Skeleton loading */
   .skeleton {
-    @apply bg-slate-200 animate-pulse rounded;
+    @apply bg-slate-800/60 animate-pulse rounded;
   }
   
   /* Avatar */
   .avatar {
-    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full bg-slate-200;
+    @apply relative inline-flex items-center justify-center overflow-hidden rounded-full bg-slate-800;
   }
   
   .avatar-sm { @apply w-8 h-8 text-xs; }
@@ -274,11 +274,11 @@
   
   /* Sheet / Modal */
   .sheet-overlay {
-    @apply fixed inset-0 bg-black/40 backdrop-blur-sm z-40;
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40;
   }
   
   .sheet-content {
-    @apply fixed z-50 bg-white;
+    @apply fixed z-50 bg-slate-900;
   }
   
   .sheet-bottom {
@@ -288,7 +288,7 @@
   
   /* Divider */
   .divider {
-    @apply h-px bg-slate-200 w-full;
+    @apply h-px bg-white/[0.06] w-full;
   }
   
   /* Empty state */
