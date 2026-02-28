@@ -10,22 +10,20 @@ export const backgroundTokens = {
   colors: {
     base: 'rgb(2, 6, 23)', // slate-950
     // Glow spots from original Option E
-    glow1: 'rgba(6, 182, 212, 0.10)', // cyan-500 - top left
-    glow2: 'rgba(37, 99, 235, 0.10)', // blue-600 - bottom right
-    glow3: 'rgba(139, 92, 246, 0.05)', // purple-600 - center
+    glow1: 'rgba(6, 182, 212, 0.05)', // cyan-500 - top left
+    glow2: 'rgba(37, 99, 235, 0.05)', // blue-600 - bottom right
+    glow3: 'rgba(139, 92, 246, 0.02)', // purple-600 - center
     // Floating boxes
     box: 'rgba(6, 182, 212, 0.03)', // cyan for boxes
     boxBorder: 'rgba(6, 182, 212, 0.08)',
     // Grid
-    gridLine: 'rgba(6, 182, 212, 0.05)',
-    // Scan line
-    scanLine: 'rgba(6, 182, 212, 0.05)',
+    gridLine: 'rgba(6, 182, 212, 0.025)',
   },
   // Animation speeds (in seconds)
   speeds: {
-    low: { box: 60, scan: 12 },
-    normal: { box: 40, scan: 8 },
-    high: { box: 25, scan: 5 },
+    low: { box: 80 },
+    normal: { box: 60 },
+    high: { box: 35 },
   },
   // Opacity levels
   opacity: {
@@ -35,7 +33,7 @@ export const backgroundTokens = {
   },
   // Blur amounts
   blur: {
-    glow: '100px',
+    glow: '80px',
     box: '40px',
   },
   // Box density (number of boxes)
@@ -222,15 +220,6 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
           50% { opacity: 0.4; }
         }
 
-        @-webkit-keyframes scanLine {
-          0% { top: -10%; }
-          100% { top: 110%; }
-        }
-        @keyframes scanLine {
-          0% { top: -10%; }
-          100% { top: 110%; }
-        }
-
         @-webkit-keyframes glowPulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.6; }
@@ -262,15 +251,7 @@ export function AmbientBackground({ intensity: propIntensity, className = '' }: 
           }}
         />
 
-        {/* Scanning line effect - from Option E */}
-        <div
-          className="absolute left-0 right-0 h-32 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"
-          style={{
-            animation: reducedMotion ? 'none' : `scanLine ${speeds.scan}s linear infinite`,
-          }}
-        />
-
-        {/* Glow spots - from Option E */}
+        {/* Glow spots */}
         <div
           className="absolute top-20 left-20 w-96 h-96 rounded-full"
           style={{

@@ -308,8 +308,8 @@ export default function HomePage() {
             className={`
               absolute top-1/4 left-1/4
               w-[200px] h-[200px] md:w-[500px] md:h-[500px]
-              bg-cyan-500/15 rounded-full
-              blur-[60px] md:blur-[100px]
+              bg-cyan-500/8 rounded-full
+              blur-[60px] md:blur-[80px]
               ${!reducedMotion && isDesktop ? 'animate-pulse-slow' : ''}
             `}
           />
@@ -317,8 +317,8 @@ export default function HomePage() {
             className={`
               absolute bottom-1/4 right-1/4
               w-[150px] h-[150px] md:w-[400px] md:h-[400px]
-              bg-blue-600/10 rounded-full
-              blur-[50px] md:blur-[80px]
+              bg-blue-600/5 rounded-full
+              blur-[50px] md:blur-[70px]
               ${!reducedMotion && isDesktop ? 'animate-pulse-slow' : ''}
             `}
             style={{ animationDelay: '2s' }}
@@ -437,7 +437,7 @@ export default function HomePage() {
             >
               <Link
                 href="/create-account?mode=hire"
-                className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-2xl shadow-cyan-500/25 w-full sm:w-auto"
+                className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-2xl shadow-cyan-500/10 w-full sm:w-auto"
                 data-qa="cta-hire-help"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
@@ -454,7 +454,7 @@ export default function HomePage() {
                 className="group relative overflow-hidden rounded-xl sm:rounded-2xl w-full sm:w-auto"
                 data-qa="cta-find-work"
               >
-                <div className="absolute inset-0 border-2 border-emerald-500/40 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/60 transition-colors" />
+                <div className="absolute inset-0 border border-emerald-500/30 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/50 transition-colors" />
                 <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                 <span className="relative flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 text-sm sm:text-lg font-semibold text-emerald-400">
                   <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -558,7 +558,7 @@ export default function HomePage() {
               <Link
                 key={cat.name}
                 href={`/cities?category=${cat.name.toLowerCase()}`}
-                className="group relative p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-900/40 border border-white/5 hover:border-cyan-500/30 hover:bg-slate-900/60 transition-all duration-300"
+                className="group relative p-3 sm:p-4 rounded-lg sm:rounded-xl bg-slate-900/40 border border-white/5 hover:border-white/15 hover:bg-slate-900/60 transition-all duration-300"
                 style={isMobile || isTablet ? {
                   opacity: mobileCategoriesReveal.isVisible ? 1 : 0,
                   transform: mobileCategoriesReveal.isVisible ? 'translateY(0)' : 'translateY(12px)',
@@ -791,7 +791,7 @@ export default function HomePage() {
       <section ref={ctaReveal.ref} className="py-14 sm:py-20">
         <div className="max-w-4xl mx-auto px-5 sm:px-8">
           <div
-            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-cyan-500/20 p-6 sm:p-10 text-center"
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl bg-gradient-to-br from-slate-900 to-slate-800 border border-white/10 p-6 sm:p-10 text-center"
             style={isMobile || isTablet ? mobileCtaReveal.style : {
               opacity: desktopCtaReveal.isVisible ? 1 : 0,
               transform: desktopCtaReveal.isVisible ? 'scale(1)' : 'scale(0.98)',
@@ -812,7 +812,7 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href="/create-account?mode=hire"
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg shadow-cyan-500/25"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg shadow-cyan-500/10"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -826,7 +826,7 @@ export default function HomePage() {
                   href="/create-account?mode=work"
                   className="group relative overflow-hidden rounded-xl sm:rounded-2xl"
                 >
-                  <div className="absolute inset-0 border-2 border-emerald-500/40 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/60 transition-colors" />
+                  <div className="absolute inset-0 border border-emerald-500/30 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/50 transition-colors" />
                   <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
                   <span className="relative flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-emerald-400">
                     <DollarSign className="w-4 h-4" />

@@ -34,8 +34,8 @@ const variants = {
   primary: `
     bg-gradient-to-r from-cyan-500 to-blue-600 text-white
     hover:from-cyan-400 hover:to-blue-500
-    shadow-[0_4px_14px_-2px_rgba(6,182,212,0.4)]
-    hover:shadow-[0_6px_20px_-2px_rgba(6,182,212,0.5)]
+    shadow-[0_4px_14px_-2px_rgba(6,182,212,0.2)]
+    hover:shadow-[0_6px_20px_-2px_rgba(6,182,212,0.25)]
     focus-visible:ring-cyan-500
   `,
   secondary: `
@@ -53,27 +53,27 @@ const variants = {
   accent: `
     bg-gradient-to-r from-purple-500 to-pink-600 text-white
     hover:from-purple-400 hover:to-pink-500
-    shadow-[0_4px_14px_-2px_rgba(139,92,246,0.4)]
-    hover:shadow-[0_6px_20px_-2px_rgba(139,92,246,0.5)]
+    shadow-[0_4px_14px_-2px_rgba(139,92,246,0.2)]
+    hover:shadow-[0_6px_20px_-2px_rgba(139,92,246,0.25)]
     focus-visible:ring-purple-500
   `,
   danger: `
     bg-gradient-to-r from-red-600 to-rose-600 text-white
     hover:from-red-500 hover:to-rose-500
-    shadow-[0_4px_14px_-2px_rgba(239,68,68,0.4)]
-    hover:shadow-[0_6px_20px_-2px_rgba(239,68,68,0.5)]
+    shadow-[0_4px_14px_-2px_rgba(239,68,68,0.2)]
+    hover:shadow-[0_6px_20px_-2px_rgba(239,68,68,0.25)]
     focus-visible:ring-red-500
   `,
   success: `
     bg-gradient-to-r from-emerald-500 to-teal-600 text-white
     hover:from-emerald-400 hover:to-teal-500
-    shadow-[0_4px_14px_-2px_rgba(16,185,129,0.4)]
-    hover:shadow-[0_6px_20px_-2px_rgba(16,185,129,0.5)]
+    shadow-[0_4px_14px_-2px_rgba(16,185,129,0.2)]
+    hover:shadow-[0_6px_20px_-2px_rgba(16,185,129,0.25)]
     focus-visible:ring-emerald-500
   `,
   outline: `
-    border-2 border-cyan-500/50 text-cyan-400 bg-transparent
-    hover:bg-cyan-500/10 hover:border-cyan-500
+    border border-cyan-500/30 text-cyan-400 bg-transparent
+    hover:bg-cyan-500/10 hover:border-cyan-500/60
     focus-visible:ring-cyan-500
   `,
 }
@@ -222,7 +222,7 @@ export const GlowButton = forwardRef<HTMLButtonElement, GlowButtonProps>(
     return (
       <div className="relative group">
         {/* Animated glow background */}
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur opacity-30 group-hover:opacity-60 transition-opacity duration-500 animate-pulse" />
+        <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur opacity-15 group-hover:opacity-30 transition-opacity duration-500" />
         <Button
           ref={ref}
           variant="primary"

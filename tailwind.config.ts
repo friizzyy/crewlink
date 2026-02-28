@@ -67,10 +67,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        // UNIVERSAL FONT: Inter loaded via next/font in root layout
-        // DO NOT change this - it must match landing page exactly
-        sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-geist-sans)', 'Geist Sans', 'system-ui', 'sans-serif'],
+        display: ['var(--font-geist-sans)', 'Geist Sans', 'system-ui', 'sans-serif'],
         mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       fontSize: {
@@ -102,8 +100,8 @@ const config: Config = {
         'soft': '0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.06)',
         'medium': '0 4px 12px -2px rgba(0, 0, 0, 0.1), 0 8px 24px -4px rgba(0, 0, 0, 0.08)',
         'heavy': '0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 16px 48px -8px rgba(0, 0, 0, 0.1)',
-        'glow': '0 0 24px rgba(12, 140, 231, 0.25)',
-        'glow-accent': '0 0 24px rgba(255, 127, 16, 0.3)',
+        'glow': '0 0 24px rgba(12, 140, 231, 0.12)',
+        'glow-accent': '0 0 24px rgba(255, 127, 16, 0.15)',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-out forwards',

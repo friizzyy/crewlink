@@ -37,18 +37,18 @@ const sizeStyles = {
 }
 
 const borderStyles = {
-  default: 'border border-white/10 focus:border-cyan-500/50',
+  default: 'border border-white/10 focus:border-cyan-500/40',
   error: 'border border-red-500/50 focus:border-red-500',
   success: 'border border-emerald-500/50 focus:border-emerald-500',
 }
 
 const focusStyles = {
-  default: 'focus:outline-none focus:ring-2 focus:ring-cyan-500/20',
+  default: 'focus:outline-none focus:ring-2 focus:ring-cyan-500/10',
   error: 'focus:outline-none focus:ring-2 focus:ring-red-500/20',
   success: 'focus:outline-none focus:ring-2 focus:ring-emerald-500/20',
 }
 
-const glowFocusStyles = 'focus:shadow-[0_0_20px_rgba(6,182,212,0.15)]'
+const glowFocusStyles = 'focus:shadow-[0_0_12px_rgba(6,182,212,0.06)]'
 
 // ============================================
 // INPUT COMPONENT

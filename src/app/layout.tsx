@@ -1,20 +1,10 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { GeistSans } from 'geist/font/sans'
 import { Toaster } from '@/components/ui/Toast'
 import { AmbientBackground } from '@/components/AmbientBackground'
 import { UserRoleProvider } from '@/contexts/UserRoleContext'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import './globals.css'
-
-// ============================================
-// UNIVERSAL FONT - SINGLE SOURCE OF TRUTH
-// This MUST be Inter to match landing page exactly
-// ============================================
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-})
 
 export const metadata: Metadata = {
   title: 'CrewLink | Find Work. Hire Help. Get It Done.',
@@ -41,7 +31,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} antialiased`}>
+    <html lang="en" className={`${GeistSans.variable} antialiased`}>
       <body className="font-sans text-white bg-slate-950 min-h-screen">
         <SessionProvider>
           {/* Universal animated background - appears on ALL pages */}

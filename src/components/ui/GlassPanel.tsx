@@ -36,7 +36,7 @@ const paddings = {
 const borders = {
   none: '',
   light: 'border border-white/5',
-  glow: 'border border-cyan-500/20',
+  glow: 'border border-white/10',
 }
 
 const roundedSizes = {
@@ -81,7 +81,7 @@ export const GlassPanel = forwardRef<HTMLDivElement, GlassPanelProps>(
           roundedSizes[rounded],
           blur !== 'none' && blurLevels[blur],
           hoverable && 'transition-all duration-200 hover:bg-slate-900/90 cursor-pointer',
-          glowOnHover && 'hover:border-cyan-500/30 hover:shadow-[0_0_20px_rgba(6,182,212,0.15)]',
+          glowOnHover && 'hover:border-white/15 hover:shadow-[0_0_12px_rgba(6,182,212,0.06)]',
           className
         )}
         {...props}
@@ -146,10 +146,10 @@ const gradients = {
 }
 
 const borderGradients = {
-  cyan: 'from-cyan-500/50 via-blue-500/50 to-cyan-500/50',
-  purple: 'from-purple-500/50 via-pink-500/50 to-purple-500/50',
-  emerald: 'from-emerald-500/50 via-teal-500/50 to-emerald-500/50',
-  amber: 'from-amber-500/50 via-orange-500/50 to-amber-500/50',
+  cyan: 'from-cyan-500/30 via-blue-500/30 to-cyan-500/30',
+  purple: 'from-purple-500/30 via-pink-500/30 to-purple-500/30',
+  emerald: 'from-emerald-500/30 via-teal-500/30 to-emerald-500/30',
+  amber: 'from-amber-500/30 via-orange-500/30 to-amber-500/30',
 }
 
 export const FeatureCard = forwardRef<HTMLDivElement, FeatureCardProps>(
@@ -159,7 +159,7 @@ export const FeatureCard = forwardRef<HTMLDivElement, FeatureCardProps>(
         {/* Gradient border */}
         <div
           className={cn(
-            'absolute -inset-px rounded-2xl bg-gradient-to-r opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+            'absolute -inset-px rounded-2xl bg-gradient-to-r opacity-0 group-hover:opacity-60 transition-opacity duration-500',
             borderGradients[gradient]
           )}
         />
@@ -175,8 +175,8 @@ export const FeatureCard = forwardRef<HTMLDivElement, FeatureCardProps>(
           {shine && (
             <div
               className={cn(
-                'absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000',
-                'bg-gradient-to-r from-transparent via-white/5 to-transparent skew-x-12'
+                'absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-[1200ms]',
+                'bg-gradient-to-r from-transparent via-white/3 to-transparent skew-x-12'
               )}
             />
           )}
