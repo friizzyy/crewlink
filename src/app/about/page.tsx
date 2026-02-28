@@ -141,7 +141,7 @@ function StatsSection() {
   }
 
   return (
-    <section className="py-16">
+    <section className="py-16 sm:py-24">
       <div
         ref={ref}
         className={cn(
@@ -187,7 +187,7 @@ function StorySection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="py-20">
+    <section className="py-16 sm:py-24">
       <div
         ref={ref}
         className={cn(
@@ -263,7 +263,7 @@ function ValuesSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="py-20 relative">
+    <section className="py-16 sm:py-24 relative">
       {/* Background */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-500/5 rounded-full blur-[120px]" />
@@ -339,7 +339,7 @@ function TeamSection() {
   }
 
   return (
-    <section className="py-20">
+    <section className="py-16 sm:py-24">
       <div
         ref={ref}
         className={cn(
@@ -347,7 +347,7 @@ function TeamSection() {
           getRevealClasses(isVisible)
         )}
       >
-        <div className="text-center mb-12">
+        <div className="text-center mb-8 sm:mb-12">
           <Badge variant="brand" size="md" className="mb-6">
             <Users className="w-4 h-4 mr-2" />
             Leadership
@@ -406,7 +406,7 @@ function InvestorsSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="py-16">
+    <section className="py-16 sm:py-24">
       <div
         ref={ref}
         className={cn(
@@ -448,7 +448,7 @@ function CTASection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section className="py-20">
+    <section className="py-16 sm:py-24">
       <div
         ref={ref}
         className={cn(

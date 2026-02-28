@@ -570,7 +570,7 @@ export default function HiringDashboardPage() {
                       return (
                         <div
                           key={item.id}
-                          className="group/item flex items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-white/[0.02] animate-stagger-fade"
+                          className="group/item flex items-center gap-4 rounded-xl px-3 py-3 transition-colors hover:bg-white/5 animate-stagger-fade"
                           style={{ animationDelay: `${idx * 80}ms` }}
                         >
                           <div

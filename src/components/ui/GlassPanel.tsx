@@ -19,9 +19,9 @@ export interface GlassPanelProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const variants = {
-  default: 'bg-slate-900/80 backdrop-blur-md',
-  elevated: 'bg-slate-900/90 backdrop-blur-lg shadow-xl',
-  subtle: 'bg-slate-900/60 backdrop-blur-sm',
+  default: 'bg-slate-900/60 backdrop-blur-md',
+  elevated: 'bg-slate-900/80 backdrop-blur-lg shadow-heavy',
+  subtle: 'bg-slate-900/40 backdrop-blur-sm',
   solid: 'bg-slate-900',
 }
 

@@ -152,7 +152,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Main Content - Two Column Desktop */}
-      <section ref={contentReveal.ref} className="py-8 sm:py-12">
+      <section ref={contentReveal.ref} className="py-16 sm:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Mode Toggle */}
           <div className={`flex justify-center mb-8 ${getRevealClasses(contentReveal.isVisible, 'up')}`}>
@@ -404,7 +404,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA - Compact */}
-      <section ref={ctaReveal.ref} className="py-12 pb-20">
+      <section ref={ctaReveal.ref} className="py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <GlassPanel
             variant="elevated"

@@ -441,7 +441,7 @@ function StatsSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-8 sm:py-12">
+    <section ref={ref} className="py-16 sm:py-24">
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {trustStats.map((stat, i) => (
@@ -471,10 +471,10 @@ function TrustPillarsSection() {
   const [activePillar, setActivePillar] = useState(0)
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Section header */}
-        <div className="text-center mb-10 sm:mb-14">
+        <div className="text-center mb-8 sm:mb-12">
           <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
             <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
               How we protect you
@@ -603,10 +603,10 @@ function SafetyTipsSection() {
   const isWorkers = tipsMode === 'workers'
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8 sm:mb-12">
           <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
             <span className="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
               Stay safe on CrewLink
@@ -662,7 +662,7 @@ function FAQSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-12">
           <h2 className={`font-display text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}>
@@ -697,7 +697,7 @@ function SupportCTASection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid md:grid-cols-2 gap-4 sm:gap-6">
           {/* Report card */}
@@ -741,7 +741,7 @@ function EmergencyCTASection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16">
+    <section ref={ref} className="py-16 sm:py-24">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         <GlassPanel
           variant="elevated"

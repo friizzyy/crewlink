@@ -71,11 +71,11 @@ export function Modal({
     <div
       ref={overlayRef}
       onClick={handleOverlayClick}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
     >
       <div
         className={cn(
-          'relative w-full bg-white rounded-2xl shadow-xl animate-scale-in',
+          'relative w-full bg-slate-900 border border-white/[0.06] rounded-2xl shadow-xl animate-scale-in',
           sizes[size],
           className
         )}
@@ -88,12 +88,12 @@ export function Modal({
           <div className="flex items-start justify-between p-6 pb-0">
             <div>
               {title && (
-                <h2 id="modal-title" className="text-lg font-semibold text-slate-900">
+                <h2 id="modal-title" className="text-lg font-semibold text-white">
                   {title}
                 </h2>
               )}
               {description && (
-                <p id="modal-description" className="text-sm text-slate-500 mt-1">
+                <p id="modal-description" className="text-sm text-slate-400 mt-1">
                   {description}
                 </p>
               )}
@@ -105,7 +105,7 @@ export function Modal({
                 icon={<X size={18} />}
                 aria-label="Close modal"
                 onClick={onClose}
-                className="shrink-0 -mt-1 -mr-1"
+                className="shrink-0 -mt-1 -mr-1 text-slate-500 hover:text-white hover:bg-white/5"
               />
             )}
           </div>
@@ -229,7 +229,7 @@ export function BottomSheet({
       <div
         ref={sheetRef}
         className={cn(
-          'absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl',
+          'absolute bottom-0 left-0 right-0 bg-slate-900 rounded-t-3xl shadow-xl',
           'animate-slide-up overflow-hidden',
           heights[height],
           className
@@ -247,12 +247,12 @@ export function BottomSheet({
             onTouchEnd={handleDragEnd}
             onMouseDown={handleMouseDown}
           >
-            <div className="w-10 h-1 bg-slate-300 rounded-full" />
+            <div className="w-10 h-1 bg-slate-600 rounded-full" />
           </div>
         )}
         {(title || showClose) && (
-          <div className="flex items-center justify-between px-6 py-3 border-b border-slate-100">
-            {title && <h2 className="text-lg font-semibold text-slate-900">{title}</h2>}
+          <div className="flex items-center justify-between px-6 py-3 border-b border-white/[0.06]">
+            {title && <h2 className="text-lg font-semibold text-white">{title}</h2>}
             {showClose && (
               <IconButton
                 variant="ghost"
@@ -260,6 +260,7 @@ export function BottomSheet({
                 icon={<X size={18} />}
                 aria-label="Close"
                 onClick={onClose}
+                className="text-slate-500 hover:text-white hover:bg-white/5"
               />
             )}
           </div>
@@ -303,8 +304,8 @@ export function ConfirmDialog({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm" showClose={false}>
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
-        {description && <p className="text-slate-500 mb-6">{description}</p>}
+        <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
+        {description && <p className="text-slate-400 mb-6">{description}</p>}
         <div className="flex gap-3">
           <button
             type="button"
@@ -373,21 +374,22 @@ export function Drawer({
       />
       <div
         className={cn(
-          'absolute top-0 bottom-0 bg-white shadow-xl overflow-auto',
+          'absolute top-0 bottom-0 bg-slate-900 shadow-xl overflow-auto',
           side === 'right' ? 'right-0 animate-slide-in-right' : 'left-0 animate-slide-in-left',
           className
         )}
         style={{ width }}
       >
         {title && (
-          <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-            <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/[0.06]">
+            <h2 className="text-lg font-semibold text-white">{title}</h2>
             <IconButton
               variant="ghost"
               size="icon-sm"
               icon={<X size={18} />}
               aria-label="Close drawer"
               onClick={onClose}
+              className="text-slate-500 hover:text-white hover:bg-white/5"
             />
           </div>
         )}

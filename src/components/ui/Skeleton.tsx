@@ -40,7 +40,7 @@ export function SkeletonCard({
   return (
     <div
       className={cn(
-        'rounded-2xl bg-slate-900/80 border border-white/5 p-5 space-y-4',
+        'rounded-2xl bg-slate-900/60 border border-white/[0.06] p-5 space-y-4',
         className
       )}
     >
@@ -88,7 +88,7 @@ export function SkeletonJobCard({ className }: SkeletonJobCardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl bg-slate-900/80 border border-white/5 p-5 space-y-4',
+        'rounded-2xl bg-slate-900/60 border border-white/[0.06] p-5 space-y-4',
         className
       )}
     >
@@ -143,7 +143,7 @@ export function SkeletonStatCard({ className }: SkeletonStatCardProps) {
   return (
     <div
       className={cn(
-        'rounded-2xl bg-slate-900/80 border border-white/5 p-5 space-y-3',
+        'rounded-2xl bg-slate-900/60 border border-white/[0.06] p-5 space-y-3',
         className
       )}
     >

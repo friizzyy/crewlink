@@ -141,7 +141,7 @@ export const Avatar = forwardRef<HTMLDivElement, AvatarProps>(
         {status && (
           <span
             className={cn(
-              'absolute rounded-full border-2 border-white',
+              'absolute rounded-full border-2 border-slate-900',
               statusColors[status],
               statusSizes[size]
             )}
@@ -191,7 +191,7 @@ export function Rating({ value, max = 5, size = 'md', showValue = true, classNam
         ))}
       </div>
       {showValue && (
-        <span className={cn('font-medium text-slate-700', size === 'sm' ? 'text-xs' : 'text-sm')}>
+        <span className={cn('font-medium text-slate-300', size === 'sm' ? 'text-xs' : 'text-sm')}>
           {value.toFixed(1)}
         </span>
       )}
@@ -241,7 +241,7 @@ export function EmptyState({ icon, title, description, action, className }: Empt
   return (
     <div className={cn('empty-state', className)}>
       {icon && <div className="text-slate-400 mb-4">{icon}</div>}
-      <h3 className="text-lg font-semibold text-slate-900 mb-1">{title}</h3>
+      <h3 className="text-lg font-semibold text-white mb-1">{title}</h3>
       {description && <p className="text-slate-500 mb-6 max-w-sm">{description}</p>}
       {action}
     </div>
@@ -300,20 +300,20 @@ export interface DividerProps {
 
 export function Divider({ orientation = 'horizontal', label, className }: DividerProps) {
   if (orientation === 'vertical') {
-    return <div className={cn('w-px bg-slate-200 h-full', className)} />
+    return <div className={cn('w-px bg-white/[0.06] h-full', className)} />
   }
 
   if (label) {
     return (
       <div className={cn('flex items-center gap-4', className)}>
-        <div className="flex-1 h-px bg-slate-200" />
+        <div className="flex-1 h-px bg-white/[0.06]" />
         <span className="text-sm text-slate-500">{label}</span>
-        <div className="flex-1 h-px bg-slate-200" />
+        <div className="flex-1 h-px bg-white/[0.06]" />
       </div>
     )
   }
 
-  return <div className={cn('h-px bg-slate-200 w-full', className)} />
+  return <div className={cn('h-px bg-white/[0.06] w-full', className)} />
 }
 
 // ============================================
@@ -328,11 +328,11 @@ export interface StatusIndicatorProps {
 
 export function StatusIndicator({ status, label, className }: StatusIndicatorProps) {
   const statusConfig = {
-    success: { icon: CheckCircle, color: 'text-success-600', bg: 'bg-success-50' },
-    error: { icon: XCircle, color: 'text-red-600', bg: 'bg-red-50' },
-    warning: { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50' },
-    info: { icon: CheckCircle, color: 'text-brand-600', bg: 'bg-brand-50' },
-    pending: { icon: Clock, color: 'text-slate-600', bg: 'bg-slate-50' },
+    success: { icon: CheckCircle, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+    error: { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10' },
+    warning: { icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+    info: { icon: CheckCircle, color: 'text-brand-400', bg: 'bg-brand-500/10' },
+    pending: { icon: Clock, color: 'text-slate-400', bg: 'bg-slate-500/10' },
   }
 
   const config = statusConfig[status]
@@ -371,7 +371,7 @@ export function StatCard({ label, value, icon, trend, className }: StatCardProps
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm text-slate-500 mb-1">{label}</p>
-          <p className="text-2xl font-semibold text-slate-900">{value}</p>
+          <p className="text-2xl font-semibold text-white">{value}</p>
           {trend && (
             <p
               className={cn(
@@ -458,7 +458,7 @@ export function PriceDisplay({ amount, min, max, type, size = 'md', className }:
   return (
     <div className={cn('flex items-center gap-1', sizes[size], className)}>
       <DollarSign className="w-4 h-4 text-slate-400" />
-      <span className="font-semibold text-slate-900">{display}</span>
+      <span className="font-semibold text-white">{display}</span>
       {suffix && <span className="text-slate-500">{suffix}</span>}
     </div>
   )

@@ -254,7 +254,7 @@ export default function HelpPage() {
       </section>
 
       {/* Categories */}
-      <section className="py-20 relative">
+      <section className="py-16 sm:py-24 relative">
         <div
           ref={categoriesRef.ref}
           className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ${getRevealClasses(categoriesRef.isVisible, 'up')}`}
@@ -311,7 +311,7 @@ export default function HelpPage() {
       </section>
 
       {/* Popular Articles */}
-      <section className="py-20 relative">
+      <section className="py-16 sm:py-24 relative">
         <div
           ref={articlesRef.ref}
           className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${getRevealClasses(articlesRef.isVisible, 'up')}`}
@@ -349,12 +349,12 @@ export default function HelpPage() {
       </section>
 
       {/* Contact Section */}
-      <section className="py-20 relative">
+      <section className="py-16 sm:py-24 relative">
         <div
           ref={contactRef.ref}
           className={`max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 ${getRevealClasses(contactRef.isVisible, 'up')}`}
         >
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 sm:mb-12">
             <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mb-4">
               Still need help?
             </h2>

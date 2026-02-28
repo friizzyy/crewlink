@@ -405,7 +405,7 @@ function PricingSection({ mode }: { mode: 'hire' | 'work' }) {
       id={`${mode}-panel`}
       role="tabpanel"
       aria-labelledby={`${mode}-tab`}
-      className="py-8 sm:py-12"
+      className="py-16 sm:py-24"
     >
       <div className="max-w-5xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
@@ -444,7 +444,7 @@ function TransparencySection({ mode }: { mode: 'hire' | 'work' }) {
   }
 
   return (
-    <section ref={ref} className="py-10 sm:py-16">
+    <section ref={ref} className="py-16 sm:py-24">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-12">
           <div
@@ -555,9 +555,9 @@ function ValueSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12">
-        <div className="text-center mb-8 sm:mb-14">
+        <div className="text-center mb-8 sm:mb-12">
           <h2
             className={`font-display text-2xl sm:text-3xl font-bold tracking-tight ${getRevealClasses(isVisible, 'up')}`}
           >
@@ -599,7 +599,7 @@ function FAQSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16 border-t border-white/5">
+    <section ref={ref} className="py-16 sm:py-24 border-t border-white/5">
       <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-12">
         <div className="text-center mb-8 sm:mb-12">
           <h2
@@ -644,7 +644,7 @@ function CTASection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>()
 
   return (
-    <section ref={ref} className="py-10 sm:py-16">
+    <section ref={ref} className="py-16 sm:py-24">
       <div className="max-w-4xl mx-auto px-6 sm:px-8 lg:px-12">
         <GlassPanel
           variant="elevated"
