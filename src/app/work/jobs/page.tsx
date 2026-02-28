@@ -504,7 +504,7 @@ export default function WorkJobsPage() {
       <AmbientBackground />
 
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
+      <div className="border-b border-emerald-500/20 shadow-[0_1px_12px_-2px_rgba(16,185,129,0.06)] bg-slate-900/50 relative z-10">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -525,7 +525,7 @@ export default function WorkJobsPage() {
           </div>
 
           {/* Search */}
-          <GlassPanel variant="default" padding="none" border="glow" rounded="xl" className="border-emerald-500/20">
+          <GlassPanel variant="default" padding="none" border="glow" rounded="xl" className="border-emerald-500/20 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] transition-shadow duration-300">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
               <input
@@ -551,7 +551,7 @@ export default function WorkJobsPage() {
 
           {/* AI filter indicator */}
           {aiFilters && (
-            <div className="flex items-center gap-2 mt-2 text-xs text-emerald-400">
+            <div className="flex items-center gap-2 mt-2 px-3 py-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/20 text-xs text-emerald-400">
               <Sparkles className="w-3.5 h-3.5" />
               <span>AI-powered search active</span>
               {aiFilters.category && (
@@ -587,7 +587,7 @@ export default function WorkJobsPage() {
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all',
                   selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]'
+                    ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/20 text-emerald-400 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.25)]'
                     : 'bg-slate-800/50 text-slate-400 hover:text-white border border-transparent'
                 )}
                 aria-pressed={selectedCategory === cat.id}
@@ -690,12 +690,12 @@ export default function WorkJobsPage() {
                   key={job.id}
                   interactive={false}
                   padding="lg"
-                  className="animate-card-enter"
+                  className="animate-card-enter hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-300"
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
                   <div className="flex gap-4">
                     {/* Category Icon */}
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-3xl shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center text-3xl shrink-0 shadow-[0_4px_12px_-2px_rgba(16,185,129,0.1)]">
                       {categoryIcon}
                     </div>
 

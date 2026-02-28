@@ -330,7 +330,7 @@ export default function HiringMessagesPage() {
                 key={conv.id}
                 onClick={() => setSelectedConversation(conv.id)}
                 className={cn(
-                  'w-full p-4 flex gap-3 hover:bg-white/5 transition-all text-left border-b border-white/5',
+                  'w-full p-4 flex gap-3 hover:bg-white/[0.04] transition-colors duration-200 text-left border-b border-white/5',
                   selectedConversation === conv.id && 'bg-cyan-500/10 border-l-2 border-l-cyan-400'
                 )}
               >
@@ -349,7 +349,7 @@ export default function HiringMessagesPage() {
                         {conv.otherUser?.name || 'Unknown User'}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-500 shrink-0">
+                    <span className="text-xs text-slate-400 shrink-0">
                       {conv.lastMessageAt ? formatTime(conv.lastMessageAt) : ''}
                     </span>
                   </div>
@@ -385,7 +385,7 @@ export default function HiringMessagesPage() {
       {selectedConversation && currentConversation ? (
         <div className="flex-1 flex flex-col relative z-10">
           {/* Chat Header */}
-          <GlassPanel variant="default" padding="md" border="none" rounded="none" className="border-b border-white/5 flex items-center justify-between">
+          <GlassPanel variant="default" padding="md" border="none" rounded="none" className="border-b border-cyan-500/20 shadow-[0_1px_8px_-2px_rgba(6,182,212,0.06)] flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setSelectedConversation(null)}
@@ -476,7 +476,7 @@ export default function HiringMessagesPage() {
                         <div
                           className={cn(
                             'flex items-center justify-end gap-1 mt-1',
-                            isFromMe ? 'text-cyan-400/70' : 'text-slate-500'
+                            isFromMe ? 'text-cyan-300/80' : 'text-slate-400'
                           )}
                         >
                           <span className="text-xs">{formatMessageTime(message.createdAt)}</span>
@@ -510,7 +510,7 @@ export default function HiringMessagesPage() {
                   placeholder="Type a message..."
                   rows={1}
                   disabled={isSending}
-                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-white/5 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] resize-none min-h-[42px] max-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  className="w-full px-4 py-2.5 bg-slate-800/50 border border-cyan-500/20 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/40 focus:shadow-[0_0_20px_rgba(6,182,212,0.15)] resize-none min-h-[42px] max-h-[120px] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   style={{ overflow: 'hidden' }}
                 />
               </div>
@@ -523,7 +523,7 @@ export default function HiringMessagesPage() {
                 onClick={handleSendMessage}
                 disabled={!messageText.trim() || isSending}
                 isLoading={isSending}
-                className={!messageText.trim() && !isSending ? 'opacity-50' : ''}
+                className={cn(!messageText.trim() && !isSending ? 'opacity-50' : '', 'hover:shadow-[0_0_16px_rgba(6,182,212,0.3)] transition-shadow')}
               >
                 <Send className="w-5 h-5" />
               </Button>

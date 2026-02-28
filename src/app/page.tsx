@@ -159,8 +159,8 @@ function MobileFloatingCard({
       <div
         className={`
           relative p-2 rounded-xl
-          bg-slate-900/90 border border-white/10
-          shadow-lg
+          bg-slate-900/90 backdrop-blur-md border border-white/[0.08]
+          shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]
           ${card.isSuccess ? 'border-emerald-500/30' : ''}
         `}
       >
@@ -210,10 +210,11 @@ function DesktopFloatingCard({
       <div
         className={`
           relative p-4 rounded-2xl
-          bg-slate-900/80 border border-white/10
-          shadow-2xl shadow-black/20
+          bg-slate-900/80 backdrop-blur-md border border-white/[0.08]
+          shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)]
+          hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6),inset_0_1px_1px_0_rgba(255,255,255,0.06)]
           ${card.isSuccess ? 'border-emerald-500/30' : ''}
-          ${!reducedMotion ? 'hover:translate-y-[-4px] transition-transform duration-300' : ''}
+          ${!reducedMotion ? 'hover:translate-y-[-4px] hover:border-white/[0.12] transition-all duration-300' : 'hover:border-white/[0.12] transition-all duration-300'}
         `}
         style={{
           animation: !reducedMotion ? `float-gentle 6s ease-in-out infinite ${card.delay}s` : 'none',
@@ -437,11 +438,12 @@ export default function HomePage() {
             >
               <Link
                 href="/create-account?mode=hire"
-                className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-2xl shadow-cyan-500/10 w-full sm:w-auto"
+                className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6)] transition-shadow duration-300 w-full sm:w-auto"
                 data-qa="cta-hire-help"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
                 <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <span className="relative flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 text-sm sm:text-lg font-semibold">
                   <Briefcase className="w-4 h-4 sm:w-5 sm:h-5" />
                   Hire Help Now
@@ -456,6 +458,7 @@ export default function HomePage() {
               >
                 <div className="absolute inset-0 border border-emerald-500/30 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/50 transition-colors" />
                 <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
+                <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                 <span className="relative flex items-center justify-center gap-2 px-6 sm:px-10 py-3.5 sm:py-5 text-sm sm:text-lg font-semibold text-emerald-400">
                   <DollarSign className="w-4 h-4 sm:w-5 sm:h-5" />
                   Start Earning
@@ -491,8 +494,12 @@ export default function HomePage() {
       {/* ============ STATS BAR ============ */}
       <section
         ref={statsReveal.ref}
-        className="py-6 sm:py-8 border-y border-white/5 bg-slate-900/30"
+        className="relative py-6 sm:py-8"
       >
+        {/* Top gradient divider */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        {/* Bottom gradient divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div
           className="max-w-5xl mx-auto px-5 sm:px-6"
           style={isMobile || isTablet ? mobileStatsReveal.style : {
@@ -500,6 +507,7 @@ export default function HomePage() {
             transition: 'opacity 0.5s ease-out',
           }}
         >
+          <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl border border-white/[0.06] p-6 sm:p-8 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.3)]">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
             {[
               { value: '50K+', label: 'Jobs Completed', icon: CheckCircle2 },
@@ -527,6 +535,7 @@ export default function HomePage() {
                 <span className="text-[10px] sm:text-sm text-slate-500">{stat.label}</span>
               </div>
             ))}
+          </div>
           </div>
         </div>
       </section>
@@ -591,7 +600,11 @@ export default function HomePage() {
       </section>
 
       {/* ============ HOW IT WORKS ============ */}
-      <section ref={howReveal.ref} className="py-10 sm:py-16 border-y border-white/5 bg-slate-900/20">
+      <section ref={howReveal.ref} className="relative py-10 sm:py-16 bg-slate-900/20">
+        {/* Top gradient divider */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        {/* Bottom gradient divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div
             style={isMobile || isTablet ? mobileHowReveal.style : {
@@ -708,7 +721,11 @@ export default function HomePage() {
       </section>
 
       {/* ============ TESTIMONIALS ============ */}
-      <section ref={testimonialsReveal.ref} className="py-14 sm:py-20 border-y border-white/5 bg-slate-900/20">
+      <section ref={testimonialsReveal.ref} className="relative py-14 sm:py-20 bg-slate-900/20">
+        {/* Top gradient divider */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+        {/* Bottom gradient divider */}
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
         <div className="max-w-5xl mx-auto px-5 sm:px-8">
           <div
             className="text-center mb-8 sm:mb-12"
@@ -812,10 +829,11 @@ export default function HomePage() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href="/create-account?mode=hire"
-                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-lg shadow-cyan-500/10"
+                  className="group relative overflow-hidden rounded-xl sm:rounded-2xl shadow-[0_8px_32px_-8px_rgba(0,0,0,0.5)] hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.6)] transition-shadow duration-300"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600" />
                   <div className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   <span className="relative flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white">
                     <Briefcase className="w-4 h-4" />
                     Start Hiring
@@ -828,6 +846,7 @@ export default function HomePage() {
                 >
                   <div className="absolute inset-0 border border-emerald-500/30 rounded-xl sm:rounded-2xl group-hover:border-emerald-400/50 transition-colors" />
                   <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors" />
+                  <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/10 to-transparent" />
                   <span className="relative flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-emerald-400">
                     <DollarSign className="w-4 h-4" />
                     Start Earning

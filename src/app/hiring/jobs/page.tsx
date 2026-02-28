@@ -200,7 +200,7 @@ export default function HiringJobsPage() {
       )}
 
       {/* Header */}
-      <div className="border-b border-white/5 bg-slate-900/50 relative z-10">
+      <div className="border-b border-cyan-500/20 shadow-[0_1px_12px_-2px_rgba(6,182,212,0.06)] bg-slate-900/50 relative z-10">
         <div className="max-w-5xl mx-auto px-4 py-6">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -228,7 +228,7 @@ export default function HiringJobsPage() {
                 padding="md"
                 border="light"
                 rounded="xl"
-                className="animate-card-enter"
+                className="animate-card-enter shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] transition-shadow duration-300"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="text-2xl font-bold text-white">{stat.value}</div>
@@ -316,14 +316,14 @@ export default function HiringJobsPage() {
                   interactive={false}
                   padding="lg"
                   className={cn(
-                    'border-l-4 animate-card-enter',
+                    'border-l-4 animate-card-enter hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-300',
                     statusInfo.borderColor
                   )}
                   style={{ animationDelay: `${index * 80}ms` }}
                 >
                   <div className="flex gap-4">
                     {/* Category Icon */}
-                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0">
+                    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-500/20 to-blue-500/20 flex items-center justify-center shrink-0 shadow-[0_4px_12px_-2px_rgba(6,182,212,0.1)]">
                       {(() => {
                         const CategoryIcon = categoryIcons[job.category] || ClipboardList
                         return <CategoryIcon className="w-7 h-7 text-cyan-400" />

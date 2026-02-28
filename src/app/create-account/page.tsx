@@ -178,7 +178,7 @@ export default function CreateAccountPage() {
                 {/* Hire Option */}
                 <button
                   onClick={() => { setUserType('hire'); setStep(2); }}
-                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-cyan-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-cyan-500/5 hover:shadow-lg hover:shadow-cyan-500/10 animate-slide-up"
+                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-cyan-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-cyan-500/5 hover:shadow-[0_8px_24px_-4px_rgba(6,182,212,0.12)] animate-slide-up"
                   style={{ animationDelay: '100ms' }}
                 >
                   <div className="flex items-start gap-4">
@@ -196,7 +196,7 @@ export default function CreateAccountPage() {
                 {/* Work Option */}
                 <button
                   onClick={() => { setUserType('work'); setStep(2); }}
-                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-emerald-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-emerald-500/5 hover:shadow-lg hover:shadow-emerald-500/10 animate-slide-up"
+                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-emerald-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-emerald-500/5 hover:shadow-[0_8px_24px_-4px_rgba(6,182,212,0.12)] animate-slide-up"
                   style={{ animationDelay: '200ms' }}
                 >
                   <div className="flex items-start gap-4">
@@ -214,7 +214,7 @@ export default function CreateAccountPage() {
                 {/* Both Option */}
                 <button
                   onClick={() => { setUserType('both'); setStep(2); }}
-                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-purple-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-purple-500/5 hover:shadow-lg hover:shadow-purple-500/10 animate-slide-up"
+                  className="group w-full p-5 rounded-2xl border-2 border-white/10 hover:border-purple-500/50 bg-slate-900/50 backdrop-blur-sm text-left transition-all duration-300 hover:bg-purple-500/5 hover:shadow-[0_8px_24px_-4px_rgba(6,182,212,0.12)] animate-slide-up"
                   style={{ animationDelay: '300ms' }}
                 >
                   <div className="flex items-start gap-4">
@@ -259,7 +259,7 @@ export default function CreateAccountPage() {
               <div className="space-y-3 mb-6">
                 <button
                   onClick={handleSocialLogin}
-                  className="group relative w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800 hover:border-white/20 transition-all duration-300 overflow-hidden"
+                  className="group relative w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white font-medium hover:bg-slate-800 hover:border-white/20 transition-all duration-300 overflow-hidden"
                 >
                   {/* Shine effect */}
                   <div className="absolute inset-0 overflow-hidden">
@@ -272,9 +272,9 @@ export default function CreateAccountPage() {
 
               {/* Divider */}
               <div className="flex items-center gap-4 mb-6">
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent h-px" />
                 <span className="text-sm text-slate-500 px-2">or</span>
-                <div className="flex-1 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <div className="flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-transparent h-px" />
               </div>
 
               {/* Form */}
@@ -304,7 +304,7 @@ export default function CreateAccountPage() {
                           onFocus={() => setFocusedField('firstName')}
                           onBlur={() => setFocusedField(null)}
                           placeholder="John"
-                          className={`w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all`}
+                          className={`w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all`}
                           required
                         />
                       </div>
@@ -327,7 +327,7 @@ export default function CreateAccountPage() {
                         onFocus={() => setFocusedField('lastName')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="Doe"
-                        className="relative w-full px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="relative w-full px-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -352,7 +352,7 @@ export default function CreateAccountPage() {
                         onFocus={() => setFocusedField('email')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="you@example.com"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -377,7 +377,7 @@ export default function CreateAccountPage() {
                         onFocus={() => setFocusedField('phone')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="+1 (555) 123-4567"
-                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-4 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                     </div>
@@ -402,13 +402,13 @@ export default function CreateAccountPage() {
                         onFocus={() => setFocusedField('password')}
                         onBlur={() => setFocusedField(null)}
                         placeholder="Create a strong password"
-                        className="w-full pl-12 pr-12 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
+                        className="w-full pl-12 pr-12 py-3.5 bg-slate-900/70 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-white/30 transition-all"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white hover:bg-white/[0.06] focus:text-cyan-400 transition-colors duration-200 rounded-lg p-1"
                       >
                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>

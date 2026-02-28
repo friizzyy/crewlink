@@ -237,9 +237,9 @@ function DemandBar({ level, jobCount, maxJobs }: { level: 'high' | 'medium' | 'l
   const percentage = maxJobs > 0 ? Math.max((jobCount / maxJobs) * 100, 8) : 8
 
   return (
-    <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
+    <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden shadow-[inset_0_0_8px_rgba(16,185,129,0.08)]">
       <div
-        className={`${barColors[level]} h-2 rounded-full transition-all duration-700 ease-out`}
+        className={`${barColors[level]} h-2 rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(16,185,129,0.25)]`}
         style={{ width: `${percentage}%` }}
       />
     </div>
@@ -466,7 +466,7 @@ export default function WorkDashboardPage() {
                 padding="lg"
                 border="light"
                 rounded="xl"
-                className="overflow-hidden relative md:p-8"
+                className="overflow-hidden relative md:p-8 shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:border-emerald-500/20 transition-all duration-300"
               >
                 {/* Subtle gradient accent */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
@@ -481,7 +481,7 @@ export default function WorkDashboardPage() {
                       </span>
                     </div>
                     <div className="flex items-baseline gap-3">
-                      <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent animate-glow-pulse">
+                      <span className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-emerald-300 to-teal-300 bg-clip-text text-transparent animate-glow-pulse">
                         {formatCurrency(availableBalance)}
                       </span>
                       <div className="w-24 h-12 flex-shrink-0">
@@ -561,9 +561,9 @@ export default function WorkDashboardPage() {
                     </p>
 
                     {/* Progress bar */}
-                    <div className="w-full bg-slate-800/80 rounded-full h-2 mb-3">
+                    <div className="w-full bg-slate-800/80 rounded-full h-2 mb-3 shadow-[inset_0_0_8px_rgba(16,185,129,0.08)]">
                       <div
-                        className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-700 ease-out"
+                        className="bg-gradient-to-r from-emerald-500 to-teal-500 h-2 rounded-full transition-all duration-700 ease-out shadow-[0_0_12px_rgba(16,185,129,0.25)]"
                         style={{ width: `${profileCompleteness}%` }}
                       />
                     </div>
@@ -709,7 +709,7 @@ export default function WorkDashboardPage() {
                   </button>
                 </GlassPanel>
               ) : (
-                <GlassPanel variant="subtle" padding="lg" border="light" rounded="xl">
+                <GlassPanel variant="subtle" padding="lg" border="light" rounded="xl" className="shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] hover:border-emerald-500/20 transition-all duration-300">
                   <div className="flex items-center justify-between mb-5">
                     <h2 className="text-base font-semibold text-white">Active Bids</h2>
                     <Link
@@ -771,7 +771,7 @@ export default function WorkDashboardPage() {
             {/* RIGHT: Quick Actions + Demand Insights */}
             <motion.div variants={itemVariants} className="space-y-6">
               {/* Quick Actions */}
-              <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
+              <GlassPanel variant="default" padding="lg" border="light" rounded="xl" className="hover:border-emerald-500/20 transition-all duration-300">
                 <h2 className="text-base font-semibold text-white mb-4">Quick Actions</h2>
                 <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1">
                   {workerQuickActions.map((action, idx) => (
@@ -806,7 +806,7 @@ export default function WorkDashboardPage() {
 
               {/* Demand Insights */}
               {profile?.baseAddress && (
-                <GlassPanel variant="default" padding="lg" border="light" rounded="xl">
+                <GlassPanel variant="default" padding="lg" border="light" rounded="xl" className="border-emerald-500/[0.15] hover:shadow-[0_0_24px_rgba(16,185,129,0.1)] transition-shadow duration-300">
                   <div className="flex items-center justify-between mb-4">
                     <div>
                       <h2 className="text-base font-semibold text-white">Demand Insights</h2>

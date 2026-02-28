@@ -121,26 +121,26 @@ function formatChange(value: number, isCurrency = false): string {
 function getActivityIcon(type: string) {
   switch (type) {
     case 'new_bid':
-      return { icon: Users, color: 'text-cyan-400', bg: 'bg-cyan-500/10' }
+      return { icon: Users, color: 'text-cyan-400', bg: 'bg-cyan-500/20' }
     case 'bid_accepted':
-      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
+      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/20' }
     case 'bid_rejected':
-      return { icon: Users, color: 'text-slate-400', bg: 'bg-slate-500/10' }
+      return { icon: Users, color: 'text-slate-400', bg: 'bg-slate-500/15' }
     case 'payment_received':
     case 'payment_sent':
-      return { icon: CreditCard, color: 'text-violet-400', bg: 'bg-violet-500/10' }
+      return { icon: CreditCard, color: 'text-violet-400', bg: 'bg-violet-500/20' }
     case 'booking_confirmed':
-      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
+      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/20' }
     case 'booking_cancelled':
-      return { icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10' }
+      return { icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/20' }
     case 'message':
-      return { icon: MessageCircle, color: 'text-blue-400', bg: 'bg-blue-500/10' }
+      return { icon: MessageCircle, color: 'text-blue-400', bg: 'bg-blue-500/20' }
     case 'review_received':
-      return { icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/10' }
+      return { icon: Star, color: 'text-amber-400', bg: 'bg-amber-500/20' }
     case 'job_completed':
-      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
+      return { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/20' }
     default:
-      return { icon: Bell, color: 'text-slate-400', bg: 'bg-slate-500/10' }
+      return { icon: Bell, color: 'text-slate-400', bg: 'bg-slate-500/15' }
   }
 }
 
@@ -506,7 +506,7 @@ export default function HiringDashboardPage() {
                 padding="none"
                 border="light"
                 rounded="xl"
-                className="overflow-hidden"
+                className="overflow-hidden hover:shadow-[0_0_24px_rgba(6,182,212,0.12)] transition-shadow duration-300"
               >
                 <div className="flex items-center justify-between border-b border-white/5 px-6 py-4">
                   <h2 className="text-lg font-semibold text-white">
@@ -611,7 +611,7 @@ export default function HiringDashboardPage() {
                   padding="none"
                   border="light"
                   rounded="xl"
-                  className="overflow-hidden"
+                  className="overflow-hidden hover:shadow-[0_0_24px_rgba(6,182,212,0.12)] transition-shadow duration-300"
                 >
                   <div className="border-b border-white/5 px-6 py-4">
                     <h2 className="text-lg font-semibold text-white">
@@ -628,7 +628,7 @@ export default function HiringDashboardPage() {
                         <GlassCard
                           interactive
                           padding="md"
-                          className="flex w-[120px] flex-col items-center gap-2.5 text-center animate-card-enter"
+                          className="flex w-[120px] flex-col items-center gap-2.5 text-center animate-card-enter shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] hover:-translate-y-0.5 hover:shadow-[0_8px_24px_-4px_rgba(0,0,0,0.4)] transition-all duration-300"
                           style={{ animationDelay: `${idx * 80}ms` }}
                         >
                           <div
@@ -651,7 +651,7 @@ export default function HiringDashboardPage() {
               </motion.div>
 
               {/* AI Insight Card */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="shadow-[0_8px_32px_rgba(249,115,22,0.08)] rounded-2xl">
                 <FeatureCard gradient="amber" shine>
                   <div className="mb-4 flex items-center gap-2.5">
                     <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-amber-500 shadow-[0_4px_14px_-2px_rgba(249,115,22,0.4)]">

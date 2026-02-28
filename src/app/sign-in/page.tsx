@@ -134,17 +134,19 @@ export default function SignInPage() {
           >
             <button
               onClick={() => handleSocialLogin('google')}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
+              className="group relative overflow-hidden w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <Chrome className="w-5 h-5 group-hover:text-cyan-400 transition-colors" />
-              Continue with Google
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <Chrome className="w-5 h-5 group-hover:text-cyan-400 transition-colors relative" />
+              <span className="relative">Continue with Google</span>
             </button>
             <button
               onClick={() => handleSocialLogin('apple')}
-              className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] group"
+              className="group relative overflow-hidden w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-slate-900/60 backdrop-blur-sm border border-white/10 rounded-xl text-white font-medium hover:bg-slate-800/80 hover:border-white/20 hover:shadow-lg hover:shadow-cyan-500/5 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
             >
-              <Apple className="w-5 h-5 group-hover:text-cyan-400 transition-colors" />
-              Continue with Apple
+              <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+              <Apple className="w-5 h-5 group-hover:text-cyan-400 transition-colors relative" />
+              <span className="relative">Continue with Apple</span>
             </button>
           </div>
 
@@ -160,7 +162,7 @@ export default function SignInPage() {
 
           {/* Demo Account Info */}
           <div
-            className={`mb-6 p-4 bg-cyan-500/10 border border-cyan-500/20 rounded-xl ${getStaggerClass(3)}`}
+            className={`mb-6 p-4 bg-slate-900/60 backdrop-blur-md border border-white/[0.08] shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)] rounded-xl ${getStaggerClass(3)}`}
             style={getStaggerStyle(3)}
           >
             <p className="text-sm text-cyan-300 font-medium mb-1">Demo Account</p>
@@ -201,7 +203,7 @@ export default function SignInPage() {
                     onFocus={() => setFocusedField('email')}
                     onBlur={() => setFocusedField(null)}
                     placeholder="you@example.com"
-                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
+                    className="w-full pl-12 pr-4 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
                     required
                   />
                 </div>
@@ -239,13 +241,13 @@ export default function SignInPage() {
                     onFocus={() => setFocusedField('password')}
                     onBlur={() => setFocusedField(null)}
                     placeholder="Enter your password"
-                    className="w-full pl-12 pr-12 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
+                    className="w-full pl-12 pr-12 py-3.5 bg-slate-900/80 backdrop-blur-sm border border-white/[0.12] rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:bg-slate-900 transition-all duration-300"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors p-1 rounded-lg hover:bg-white/5"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white hover:bg-white/[0.06] focus:text-cyan-400 transition-colors duration-200 rounded-lg p-1"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>

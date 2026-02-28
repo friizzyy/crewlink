@@ -161,7 +161,7 @@ function StatsSection() {
                 border="light"
                 rounded="xl"
                 hoverable
-                className="text-center"
+                className="text-center shadow-[0_4px_16px_-4px_rgba(0,0,0,0.3)]"
                 style={{ transitionDelay: `${i * 60}ms` }}
               >
                 <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-4', colors.bg)}>
@@ -210,7 +210,7 @@ function StorySection() {
               </span>
             </h2>
 
-            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl">
+            <GlassPanel variant="elevated" padding="lg" border="light" rounded="xl" className="border-cyan-500/[0.12] shadow-[0_4px_24px_-4px_rgba(0,0,0,0.3)]">
               <div className="space-y-4 text-slate-300 leading-relaxed">
                 <p>
                   In 2023, we noticed something broken. Hiring someone for a simple task meant outdated
@@ -239,7 +239,7 @@ function StorySection() {
                   <div className={cn(
                     'absolute left-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold',
                     index === milestones.length - 1
-                      ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white'
+                      ? 'bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-[0_0_16px_rgba(6,182,212,0.3)]'
                       : 'bg-slate-800 border border-white/10 text-slate-400'
                   )}>
                     {milestone.year === 'Future' ? <Sparkles className="w-4 h-4" /> : milestone.year.slice(-2)}
@@ -299,6 +299,7 @@ function ValuesSection() {
                 key={value.title}
                 gradient={value.gradient}
                 shine
+                className="hover:shadow-[0_8px_32px_-4px_rgba(0,0,0,0.4)] transition-shadow duration-300"
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
                 <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center mb-4', {
@@ -369,7 +370,7 @@ function TeamSection() {
               href={`/team/${member.name.toLowerCase().replace(/\s+/g, '-')}`}
               className="text-center group"
             >
-              <GlassCard interactive padding="lg" rounded="xl" className="mb-0">
+              <GlassCard interactive padding="lg" rounded="xl" className="mb-0 hover:-translate-y-1 hover:shadow-[0_12px_32px_-4px_rgba(0,0,0,0.4)] transition-all duration-300">
                 <div className={cn(
                   'w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white text-2xl font-bold transition-transform group-hover:scale-105 ring-2 ring-offset-2 ring-offset-slate-900',
                   getGradient(member.color),
