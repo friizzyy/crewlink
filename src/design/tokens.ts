@@ -13,18 +13,18 @@
 // ============================================
 
 export const colors = {
-  // Primary brand - Cyan/Blue gradient
+  // Primary brand - Blue (matches tailwind brand-*)
   primary: {
     50: '#f0f7ff',
     100: '#e0effe',
     200: '#b9dffd',
     300: '#7cc5fb',
     400: '#36a7f6',
-    500: '#06b6d4', // cyan-500 - primary accent
-    600: '#0891b2', // cyan-600
-    700: '#0e7490', // cyan-700
-    800: '#155e75', // cyan-800
-    900: '#164e63', // cyan-900
+    500: '#0c8ce7', // brand-500 - primary accent
+    600: '#006fc5', // brand-600
+    700: '#0159a0', // brand-700
+    800: '#064c84', // brand-800
+    900: '#0b406e', // brand-900
   },
 
   // Secondary - Blue
@@ -120,8 +120,8 @@ export const spacing = {
 
 export const typography = {
   fontFamily: {
-    sans: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
-    display: ['var(--font-inter)', 'Inter', 'system-ui', 'sans-serif'],
+    sans: ['var(--font-geist-sans)', 'Geist Sans', 'system-ui', 'sans-serif'],
+    display: ['var(--font-geist-sans)', 'Geist Sans', 'system-ui', 'sans-serif'],
     mono: ['ui-monospace', 'SFMono-Regular', 'monospace'],
   },
 
@@ -171,9 +171,8 @@ export const shadows = {
   soft: '0 2px 8px -2px rgba(0, 0, 0, 0.08), 0 4px 16px -4px rgba(0, 0, 0, 0.06)',
   medium: '0 4px 12px -2px rgba(0, 0, 0, 0.1), 0 8px 24px -4px rgba(0, 0, 0, 0.08)',
   heavy: '0 8px 24px -4px rgba(0, 0, 0, 0.12), 0 16px 48px -8px rgba(0, 0, 0, 0.1)',
-  glow: '0 0 24px rgba(6, 182, 212, 0.25)',
-  glowStrong: '0 0 40px rgba(6, 182, 212, 0.4)',
-  glowAccent: '0 0 24px rgba(255, 127, 16, 0.3)',
+  glow: '0 0 24px rgba(12, 140, 231, 0.12)',
+  glowAccent: '0 0 24px rgba(255, 127, 16, 0.15)',
 } as const
 
 // ============================================
@@ -239,7 +238,7 @@ export const components = {
   navbar: {
     height: '80px', // h-20
     background: 'rgba(2, 6, 23, 0.8)', // slate-950/80
-    borderColor: 'rgba(6, 182, 212, 0.1)', // cyan-500/10
+    borderColor: 'rgba(255, 255, 255, 0.06)', // white/6
   },
 
   // Buttons
@@ -254,16 +253,16 @@ export const components = {
   // Cards/Panels
   card: {
     borderRadius: '1rem', // rounded-2xl
-    background: 'rgba(15, 23, 42, 0.5)', // slate-900/50
-    borderColor: 'rgba(6, 182, 212, 0.1)', // cyan-500/10
+    background: 'rgba(15, 23, 42, 0.6)', // slate-900/60
+    borderColor: 'rgba(255, 255, 255, 0.06)', // white/6
   },
 
   // Inputs
   input: {
     borderRadius: '0.75rem', // rounded-xl
-    background: 'rgba(15, 23, 42, 0.5)', // slate-900/50
-    borderColor: 'rgba(100, 116, 139, 0.3)', // slate-500/30
-    focusBorderColor: 'rgba(6, 182, 212, 0.5)', // cyan-500/50
+    background: 'rgba(30, 41, 59, 0.5)', // slate-800/50
+    borderColor: 'rgba(255, 255, 255, 0.10)', // white/10
+    focusBorderColor: 'rgba(12, 140, 231, 0.5)', // brand-500/50
   },
 
   // Icons
@@ -284,7 +283,7 @@ export const components = {
 
 export const gradients = {
   // Primary CTA gradient
-  primaryCta: 'linear-gradient(to right, #06b6d4, #3b82f6)', // cyan-500 to blue-500
+  primaryCta: 'linear-gradient(to right, #0c8ce7, #3b82f6)', // brand-500 to blue-500
 
   // Secondary gradient (emerald)
   secondaryCta: 'linear-gradient(to right, #10b981, #14b8a6)', // emerald-500 to teal-500
